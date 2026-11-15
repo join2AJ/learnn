@@ -1,6 +1,10 @@
 /** Shown once after each update ("What's new"). Newest first. */
-export const APP_VERSION = "3.0";
+export const APP_VERSION = "3.1";
 export const CHANGELOG: { v: string; date: string; items: [string, string][] }[] = [
+  { v: "3.1", date: "16 Nov 2026", items: [
+    ["compass", "Map of Japan (Explore): 47 prefectures in 8 regions - tap to hear names in Japanese, see the capital and what each is famous for (English & Hindi), zoom into regions, big-city tips and phrases."],
+    ["target", "New game: “Find the prefecture” on the map."],
+  ] },
   { v: "3.0", date: "16 Nov 2026", items: [
     ["layers", "Topic packs (food, travel, family… 15 themes) and JLPT N5–N1 packs - browse and study each as flashcards."],
     ["flag", "Personal goal: e.g. 600 words by February for your trip, with the words per day you need."],

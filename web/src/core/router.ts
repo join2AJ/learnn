@@ -39,7 +39,7 @@ export function sectionOf(parts: string[]): string {
     kana: "Alphabet", scripts: "Alphabet", write: "Writing", pron: "Pronunciation", grammar: "Grammar", verbs: "Grammar",
     words: "Vocabulary", sentences: "Vocabulary", topics: "Vocabulary", phrases: "Phrases", cards: "Flashcards", quiz: "Quizzes", speak: "Speaking", lab: "Sound Lab",
     culture: "Culture", roadmap: "Roadmap", resources: "Resources", me: "Stats", settings: "Settings",
-    recordings: "Speaking", writing: "Writing", privacy: "Settings", policy: "Settings", backup: "Settings", support: "Settings",
+    recordings: "Speaking", writing: "Writing", privacy: "Settings", map: "Culture", policy: "Settings", backup: "Settings", support: "Settings",
     learn: "Learn hub", practice: "Practice hub", explore: "Explore hub",
   };
   if ((a === "learn" || a === "practice" || a === "explore" || a === "me") && b && map[b]) return map[b];

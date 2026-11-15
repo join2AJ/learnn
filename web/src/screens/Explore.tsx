@@ -9,12 +9,14 @@ import { checkTask, phaseProgress } from "../core/path";
 import { usePack } from "../pack";
 import { Bar, Header, Jp, Say, Seg } from "../ui/kit";
 import { Icon, IconTile, LangPill } from "../ui/icons";
+import JapanMap from "./JapanMap";
 
 export default function Explore({ route }: { route: Route }) {
   const [, sub, id] = route.parts;
   if (sub === "culture") return id ? <CultureView id={id} /> : <CultureList />;
   if (sub === "roadmap") return <Roadmap />;
   if (sub === "resources") return <Resources />;
+  if (sub === "map") return <JapanMap />;
   return <Hub />;
 }
 
@@ -34,6 +36,14 @@ function Hub() {
         <div style={{ fontSize: 20, fontWeight: 800, margin: "2px 0 8px" }}>{cur.ph.title}</div>
         <Bar pct={cur.pct} white />
         <div className="xs mu mt4">{cur.done}/{cur.total} auto-checked tasks · tap for the full timeline</div>
+      </button>
+
+      <button className="card tap mt12" style={{ padding: 0, overflow: "hidden" }} onClick={() => go("/explore/map")}>
+        <div className="row" style={{ padding: 14 }}>
+          <span style={{ width: 52, height: 52, borderRadius: 16, display: "grid", placeItems: "center", background: "var(--shu-soft)", color: "var(--shu)", fontSize: 26, fontFamily: "var(--jp-serif)", fontWeight: 800 }}>日</span>
+          <div className="grow"><div style={{ fontWeight: 800 }}>Map of Japan · 日本地図</div><div className="sm mu">47 prefectures, 8 regions, big cities - tap to hear names, play “Find the prefecture”</div></div>
+          <ArrowRight size={18} />
+        </div>
       </button>
 
       <div className="section-title"><h2>Know the people · 日本の文化</h2><span className="mu">{Object.keys(p.culturesRead).length}/{pk.culture.length} read</span></div>
