@@ -1,6 +1,6 @@
 # Nihongo Path — learn Japanese fast (Android)
 
-**Install:** download [`release/NihongoPath-v2.0.apk`](release/NihongoPath-v2.0.apk) to your phone, open it and allow "install unknown apps". Android 7.0+.
+**Install:** download [`release/NihongoPath-v2.1.apk`](release/NihongoPath-v2.1.apk) to your phone, open it and allow "install unknown apps". Android 7.0+.
 
 A beginner-first Japanese course with English **and Hindi** explanations:
 
@@ -11,6 +11,8 @@ A beginner-first Japanese course with English **and Hindi** explanations:
 | **Practice** | Spaced-repetition flashcards · 8 quiz types (kana, listening, meaning, reverse, particles, sentence builder, verb forms) · **Speak aloud** with speech recognition · **Writing pad** with shape scoring · **Sound Lab**: live spectrogram, your vowels plotted against Japanese/English/Hindi formant targets, reference "sound shapes", pitch-accent tracker |
 | **Explore** | Culture (values, what people love / dislike, etiquette do's & don'ts, communication, Japan–India links, festivals) · roadmap with auto-ticking tasks + personal timeline + JLPT table · YouTube channels & resources |
 | **Me** | Total time, time per section, 14-day chart, 10-week heatmap, accuracy, mastery bars, 21 badges · Settings (Hindi/romaji, voice speed, theme, goals, backup/restore) |
+
+**New in 2.1:** guided first-run (name, age, why you're learning, daily time) with a 30-day **pledge** and promise-keeping badges (3/7/21/30 days) · app tour (the ? on Home) · "Today's plan" checklist · 🎙 **record & compare** on any word: your spectrogram vs a synthesized reference, low/mid/high energy balance, loudness, pace and melody, with history in Me · every Japanese snippet in lessons, tables and culture notes is tap-to-hear.
 
 Rewards: XP and levels (初心者 → 伝説), streaks, daily-goal bonus, badges, confetti and spoken praise (すごい！よくできました！).
 
