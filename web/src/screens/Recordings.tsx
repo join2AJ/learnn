@@ -116,7 +116,7 @@ export default function Recordings() {
                     </button>
                     <button className="grow" style={{ textAlign: "left", minWidth: 0 }} onClick={() => emitUi({ type: "voice", text: r.w, ro: w?.ro, en: w?.m, reviewT: r.t })}>
                       <div className="jp" style={{ fontWeight: 700, fontSize: 17, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.w}</div>
-                      <div className="xs mu">{d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · {Math.round(r.db)} dB · {r.dur.toFixed(1)}s · {r.f0[0] ? Math.round(r.f0[0]) + "–" + Math.round(r.f0[1]) + " Hz" : "no pitch"}{has ? "" : " · no sound saved (before v2.4)"}</div>
+                      <div className="xs mu">{d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · {Math.round(r.db)} dB · {r.dur.toFixed(1)}s · {r.f0[0] ? Math.round(r.f0[0]) + "–" + Math.round(r.f0[1]) + " Hz" : "no pitch"}{r.match !== undefined ? " · words " + Math.round(r.match * 100) + "%" : ""}{r.heard ? " · heard 「" + r.heard + "」" : ""}{has ? "" : " · no sound saved (before v2.4)"}</div>
                       <div className="row mt4" style={{ gap: 3 }}>
                         {r.bands.map((b, i) => <div key={i} title={["Low", "Mid", "High"][i]} style={{ height: 5, width: b * 120, borderRadius: 3, background: ["var(--ai)", "var(--gold)", "var(--shu)"][i], opacity: 0.8 }} />)}
                       </div>

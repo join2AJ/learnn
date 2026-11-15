@@ -4,6 +4,8 @@ import { dayKey, emitUi, exportAll, importAll, resetProgress, setSettings, toast
 import { appVersion, openExternal, openTtsSettings, speak, ttsStatus } from "../core/native";
 import { PACKS } from "../packs/registry";
 import { usePack } from "../pack";
+import { contentStats } from "../core/contentStats";
+import { APP_VERSION } from "../changelog";
 import { Header, Seg, Switch, tap } from "../ui/kit";
 
 export default function Settings() {
@@ -64,6 +66,7 @@ export default function Settings() {
         </Row>
         <Row t="Edit profile" d={[s.age, (s.reasons || []).join(", ")].filter(Boolean).join(" · ") || "Name, age, reasons"}><button className="btn sm" onClick={() => setSettings({ profiled: false })}>Edit</button></Row>
         <Row t="App tour" d="How to use each tab"><button className="btn sm" onClick={() => emitUi({ type: "tour" })}>Show</button></Row>
+        <Row t="What’s new" d={"Changes in v" + APP_VERSION + " and earlier"}><button className="btn sm" onClick={() => emitUi({ type: "whatsnew" })}>Show</button></Row>
       </div>
 
       <div className="section-title"><h2>Backup</h2></div>
@@ -78,9 +81,21 @@ export default function Settings() {
           : <div className="row mt12"><button className="btn grow" onClick={() => setConfirm(false)}>Cancel</button><button className="btn primary grow" onClick={() => { resetProgress(); setConfirm(false); toast("Progress reset"); }}>Yes, reset</button></div>}
       </div>
 
+      <div className="section-title"><h2>What’s inside</h2><span className="mu">{pk.name} pack</span></div>
+      {(() => { const c = contentStats(pk); const items: [string, string][] = [
+        ["Core words", c.words.toLocaleString()], ["Example sentences", c.sentences.toLocaleString()], ["Hindi translations", c.hindi.toLocaleString()],
+        ["Grammar lessons", c.lessons + " in " + c.units + " units"], ["Core grammar words", String(c.coreGrammar)], ["Lesson quiz questions", String(c.lessonQuiz)],
+        ["Survival phrases", c.phrases + " in " + c.phraseGroups + " topics"], ["Hiragana / Katakana", c.hiragana + " / " + c.katakana], ["Starter kanji", String(c.kanji)],
+        ["Stroke-order characters", String(c.strokeChars)], ["Memory tricks", String(c.mnemonics)], ["Verbs to conjugate", c.verbs + " × 20 forms = " + c.verbForms.toLocaleString()],
+        ["Culture insights", c.cultureItems + " in " + c.culture + " sections"], ["Pronunciation rules", String(c.pron)], ["Sound Lab references", c.sounds + " sounds · " + c.vowels + " vowels · " + c.pitchWords + " pitch words"],
+        ["Quiz types", c.quizTypes + " (+" + (c.sentenceBuilder + c.particleQuiz) + " builder/particle items)"], ["Badges", String(c.badges)], ["Videos & resources", c.resources + " (" + c.youtube + " YouTube)"],
+      ]; return (
+        <div className="list">{items.map(([k, v]) => <div key={k} className="li" style={{ padding: "11px 16px" }}><span className="grow sm" style={{ fontWeight: 600 }}>{k}</span><span className="sm" style={{ fontWeight: 800 }}>{v}</span></div>)}
+          <div className="li" style={{ display: "block" }}><div className="xs mu">Words by type: {Object.entries(c.types).sort((a, b) => b[1] - a[1]).map(([t, n]) => t + " " + n).join(" · ")}</div></div></div>); })()}
+
       <div className="section-title"><h2>About</h2></div>
       <div className="card sm" style={{ lineHeight: 1.6 }}>
-        <div><b>Nihongo Path</b> · v2.6 ({appVersion()})</div>
+        <div><b>Nihongo Path</b> · v{APP_VERSION} ({appVersion()})</div>
         <div className="mu mt4">Built as a multi-language engine: each language is a content pack (scripts, words, grammar, culture, sounds). Japanese is the first pack.</div>
         <div className="mu mt8">Credits: stroke order from <a onClick={() => openExternal("https://kanjivg.tagaini.net")}>KanjiVG</a> (CC BY-SA 3.0, Ulrich Apel). Word ranks from Mindomax (OpenSubtitles + Tatoeba) and the wordfreq project. Example sentences were AI-written and reviewed; treat them as study material. Formant values are rounded literature averages.</div>
       </div>

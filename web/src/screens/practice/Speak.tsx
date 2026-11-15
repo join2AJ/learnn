@@ -3,7 +3,10 @@ import { AudioLines, Mic, SkipForward, ThumbsUp } from "lucide-react";
 import { go } from "../../core/router";
 import { bumpDay, updateProgress, useProgress, useSettings } from "../../core/store";
 import { award } from "../../core/rewards";
-import { listen, speak, speechSupported, stopListening } from "../../core/native";
+import { asrUnsupported, captureNative, captureSupported, listen, speak, speechSupported, stopListening } from "../../core/native";
+import { analyzeAndSave } from "../../core/voiceAnalysis";
+import { expectedDuration } from "../../core/dsp";
+import { emitUi } from "../../core/store";
 import { usePack } from "../../pack";
 import { matchScore } from "../../core/match";
 import { Header, pick, Say, Seg, shuffle, tap } from "../../ui/kit";
@@ -22,26 +25,49 @@ export default function Speak() {
   const [idx, setIdx] = useState(0);
   const [state, setState] = useState<"idle" | "listening" | "done">("idle");
   const [heard, setHeard] = useState<string[]>([]);
+  const [savedT, setSavedT] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [err, setErr] = useState("");
   const item = items[idx % items.length];
   const supported = speechSupported();
 
   useEffect(() => () => stopListening(), []);
-  useEffect(() => { setState("idle"); setHeard([]); setErr(""); }, [idx, mode]);
+  useEffect(() => { setState("idle"); setHeard([]); setErr(""); setSavedT(null); }, [idx, mode]);
 
-  const start = () => {
-    tap(20); setErr(""); setHeard([]); setState("listening");
+  /** Score what was heard; when we also have the audio, save it to My recordings with full analysis. */
+  const finish = async (texts: string[], audio?: { pcm: Float32Array; sr: number }) => {
+    setHeard(texts);
+    const sc = matchScore(texts, item.alt);
+    setScore(sc); setState("done");
+    const ok = sc >= 0.75;
+    updateProgress((x) => { x.speak = { ok: x.speak.ok + (ok ? 1 : 0), tries: x.speak.tries + 1 }; if (!audio) bumpDay(x, (d) => { d.spoke = (d.spoke || 0) + 1; }); });
+    if (ok) { award(8); speak(pick(pk.praise).jp, { lang: pk.ttsLang }); }
+    if (audio) {
+      const rec = await analyzeAndSave(item.jp, item.ro, audio.pcm, audio.sr, { match: sc, heard: texts[0] || "" });
+      if (rec) setSavedT(rec.t);
+    }
+  };
+
+  const start = async () => {
+    tap(20); setErr(""); setHeard([]); setSavedT(null); setState("listening");
+    if (captureSupported()) {
+      // one recording: audio for My recordings + the same audio checked by speech recognition
+      const ms = Math.round(Math.min(6, Math.max(2.5, expectedDuration(item.ro) * 1.8 + 1)) * 1000);
+      const c = await captureNative(pk.ttsLang, ms);
+      if (!c.pcm) { setErr("Microphone is not available."); setState("idle"); return; }
+      if (!asrUnsupported(c)) { if (c.texts && c.texts.length) finish(c.texts, { pcm: c.pcm, sr: c.sr }); else { setErr("no-speech"); setState("idle"); } return; }
+      // this phone can't recognise our recording: keep the audio, ask once more for the word check
+      setHeard(["(say it once more to check the words)"]);
+      listen(pk.ttsLang, (e) => {
+        if (e.type === "result" && e.texts) finish(e.texts, { pcm: c.pcm!, sr: c.sr });
+        else if (e.type === "error") { setErr(String(e.error || "Didn’t catch that")); setState("idle"); }
+      });
+      return;
+    }
     listen(pk.ttsLang, (e) => {
       if (e.type === "partial" && e.texts) setHeard(e.texts);
-      else if (e.type === "result" && e.texts) {
-        setHeard(e.texts);
-        const sc = matchScore(e.texts, item.alt);
-        setScore(sc); setState("done");
-        const ok = sc >= 0.75;
-        updateProgress((x) => { x.speak = { ok: x.speak.ok + (ok ? 1 : 0), tries: x.speak.tries + 1 }; bumpDay(x, (d) => { d.spoke = (d.spoke || 0) + 1; }); });
-        if (ok) { award(8); speak(pick(pk.praise).jp, { lang: pk.ttsLang }); }
-      } else if (e.type === "error") { setErr(String(e.error || "Didn’t catch that")); setState("idle"); }
+      else if (e.type === "result" && e.texts) finish(e.texts);
+      else if (e.type === "error") { setErr(String(e.error || "Didn’t catch that")); setState("idle"); }
       else if (e.type === "end") setState((st) => (st === "listening" ? "idle" : st));
     });
   };
@@ -74,6 +100,7 @@ export default function Speak() {
           <div className="kicker">I heard</div>
           <div className="jp lg" style={{ fontWeight: 700 }}>{heard[0]}</div>
           {state === "done" && <div className="mt8"><b>{ok ? "✓ " + pick(pk.praise).jp + " Match " + Math.round(score * 100) + "%" : "Close - " + Math.round(score * 100) + "% match. Listen again and copy the rhythm."}</b></div>}
+          {state === "done" && savedT && <button className="btn sm mt8" onClick={() => emitUi({ type: "voice", text: item.jp, ro: item.ro, en: item.en, reviewT: savedT })}>Saved to My recordings · open analysis →</button>}
         </div>
       )}
       {err && <div className="feedback bad"><b>Didn’t catch that.</b><div className="sm">{err === "no-speech" || err.includes("7") ? "No speech detected - try again a bit louder." : err}</div></div>}

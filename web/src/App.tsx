@@ -7,6 +7,8 @@ import { setNativeTheme, setWarn, speak } from "./core/native";
 import { Confetti, Sheet, tap } from "./ui/kit";
 import VoiceCompare from "./ui/VoiceCompare";
 import Tour from "./screens/Tour";
+import WhatsNew from "./screens/WhatsNew";
+import { APP_VERSION } from "./changelog";
 import { usePack } from "./pack";
 import { dueCount } from "./core/srs";
 import Home from "./screens/Home";
@@ -36,6 +38,7 @@ export default function App() {
   const [confetti, setConfetti] = useState(0);
   const [voice, setVoice] = useState<Extract<UiEvent, { type: "voice" }> | null>(null);
   const [tour, setTour] = useState(false);
+  const [news, setNews] = useState(false);
 
   useEffect(() => { startTracker(); setWarn((m) => toast(m, "warn")); }, []);
   useEffect(() => { setSection(sectionOf(route.parts)); window.scrollTo(0, 0); setVoice(null); }, [route.path]);
@@ -57,6 +60,7 @@ export default function App() {
     if (e.type === "toast") { setToast({ text: e.text, tone: e.tone }); window.setTimeout(() => setToast(null), 3200); }
     else if (e.type === "voice") setVoice(e);
     else if (e.type === "tour") setTour(true);
+    else if (e.type === "whatsnew") setNews(true);
     else if (e.type === "xp") { setXp({ n: e.amount, k: Date.now() }); window.setTimeout(() => setXp(null), 1600); }
     else if (e.type === "celebrate") {
       setCele(e); setConfetti((c) => c + 1); tap(30);
@@ -96,7 +100,8 @@ export default function App() {
       {xp && <div className="xp-pop" key={xp.k}>+{xp.n} XP</div>}
       <Confetti run={confetti} />
       <Sheet open={!!voice} onClose={() => setVoice(null)}>{voice && <VoiceCompare key={voice.text + (voice.reviewT || "")} text={voice.text} ro={voice.ro} en={voice.en} reviewT={voice.reviewT} />}</Sheet>
-      {(tour || !settings.toured) && !cele && <Tour onDone={() => { setTour(false); if (!settings.toured) setSettings({ toured: true }); }} />}
+      {(news || (settings.toured && settings.seenVersion !== APP_VERSION)) && !cele && !tour && <WhatsNew since={news ? "" : settings.seenVersion} onDone={() => { setNews(false); setSettings({ seenVersion: APP_VERSION }); }} />}
+      {(tour || !settings.toured) && !cele && <Tour onDone={() => { setTour(false); if (!settings.toured) setSettings({ toured: true, seenVersion: APP_VERSION }); }} />}
       {cele && (<>
         <div className="scrim" style={{ zIndex: 89 }} onClick={() => setCele(null)} />
         <div className="modal" role="dialog">

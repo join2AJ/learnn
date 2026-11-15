@@ -1,6 +1,6 @@
 # Nihongo Path - learn Japanese fast (Android)
 
-**Install:** download [`release/NihongoPath-v2.6.apk`](release/NihongoPath-v2.6.apk) to your phone, open it and allow "install unknown apps". Android 7.0+.
+**Install:** download [`release/NihongoPath-v2.7.apk`](release/NihongoPath-v2.7.apk) to your phone, open it and allow "install unknown apps". Android 7.0+.
 
 A beginner-first Japanese course with English **and Hindi** explanations:
 
@@ -15,6 +15,26 @@ A beginner-first Japanese course with English **and Hindi** explanations:
 **New in 2.1:** guided first-run (name, age, why you're learning, daily time) with a 30-day **pledge** and promise-keeping badges (3/7/21/30 days) · app tour (the ? on Home) · "Today's plan" checklist · 🎙 **record & compare** on any word: your spectrogram vs a synthesized reference, low/mid/high energy balance, loudness, pace and melody, with history in Me · every Japanese snippet in lessons, tables and culture notes is tap-to-hear.
 
 Rewards: XP and levels (初心者 → 伝説), streaks, daily-goal bonus, badges, confetti and spoken praise (すごい！よくできました！).
+
+## What's inside (Japanese pack)
+
+| Content | Count |
+|---|---|
+| Core words (frequency-ranked, with Hindi) | 1,000 |
+| Example sentences | 1,214 |
+| Hindi translations | 1,200 |
+| Grammar lessons / units / quiz questions | 25 / 5 / 75 |
+| Core grammar words | 30 |
+| Survival phrases (8 topics) | 49 |
+| Hiragana / katakana (incl. voiced + combos) | 104 / 104 |
+| Starter kanji | 60 |
+| Characters with stroke order | 482 |
+| Memory tricks | 92 |
+| Verbs × 20 forms | 175 × 20 = 3,500 |
+| Culture insights (8 sections) | 57 |
+| Pronunciation rules | 9 |
+| Quiz types / badges | 8 / 30 |
+| Videos & resources (15 YouTube) | 29 |
 
 ## Project layout
 

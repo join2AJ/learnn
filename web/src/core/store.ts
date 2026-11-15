@@ -18,11 +18,12 @@ export interface Settings {
   age: string;
   reasons: string[];
   pledge: { min: number; start: string; days: number } | null;
+  seenVersion: string;
 }
 
 export interface SrsCard { due: number; ivl: number; ease: number; reps: number; lapses: number; last: number; }
 /** Summary of one voice recording (audio itself is not stored). */
-export interface VoiceRec { t: number; w: string; bands: [number, number, number]; ref: [number, number, number]; db: number; dur: number; exp: number; f0: [number, number]; score: number; match?: number; }
+export interface VoiceRec { t: number; w: string; bands: [number, number, number]; ref: [number, number, number]; db: number; dur: number; exp: number; f0: [number, number]; score: number; match?: number; heard?: string; }
 export interface DayStat { ms: number; sec: Record<string, number>; xp: number; reviews: number; correct: number; wrong: number; learned: number; spoke?: number; }
 
 export interface Progress {
@@ -48,7 +49,7 @@ export interface Progress {
 
 const defSettings: Settings = {
   lang: "ja", name: "", onboarded: false, showHindi: true, showRomaji: true, rate: 0.9,
-  theme: "auto", dailyGoalMin: 20, newPerDay: 15, haptics: true, autoplay: true, profiled: false, toured: false, age: "", reasons: [], pledge: null,
+  theme: "auto", dailyGoalMin: 20, newPerDay: 15, haptics: true, autoplay: true, profiled: false, toured: false, age: "", reasons: [], pledge: null, seenVersion: "",
 };
 const defProgress = (): Progress => ({
   xp: 0, known: [], kana: {}, lessons: {}, srs: {}, badges: {}, quiz: { correct: 0, wrong: 0, best: 0 },
@@ -136,7 +137,8 @@ export type UiEvent =
   | { type: "xp"; amount: number }
   | { type: "celebrate"; title: string; sub: string; jp?: string; icon?: string }
   | { type: "voice"; text: string; ro?: string; en?: string; reviewT?: number }
-  | { type: "tour" };
+  | { type: "tour" }
+  | { type: "whatsnew" };
 const ui = new Set<(e: UiEvent) => void>();
 export const onUi = (f: (e: UiEvent) => void) => { ui.add(f); return () => { ui.delete(f); }; };
 export const emitUi = (e: UiEvent) => ui.forEach((f) => f(e));

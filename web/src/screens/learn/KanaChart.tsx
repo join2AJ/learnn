@@ -19,9 +19,12 @@ export default function KanaChart({ id }: { id: string }) {
   const alpha = pk.alphabets.find((a) => a.id === id) || pk.alphabets[0];
   const all = alpha.groups.flatMap((g) => g.rows.flatMap((r) => r.cells.filter(Boolean) as LetterCell[]));
   const mastered = all.filter((c) => isMastered(p.kana[c.ch])).length;
-  // "Today" = the first row that still has an unmastered character
-  let todayRow = "";
-  if (alpha.id !== "kanji") for (const g of alpha.groups) { const ri = g.rows.findIndex((r) => r.cells.some((c) => c && !isMastered(p.kana[c.ch]))); if (ri >= 0) { todayRow = g.id + ri; break; } }
+  // NEXT = first row with an unmastered character; TODAY = your calendar day of the 7-day kana plan
+  let todayRow = "", nextDay = 0;
+  if (alpha.id !== "kanji") for (const g of alpha.groups) { const ri = g.rows.findIndex((r) => r.cells.some((c) => c && !isMastered(p.kana[c.ch]))); if (ri >= 0) { todayRow = g.id + ri; nextDay = parseInt(g.rows[ri].label.replace(/^.*Day /, "")) || 0; break; } }
+  const startD = new Date(p.started); startD.setHours(0, 0, 0, 0);
+  const now0 = new Date(); now0.setHours(0, 0, 0, 0);
+  const planDay = Math.round((now0.getTime() - startD.getTime()) / 86_400_000) + 1 + (alpha.id === "kata" ? -7 : 0);
   const idx = sel ? all.findIndex((c) => c.ch === sel.ch) : -1;
   const step = (d: number) => { const c = all[(idx + d + all.length) % all.length]; tap(); setSel(c); speak(c.ch, { lang: pk.ttsLang, rate: s.rate }); };
 
@@ -34,6 +37,12 @@ export default function KanaChart({ id }: { id: string }) {
         <button className="btn sm grow" onClick={() => go("/practice/write?set=" + alpha.id)}><PenLine size={16} /> Writing</button>
       </div>
       <div className="sm mu mt12" style={{ lineHeight: 1.5 }}>{alpha.blurb}</div>
+      {alpha.id !== "kanji" && nextDay > 0 && (
+        <div className="card flat mt12" style={{ padding: "10px 12px" }}>
+          <div className="sm"><b>Plan day {Math.max(1, planDay)}</b> of the 7-day {alpha.name.toLowerCase()} plan · next to learn: <b style={{ color: "var(--shu)" }}>Day {nextDay} rows</b></div>
+          <div className="xs mu mt4">{nextDay > Math.max(1, planDay) ? "You’re ahead of schedule - great! Keep going or review." : nextDay < Math.max(1, planDay) ? "A little behind the plan - a few minutes today will catch you up." : "Right on schedule."} The plan day changes at midnight; NEXT moves when you master a row in quizzes.</div>
+        </div>
+      )}
 
       {alpha.groups.map((g, gi) => (
         <div key={g.id}>
@@ -41,7 +50,7 @@ export default function KanaChart({ id }: { id: string }) {
           <div className="kgrid">
             {g.rows.map((r, ri) => (
               <div key={ri} className="krow" style={{ gridTemplateColumns: (r.label ? "26px " : "") + `repeat(${g.cols}, 1fr)`, ...(todayRow === g.id + ri ? { outline: "2px solid var(--shu)", outlineOffset: 3, borderRadius: 16 } : {}) }}>
-                {r.label && <DayLabel label={r.label} today={todayRow === g.id + ri} />}
+                {r.label && <DayLabel label={r.label} next={todayRow === g.id + ri} planDay={planDay} />}
                 {r.cells.map((c, ci) => c ? (
                   <button key={ci} className={"kcell" + (alpha.id === "kanji" ? " kanji" : "") + (isMastered(p.kana[c.ch]) ? " m" : "")}
                     onClick={() => { tap(); setSel(c); speak(alpha.id === "kanji" ? c.ch : c.ch, { lang: pk.ttsLang, rate: s.rate }); }}>
@@ -121,13 +130,15 @@ function CellDetail({ c, alphaId, mnemonic, onStep, pos }: { c: LetterCell; alph
 const DAY_COL = ["var(--shu)", "var(--ai)", "var(--plum)", "var(--matcha)"];
 const DAYS = ["var(--shu)", "#e8793a", "var(--gold)", "var(--matcha)", "var(--ai)", "var(--plum)", "var(--sakura)"];
 /** Row label as a coloured "Day N" pill; today's row is highlighted. */
-function DayLabel({ label, today }: { label: string; today: boolean }) {
+function DayLabel({ label, next, planDay }: { label: string; next: boolean; planDay: number }) {
   const [row, day] = label.split(" · ");
   const n = parseInt((day || "").replace(/\D/g, "")) || 1;
+  const today = n === Math.max(1, Math.min(7, planDay));
   const col = DAYS[(n - 1) % DAYS.length];
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3 }}>
-      <span style={{ writingMode: "vertical-rl", transform: "rotate(180deg)", fontSize: 10, fontWeight: 800, color: "#fff", background: col, borderRadius: 8, padding: "6px 3px", letterSpacing: ".04em" }}>{today ? "TODAY" : (day || "").toUpperCase()}</span>
+      <span style={{ writingMode: "vertical-rl", transform: "rotate(180deg)", fontSize: 10, fontWeight: 800, color: "#fff", background: col, borderRadius: 8, padding: "6px 3px", letterSpacing: ".04em" }}>{(day || "").toUpperCase()}</span>
+      {(today || next) && <span style={{ fontSize: 8, fontWeight: 900, color: next ? "var(--shu)" : "var(--matcha)", letterSpacing: ".04em" }}>{next ? "NEXT" : "TODAY"}</span>}
       <span style={{ fontSize: 10, fontWeight: 800, color: "var(--ink-3)" }}>{row}</span>
     </div>
   );
