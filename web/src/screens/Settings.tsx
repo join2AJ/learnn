@@ -23,7 +23,7 @@ export default function Settings() {
       <div className="list">
         {PACKS.map((x) => (
           <button key={x.id} className="li" disabled={x.status !== "ready"} style={{ opacity: x.status === "ready" ? 1 : .5 }} onClick={() => { tap(); setSettings({ lang: x.id }); }}>
-            <span className="ico soft-gold" style={{ fontSize: 22 }}>{x.flag}</span>
+            <span className="ico soft-gold jp" style={{ fontSize: 16, fontWeight: 800, color: "var(--gold)" }}>{x.flag}</span>
             <span className="grow"><div className="t">{x.name} <span className="jp mu" style={{ fontWeight: 500 }}>{x.native}</span></div><div className="d">{x.status === "ready" ? x.tagline : "Planned — same engine, new content pack"}</div></span>
             {s.lang === x.id && <Check color="var(--matcha)" />}
           </button>
@@ -80,7 +80,7 @@ export default function Settings() {
 
       <div className="section-title"><h2>About</h2></div>
       <div className="card sm" style={{ lineHeight: 1.6 }}>
-        <div><b>Nihongo Path</b> · v2.1 ({appVersion()})</div>
+        <div><b>Nihongo Path</b> · v2.2 ({appVersion()})</div>
         <div className="mu mt4">Built as a multi-language engine: each language is a content pack (scripts, words, grammar, culture, sounds). Japanese is the first pack.</div>
         <div className="mu mt8">Credits: stroke order from <a onClick={() => openExternal("https://kanjivg.tagaini.net")}>KanjiVG</a> (CC BY-SA 3.0, Ulrich Apel). Word ranks from Mindomax (OpenSubtitles + Tatoeba) and the wordfreq project. Example sentences were AI-written and reviewed; treat them as study material. Formant values are rounded literature averages.</div>
       </div>

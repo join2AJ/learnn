@@ -9,6 +9,7 @@ import type { LetterCell } from "../../core/types";
 import { usePack } from "../../pack";
 import { Bar, Header, pick, Say, Seg, tap } from "../../ui/kit";
 import { RecBtn } from "../../ui/VoiceCompare";
+import { Icon } from "../../ui/icons";
 
 type Card = { id: string; front: string; reading?: string; romaji?: string; meaning: string; hindi?: string; s?: string; sr?: string; st?: string; speakText: string; kind: "word" | "kana" };
 
@@ -65,7 +66,7 @@ export default function Flashcards({ deck }: { deck: string }) {
         <Header title="Flashcards" backTo="/practice" />
         {deckSel}
         <div className="card hero tint-matcha center mt16">
-          <div style={{ fontSize: 54 }}>🎉</div>
+          <div style={{ display: "grid", placeItems: "center" }}><Icon name="party" size={52} /></div>
           <div className="jp" style={{ fontSize: 26, fontWeight: 800 }}>{pr.jp}</div>
           <div style={{ fontWeight: 800, fontSize: 20 }}>{total ? "Session complete" : "Nothing due right now"}</div>
           <div className="sm mu mt4">{total ? stats.done + " cards reviewed · " + stats.again + " to relearn" : "Come back later — reviews appear right before you’d forget."}</div>

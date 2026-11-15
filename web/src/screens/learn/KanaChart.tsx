@@ -85,7 +85,7 @@ function CellDetail({ c, alphaId, mnemonic }: { c: LetterCell; alphaId: string; 
           <div className="kicker">{alphaId === "kanji" ? "Kanji" : alphaId === "kata" ? "Katakana" : "Hiragana"}</div>
           <div style={{ fontSize: 30, fontWeight: 800, lineHeight: 1.1 }}>{c.rom}</div>
           {s.showHindi && c.hint && <div className="hi lg">{c.hint}</div>}
-          {stat && <div className="xs mu mt4">Quiz: {stat.c} right · {stat.w} wrong {isMastered(stat) ? "· ✅ mastered" : ""}</div>}
+          {stat && <div className="xs mu mt4">Quiz: {stat.c} right · {stat.w} wrong {isMastered(stat) ? "· mastered ✓" : ""}</div>}
         </div>
         <div className="row gap6"><Say text={c.ch} /><RecBtn text={c.ch} ro={c.rom} size="m" /></div>
       </div>

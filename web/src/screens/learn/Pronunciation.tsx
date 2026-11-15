@@ -6,6 +6,7 @@ import { openExternal } from "../../core/native";
 import { usePack } from "../../pack";
 import { Header, Jp, Say } from "../../ui/kit";
 import { RecBtn } from "../../ui/VoiceCompare";
+import { LangPill } from "../../ui/icons";
 
 export default function Pronunciation() {
   const pk = usePack();
@@ -23,8 +24,8 @@ export default function Pronunciation() {
           <div className="row"><span className="tag" style={{ background: "var(--shu)", color: "#fff" }}>{i + 1}</span><div style={{ fontWeight: 800, fontSize: 16 }}>{t.title}</div></div>
           <div className="prose sm mt8"><Jp text={t.text} /></div>
           <div className="cmp mt8">
-            <div style={{ background: "var(--ai-soft)" }}><span className="flag">🇬🇧</span><span><Jp text={t.en} /></span></div>
-            {s.showHindi && <div style={{ background: "var(--gold-soft)" }}><span className="flag">🇮🇳</span><span><Jp text={t.hi} /></span></div>}
+            <div style={{ background: "var(--ai-soft)" }}><LangPill l="en" /><span><Jp text={t.en} /></span></div>
+            {s.showHindi && <div style={{ background: "var(--gold-soft)" }}><LangPill l="hi" /><span><Jp text={t.hi} /></span></div>}
           </div>
           <div className="mt8">
             {t.examples.map((e) => (

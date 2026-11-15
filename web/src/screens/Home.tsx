@@ -9,6 +9,7 @@ import { pendingMs } from "../core/timeTracker";
 import { usePack } from "../pack";
 import { Bar, Jp, Ring, Say, tap } from "../ui/kit";
 import { RecBtn } from "../ui/VoiceCompare";
+import { Icon, IconTile, LangPill } from "../ui/icons";
 
 const hash = (s: string) => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
 
@@ -36,7 +37,7 @@ export default function Home() {
           <div className="sm mu">{g.ro} · {g.en}</div>
         </div>
         <button className="icon-btn ghost" aria-label="How to use this app" onClick={() => emitUi({ type: "tour" })}><HelpCircle size={22} /></button>
-        <button className="chip" onClick={() => go("/me")} aria-label="Streak"><span className="streak-flame">🔥</span><b>{p.streak.count}</b></button>
+        <button className="chip" onClick={() => go("/me")} aria-label="Streak"><Icon name="flame" size={18} color="#ff7a3d" /><b>{p.streak.count}</b></button>
       </div>
 
       {/* Hero: goal + level + next step */}
@@ -118,10 +119,10 @@ export default function Home() {
       {/* Culture tip */}
       <div className="section-title"><h2>Culture tip</h2><button className="sm" style={{ color: "var(--shu)", fontWeight: 700 }} onClick={() => go("/explore")}>More</button></div>
       <div className="card soft-sakura" style={{ boxShadow: "none" }}>
-        <div className="kicker">{tip.icon} {tip.sec}</div>
+        <div className="kicker row gap6"><Icon name={tip.icon} size={14} /> {tip.sec}</div>
         <div style={{ fontWeight: 800, fontSize: 16, marginTop: 4 }}>{tip.title} {tip.jp && <span className="mu" style={{ fontWeight: 500, fontSize: 14 }}><Jp text={tip.jp} /></span>}</div>
         <div className="sm mt4" style={{ lineHeight: 1.55 }}><Jp text={tip.text} /></div>
-        {tip.india && s.showHindi && <div className="sm mt8" style={{ lineHeight: 1.5 }}>🇮🇳 {tip.india}</div>}
+        {tip.india && s.showHindi && <div className="sm mt8 row top" style={{ lineHeight: 1.5, gap: 8 }}><LangPill l="hi" /><span><Jp text={tip.india} /></span></div>}
       </div>
 
       <div className="card flat mt12" style={{ background: "transparent" }}>
@@ -162,7 +163,7 @@ function TodayPlan() {
       </div>
       {ps && (
         <div className="soft-gold mt8" style={{ borderRadius: 14, padding: "10px 12px" }}>
-          <div className="row"><span style={{ fontSize: 20 }}>🤝</span><div className="grow"><div className="sm" style={{ fontWeight: 800 }}>Your pledge · day {ps.day} of {ps.days}</div><div className="xs mu">{ps.min} min a day · kept {ps.kept} day{ps.kept === 1 ? "" : "s"} · current run {gs.cur}</div></div></div>
+          <div className="row"><IconTile name="handshake" tone="gold" size={34} icon={18} /><div className="grow"><div className="sm" style={{ fontWeight: 800 }}>Your pledge · day {ps.day} of {ps.days}</div><div className="xs mu">{ps.min} min a day · kept {ps.kept} day{ps.kept === 1 ? "" : "s"} · current run {gs.cur}</div></div></div>
           <div className="row mt8" style={{ gap: 3, flexWrap: "wrap" }}>
             {Array.from({ length: ps.days }, (_, i) => { const dt = new Date(ps.start + "T12:00:00"); dt.setDate(dt.getDate() + i); const k = dayKey(dt); const hit = p.goalHit[k]; const past = i < ps.day - 1; return <i key={i} style={{ width: 8, height: 8, borderRadius: 3, display: "block", background: hit ? "var(--matcha)" : past ? "var(--shu)" : i === ps.day - 1 ? "var(--gold)" : "var(--line-2)", opacity: hit || past ? 1 : 0.7 }} />; })}
           </div>

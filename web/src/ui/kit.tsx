@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ChevronLeft, Volume2 } from "lucide-react";
+import { ChevronLeft, Turtle, Volume2 } from "lucide-react";
 import { onSpeaking, speak, vibrate } from "../core/native";
 import { getSettings } from "../core/store";
 import { back } from "../core/router";
@@ -15,7 +15,7 @@ export function Say({ text, size = "m", rate, label, slow }: { text: string; siz
   return (
     <button aria-label={label || "Play " + text} className={"say" + (size === "s" ? " s" : "") + (on ? " on" : "")}
       onClick={(e) => { e.stopPropagation(); tap(); speak(text, { lang: pack().ttsLang, rate: slow ? 0.5 : rate ?? getSettings().rate, id }); }}>
-      {slow ? <span style={{ fontSize: size === "s" ? 14 : 17 }}>🐢</span> : <Volume2 size={size === "s" ? 15 : 18} strokeWidth={2.4} />}
+      {slow ? <Turtle size={size === "s" ? 15 : 18} strokeWidth={2.2} /> : <Volume2 size={size === "s" ? 15 : 18} strokeWidth={2.4} />}
     </button>
   );
 }

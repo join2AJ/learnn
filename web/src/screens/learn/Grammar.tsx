@@ -8,6 +8,7 @@ import type { Example, LessonBlock } from "../../core/types";
 import { usePack } from "../../pack";
 import { Bar, Header, Jp, Md, pick, Say, tap } from "../../ui/kit";
 import { RecBtn } from "../../ui/VoiceCompare";
+import { Icon, LangPill } from "../../ui/icons";
 
 export function GrammarList() {
   const pk = usePack();
@@ -55,7 +56,7 @@ export function ExampleRow({ e }: { e: Example }) {
         {s.showRomaji && <div className="r">{e.ro}</div>}
         <div className="e">{e.en}</div>
         {s.showHindi && e.hi && <div className="hi sm">{e.hi}</div>}
-        {e.note && <div className="xs mu mt4">💡 {e.note}</div>}
+        {e.note && <div className="xs mu mt4 row top gap4"><Icon name="bulb" size={13} color="var(--gold)" /><span>{e.note}</span></div>}
       </div>
       <div className="col gap6"><Say text={e.jp} size="s" /><Say text={e.jp} size="s" slow /><RecBtn text={e.jp} ro={e.ro} en={e.en} /></div>
     </div>
@@ -67,18 +68,18 @@ function Block({ b }: { b: LessonBlock }) {
   switch (b.kind) {
     case "text": return <div className="card prose">{b.title && <b>{b.title}</b>}<p><Md text={b.text!} /></p></div>;
     case "pattern": return <div className="card">{b.title && <div className="kicker">{b.title}</div>}<div className="pattern mt4"><Jp text={b.text!} /></div></div>;
-    case "tip": return <div className="card soft-gold" style={{ boxShadow: "none" }}><div className="kicker">💡 Tip</div><div className="sm mt4" style={{ lineHeight: 1.6 }}><Md text={b.text!} /></div></div>;
+    case "tip": return <div className="card soft-gold" style={{ boxShadow: "none" }}><div className="kicker row gap4"><Icon name="bulb" size={13} /> Tip</div><div className="sm mt4" style={{ lineHeight: 1.6 }}><Md text={b.text!} /></div></div>;
     case "table": return (
       <div className="card">{b.title && <div style={{ fontWeight: 800, marginBottom: 8 }}>{b.title}</div>}
         <div className="tbl-wrap"><table className="tbl"><thead><tr>{b.head!.map((h, i) => <th key={i}>{h}</th>)}</tr></thead>
           <tbody>{b.rows!.map((r, i) => <tr key={i}>{r.map((c, j) => <td key={j}><Jp text={c} /></td>)}</tr>)}</tbody></table></div></div>);
-    case "examples": return <div className="card"><div className="kicker">Examples · tap 🔊 to hear, 🐢 for slow</div>{b.examples!.map((e) => <ExampleRow key={e.jp} e={e} />)}</div>;
+    case "examples": return <div className="card"><div className="kicker">Examples · speaker to hear · turtle for slow · mic to record</div>{b.examples!.map((e) => <ExampleRow key={e.jp} e={e} />)}</div>;
     case "compare": return (
       <div className="card">{<div style={{ fontWeight: 800, marginBottom: 8 }}>{b.title || "Compare"}</div>}
         <div className="cmp">
-          <div style={{ background: "var(--ai-soft)" }}><span className="flag">🇬🇧</span><span><Jp text={b.compare!.en} /></span></div>
-          {s.showHindi && <div style={{ background: "var(--gold-soft)" }}><span className="flag">🇮🇳</span><span><Jp text={b.compare!.hi} /></span></div>}
-          <div style={{ background: "var(--shu-soft)" }}><span className="flag">🇯🇵</span><span><Jp text={b.compare!.jp} /></span></div>
+          <div style={{ background: "var(--ai-soft)" }}><LangPill l="en" /><span><Jp text={b.compare!.en} /></span></div>
+          {s.showHindi && <div style={{ background: "var(--gold-soft)" }}><LangPill l="hi" /><span><Jp text={b.compare!.hi} /></span></div>}
+          <div style={{ background: "var(--shu-soft)" }}><LangPill l="ja" /><span><Jp text={b.compare!.jp} /></span></div>
         </div></div>);
   }
   return null;
@@ -145,7 +146,7 @@ export function LessonView({ id }: { id: string }) {
         </div>
       ) : (
         <div className="card center tint-matcha">
-          <div style={{ fontSize: 44 }}>{score === l.quiz.length ? "🏆" : "✅"}</div>
+          <div style={{ display: "grid", placeItems: "center" }}><Icon name={score === l.quiz.length ? "trophy" : "check"} size={46} /></div>
           <div style={{ fontWeight: 800, fontSize: 20 }}>Lesson complete · {score}/{l.quiz.length}</div>
           <div className="sm mu mt4">Say each example out loud once more — speaking is what makes it stick.</div>
           {next ? <button className="btn white block mt16" onClick={() => go("/learn/grammar/" + next.id, true)}>Next: {next.title} <ArrowRight size={16} /></button>

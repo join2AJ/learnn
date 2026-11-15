@@ -5,9 +5,10 @@ import { checkBadges } from "../core/rewards";
 import { PACKS } from "../packs/registry";
 import { speak, vibrate } from "../core/native";
 import { Switch, tap } from "../ui/kit";
+import { Icon } from "../ui/icons";
 
 const AGES = ["Under 13", "13–17", "18–24", "25–34", "35–44", "45–59", "60+"];
-const REASONS: [string, string][] = [["travel", "✈️ Travel to Japan"], ["anime", "🎌 Anime, manga, games"], ["job", "💼 Job in Japan"], ["jlpt", "📝 Pass the JLPT"], ["study", "🎓 Study in Japan"], ["friends", "🤝 Friends or family"], ["business", "🏢 Business / clients"], ["fun", "🧠 Brain training & fun"]];
+const REASONS: [string, string, string][] = [["travel", "Travel to Japan", "plane"], ["anime", "Anime, manga, games", "game"], ["job", "Job in Japan", "briefcase"], ["jlpt", "Pass the JLPT", "notebook"], ["study", "Study in Japan", "grad"], ["friends", "Friends or family", "users"], ["business", "Business / clients", "building"], ["fun", "Brain training & fun", "brain"]];
 const TIMES = [10, 15, 20, 30, 45, 60];
 
 export default function Onboarding() {
@@ -43,12 +44,12 @@ export default function Onboarding() {
     <div className="onb" style={{ justifyContent: "flex-start", paddingTop: 32 }}>
       <Head kicker="How it works" title="One clear path, 20 minutes a day" />
       {[["1", "あ", "Read", "Hiragana & katakana in 2 weeks — sound, Hindi hint, memory trick and animated stroke order."],
-        ["2", "🔊", "Listen & speak", "Every word and sentence is spoken. Record yourself and see your voice’s spectrum vs a reference."],
+        ["2", "volume", "Listen & speak", "Every word and sentence is spoken. Record yourself and see your voice’s spectrum vs a reference."],
         ["3", "文", "Understand", "Short grammar lessons comparing English, Hindi and Japanese, then 1,000 most-used words."],
-        ["4", "🔁", "Remember", "Flashcards come back right before you’d forget. Quizzes, writing and speaking checks."],
-        ["5", "⛩️", "Connect", "Culture: what Japanese people love, dislike and expect — so you behave right, not just speak right."]].map(([n, ic, t, d]) => (
+        ["4", "repeat", "Remember", "Flashcards come back right before you’d forget. Quizzes, writing and speaking checks."],
+        ["5", "landmark", "Connect", "Culture: what Japanese people love, dislike and expect — so you behave right, not just speak right."]].map(([n, ic, t, d]) => (
         <div key={n} className="row top card" style={{ marginTop: 10, padding: 14 }}>
-          <div className="jp" style={{ width: 42, height: 42, borderRadius: 13, background: "var(--shu-soft)", color: "var(--shu)", display: "grid", placeItems: "center", fontSize: 20, fontWeight: 700, flex: "none" }}>{ic}</div>
+          <div className="jp" style={{ width: 42, height: 42, borderRadius: 13, background: "var(--shu-soft)", color: "var(--shu)", display: "grid", placeItems: "center", fontSize: 20, fontWeight: 700, flex: "none" }}><Icon name={ic} size={20} /></div>
           <div><div style={{ fontWeight: 800 }}>{t}</div><div className="sm mu">{d}</div></div>
         </div>
       ))}
@@ -63,7 +64,7 @@ export default function Onboarding() {
       <div className="list mt8">
         {PACKS.map((pk) => (
           <button key={pk.id} className="li" disabled={pk.status !== "ready"} style={{ opacity: pk.status === "ready" ? 1 : .55 }} onClick={() => { tap(); setSettings({ lang: pk.id }); }}>
-            <span className="ico soft-gold" style={{ fontSize: 22 }}>{pk.flag}</span>
+            <span className="ico soft-gold jp" style={{ fontSize: 16, fontWeight: 800, color: "var(--gold)" }}>{pk.flag}</span>
             <span className="grow"><div className="t">{pk.name} <span className="mu jp" style={{ fontWeight: 500 }}>{pk.native}</span></div><div className="d">{pk.status === "ready" ? pk.tagline : "Coming soon"}</div></span>
             {s.lang === pk.id && pk.status === "ready" && <Check color="var(--matcha)" />}
           </button>
@@ -91,10 +92,10 @@ export default function Onboarding() {
     <div className="onb" style={{ justifyContent: "flex-start", paddingTop: 32 }}>
       <Head kicker="Your why" title="Why are you learning Japanese?" sub="Pick all that apply. A strong reason keeps you going on hard days." />
       <div className="grid2">
-        {REASONS.map(([k, l]) => { const on = reasons.includes(k); return (
-          <button key={k} className="tile" style={{ minHeight: 64, justifyContent: "center", boxShadow: on ? "inset 0 0 0 2px var(--shu), var(--shadow-1)" : undefined, background: on ? "var(--shu-soft)" : undefined }}
+        {REASONS.map(([k, l, ic]) => { const on = reasons.includes(k); return (
+          <button key={k} className="tile" style={{ minHeight: 84, justifyContent: "center", boxShadow: on ? "inset 0 0 0 2px var(--shu), var(--shadow-1)" : undefined, background: on ? "var(--shu-soft)" : undefined }}
             onClick={() => { tap(); setReasons(on ? reasons.filter((x) => x !== k) : [...reasons, k]); }}>
-            <span className="t" style={{ fontSize: 14 }}>{l}</span>
+            <span className="row gap6" style={{ color: on ? "var(--shu)" : "var(--ink-2)" }}><Icon name={ic} size={20} /></span><span className="t" style={{ fontSize: 14 }}>{l}</span>
           </button>); })}
       </div>
       <div style={{ flex: 1 }} />
@@ -119,7 +120,7 @@ export default function Onboarding() {
         </div>
         <div className="card tint-ink mt16">
           <div className="kicker">At {mins} min a day</div>
-          <div className="sm mt4" style={{ lineHeight: 1.7 }}>✅ Read both kana in about <b>{mins <= 15 ? 3 : 2} weeks</b><br />✅ About <b>{wpd} new words</b> a day<br />✅ 1,000 core words by around <b>{dt.toLocaleDateString(undefined, { month: "long", year: "numeric" })}</b></div>
+          <div className="sm mt4" style={{ lineHeight: 1.9 }}>{[<>Read both kana in about <b>{mins <= 15 ? 3 : 2} weeks</b></>, <>About <b>{wpd} new words</b> a day</>, <>1,000 core words by around <b>{dt.toLocaleDateString(undefined, { month: "long", year: "numeric" })}</b></>].map((t, i) => <div key={i} className="row gap6"><Icon name="check" size={16} color="#7fe0a0" />{t}</div>)}</div>
         </div>
         <div className="list mt12">
           <div className="li"><span className="grow"><div className="t">Show Hindi (हिन्दी)</div></span><Switch on={s.showHindi} onChange={(v) => setSettings({ showHindi: v })} /></div>
@@ -138,7 +139,7 @@ function Pledge({ name, mins, reasons, back }: { name: string; mins: number; rea
   const [hold, setHold] = useState(0);
   const timer = useRef<number | undefined>();
   const done = hold >= 1;
-  const why = REASONS.filter(([k]) => reasons.includes(k)).map(([, l]) => l.replace(/^\S+\s/, "").toLowerCase());
+  const why = REASONS.filter(([k]) => reasons.includes(k)).map(([, l]) => l.toLowerCase());
   const start = () => {
     if (done) return;
     const t0 = Date.now();
@@ -175,7 +176,7 @@ function Pledge({ name, mins, reasons, back }: { name: string; mins: number; rea
         <button aria-label="Press and hold to sign the pledge" onPointerDown={start} onPointerUp={stop} onPointerLeave={stop} onPointerCancel={stop}
           style={{ width: 120, height: 120, borderRadius: "50%", position: "relative", background: done ? "var(--matcha)" : "var(--shu)", color: "#fff", boxShadow: "0 12px 30px color-mix(in srgb, var(--shu) 40%, transparent)", touchAction: "none", userSelect: "none" }}>
           <svg width="120" height="120" style={{ position: "absolute", inset: 0, transform: "rotate(-90deg)" }}><circle cx="60" cy="60" r="55" fill="none" stroke="rgba(255,255,255,.9)" strokeWidth="6" strokeDasharray={345} strokeDashoffset={345 * (1 - hold)} strokeLinecap="round" /></svg>
-          <span style={{ fontSize: done ? 40 : 30 }}>{done ? "✓" : "🤝"}</span>
+          <span style={{ position: "relative", display: "grid", placeItems: "center" }}><Icon name={done ? "check" : "handshake"} size={done ? 46 : 40} /></span>
         </button>
         <div className="sm mu mt12">{done ? "Signed! お約束ありがとう。" : "Press and hold to sign"}</div>
       </div>

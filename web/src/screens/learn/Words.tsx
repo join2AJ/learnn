@@ -6,6 +6,7 @@ import { award } from "../../core/rewards";
 import { usePack } from "../../pack";
 import { Header, Say, tap } from "../../ui/kit";
 import { RecBtn } from "../../ui/VoiceCompare";
+import { Icon } from "../../ui/icons";
 
 const TIERS: [string, number, number][] = [["All", 1, 1000], ["1–100", 1, 100], ["101–300", 101, 300], ["301–600", 301, 600], ["601–1000", 601, 1000]];
 const TYPE_COL: Record<string, string> = { verb: "var(--ai)", noun: "var(--matcha)", "i-adj": "var(--gold)", "na-adj": "var(--gold)", adverb: "var(--shu)", pron: "var(--plum)", num: "var(--ai)" };
@@ -95,7 +96,7 @@ export default function Words() {
               <div className="grow"><div className="j" style={{ fontSize: 17 }}>{w.s}</div>{s.showRomaji && <div className="r">{w.sr}</div>}<div className="e mu">{w.st}</div></div>
               <Say text={w.s} size="s" />
             </div>
-            {(w.p || w.k) && <div className="xs mu">💡 {[w.p, w.k].filter(Boolean).join(" · ")}</div>}
+            {(w.p || w.k) && <div className="xs mu row top gap4"><Icon name="bulb" size={13} color="var(--gold)" /><span>{[w.p, w.k].filter(Boolean).join(" · ")}</span></div>}
             <div className="row mt8">
               <button className={"btn sm " + (k ? "ok" : "ghost")} onClick={() => toggle(w.n)}>{k ? <><Check size={15} /> Known</> : "Mark known"}</button>
               {w.t === "verb" && pk.conjugate?.(w) && <button className="btn sm ghost" onClick={() => go("/learn/verbs?w=" + encodeURIComponent(w.w))}><Repeat size={14} /> Conjugate</button>}

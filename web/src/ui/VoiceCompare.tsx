@@ -8,8 +8,9 @@ import { speak } from "../core/native";
 import { romaji } from "../packs/ja/verbs";
 import { usePack } from "../pack";
 import { tap } from "./kit";
+import { Icon } from "./icons";
 
-/** Small 🎙 button: opens the record-and-compare sheet for any text. */
+/** Small mic button: opens the record-and-compare sheet for any text. */
 export function RecBtn({ text, ro, en, size = "s" }: { text: string; ro?: string; en?: string; size?: "s" | "m" }) {
   return (
     <button aria-label={"Record yourself saying " + text} className={"say" + (size === "s" ? " s" : "")} style={{ background: "var(--matcha-soft)", color: "var(--matcha)" }}
@@ -77,16 +78,16 @@ export default function VoiceCompare({ text, ro, en }: { text: string; ro?: stri
 
   const tips: string[] = [];
   if (res) {
-    if (res.db < -32) tips.push("🔊 Too quiet — speak LOUDER, from your chest. Loud practice builds confidence and clearer sounds.");
-    else if (res.db < -26) tips.push("🔉 A bit soft — a little louder will sound more confident.");
-    else tips.push("💪 Great volume.");
-    if (res.dur > res.exp * 1.6) tips.push("🐢 Slower than natural — keep every beat short and even.");
-    else if (res.dur < res.exp * 0.6) tips.push("⚡ Very fast — give each mora its own beat.");
-    else tips.push("⏱️ Good pace.");
+    if (res.db < -32) tips.push("volume|Too quiet — speak LOUDER, from your chest. Loud practice builds confidence and clearer sounds.");
+    else if (res.db < -26) tips.push("volumeLow|A bit soft — a little louder will sound more confident.");
+    else tips.push("check|Great volume.");
+    if (res.dur > res.exp * 1.6) tips.push("turtle|Slower than natural — keep every beat short and even.");
+    else if (res.dur < res.exp * 0.6) tips.push("zap|Very fast — give each mora its own beat.");
+    else tips.push("timer|Good pace.");
     const d = res.bands.map((b, i) => b - res.ref[i]);
-    if (d[2] < -0.05) tips.push("✨ High band is weak — make s / sh / ts and い・え crisper.");
-    if (d[0] > 0.06) tips.push("🎚️ Lots of low energy — open your mouth more and push the sound forward.");
-    if (res.f0[1] && res.f0[1] / Math.max(1, res.f0[0]) < 1.12 && res.exp > 0.4) tips.push("🎵 Very flat melody — Japanese words rise and fall (pitch accent). Copy the voice’s ups and downs.");
+    if (d[2] < -0.05) tips.push("sparkles|High band is weak — make s / sh / ts and い・え crisper.");
+    if (d[0] > 0.06) tips.push("sliders|Lots of low energy — open your mouth more and push the sound forward.");
+    if (res.f0[1] && res.f0[1] / Math.max(1, res.f0[0]) < 1.12 && res.exp > 0.4) tips.push("music|Very flat melody — Japanese words rise and fall (pitch accent). Copy the voice’s ups and downs.");
   }
 
   return (
@@ -132,7 +133,7 @@ export default function VoiceCompare({ text, ro, en }: { text: string; ro?: stri
                 </div>
               </div>
             ))}
-            <div className="row xs mu gap16"><span>🟩 you</span><span>⬜ reference</span></div>
+            <div className="row xs mu gap16"><span className="row gap4"><i style={{ width: 10, height: 10, borderRadius: 3, background: "var(--matcha)", display: "block" }} />you</span><span className="row gap4"><i style={{ width: 10, height: 10, borderRadius: 3, background: "var(--ink-3)", opacity: .6, display: "block" }} />reference</span></div>
           </div>
 
           <div className="grid3 mt8">
@@ -141,14 +142,14 @@ export default function VoiceCompare({ text, ro, en }: { text: string; ro?: stri
             <div className="stat"><div className="v" style={{ fontSize: 19 }}>{res.f0[0] ? Math.round(res.f0[0]) + "–" + Math.round(res.f0[1]) : "–"}</div><div className="k">Pitch Hz</div></div>
           </div>
           {res.contour.some((x) => x > 0) && <Contour c={res.contour} />}
-          <div className="feedback ok" style={{ background: "var(--surface-2)" }}>{tips.map((t) => <div key={t} className="sm" style={{ padding: "2px 0" }}>{t}</div>)}</div>
+          <div className="feedback ok" style={{ background: "var(--surface-2)" }}>{tips.map((t) => { const [ic, msg] = t.split("|"); return <div key={t} className="sm row top" style={{ padding: "3px 0", gap: 8 }}><span style={{ color: "var(--matcha)", marginTop: 1 }}><Icon name={ic} size={16} /></span><span>{msg}</span></div>; })}</div>
         </div>
       )}
 
       {history.length > 0 && (
         <div className="xs mu mt12">Your recent scores for this: {history.map((h) => h.score).join(" → ")}</div>
       )}
-      <div className="xs mu2 mt8" style={{ lineHeight: 1.45 }}>The reference is generated from the sounds of the word (not a recording of a native speaker), so use it for the overall shape: vowels in the low/mid bands, s/sh/ts hiss up high. Always copy the 🔊 voice for the real sound.</div>
+      <div className="xs mu2 mt8" style={{ lineHeight: 1.45 }}>The reference is generated from the sounds of the word (not a recording of a native speaker), so use it for the overall shape: vowels in the low/mid bands, s/sh/ts hiss up high. Always copy the speaker voice for the real sound.</div>
     </div>
   );
 }

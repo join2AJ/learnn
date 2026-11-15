@@ -7,6 +7,7 @@ import { speak } from "../../core/native";
 import type { LanguagePack, LetterCell, Word } from "../../core/types";
 import { usePack } from "../../pack";
 import { Bar, Header, pick, Say, shuffle, tap } from "../../ui/kit";
+import { Icon } from "../../ui/icons";
 
 interface Q {
   prompt: ReactNode;
@@ -143,7 +144,7 @@ export default function Quiz({ mode, set }: { mode: string; set: string }) {
       <div className="screen">
         <Header title={TITLES[mode]} backTo="/practice" />
         <div className={"card hero center " + (pct >= 0.8 ? "tint-matcha" : pct >= 0.5 ? "tint-ai" : "tint-shu")}>
-          <div style={{ fontSize: 56 }}>{pct === 1 ? "🏆" : pct >= 0.8 ? "🌟" : pct >= 0.5 ? "💪" : "🌱"}</div>
+          <div style={{ display: "grid", placeItems: "center" }}><Icon name={pct === 1 ? "trophy" : pct >= 0.8 ? "star" : pct >= 0.5 ? "rocket" : "sprout"} size={54} /></div>
           <div className="jp" style={{ fontSize: 24, fontWeight: 800 }}>{pct >= 0.8 ? pick(pk.praise).jp : "頑張って！"}</div>
           <div style={{ fontSize: 40, fontWeight: 800 }}>{score} / {qs.length}</div>
           <div className="sm mu">{pct === 1 ? "Perfect round! +15 XP bonus" : pct >= 0.8 ? "Excellent — you’re ready for more." : "Every mistake is a future right answer. Try again!"}</div>
@@ -159,7 +160,7 @@ export default function Quiz({ mode, set }: { mode: string; set: string }) {
   const ok = picked !== null && picked === q.answer;
   return (
     <div className="screen">
-      <Header title={TITLES[mode] || "Quiz"} sub={"Question " + (i + 1) + " of " + qs.length + (streak >= 3 ? " · 🔥 " + streak + " streak" : "")} backTo="/practice" />
+      <Header title={TITLES[mode] || "Quiz"} sub={"Question " + (i + 1) + " of " + qs.length + (streak >= 3 ? " · " + streak + " in a row" : "")} backTo="/practice" />
       <Bar pct={i / qs.length} />
       <div className="card mt16 center" style={{ minHeight: 180, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
         {q.prompt}
@@ -178,7 +179,7 @@ export default function Quiz({ mode, set }: { mode: string; set: string }) {
 
       {picked !== null && (
         <div className={"feedback " + (ok ? "ok" : "bad")}>
-          <div className="row"><b className="grow">{ok ? pick(pk.praise).jp + " " + (streak >= 3 ? "🔥" : "") : "Almost!"}</b>{q.speakText && <Say text={q.speakText} size="s" />}</div>
+          <div className="row"><b className="grow">{ok ? <span className="row gap6">{pick(pk.praise).jp}{streak >= 3 && <Icon name="flame" size={16} color="#ff7a3d" />}</span> : "Almost!"}</b>{q.speakText && <Say text={q.speakText} size="s" />}</div>
           {q.explain && <div className="sm mt4">{q.explain}</div>}
           <button className="btn primary block mt12" onClick={next}>{i + 1 < qs.length ? "Next" : "See results"}</button>
         </div>

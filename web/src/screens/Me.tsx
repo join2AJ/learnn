@@ -9,6 +9,7 @@ import { pendingMs } from "../core/timeTracker";
 import { usePack } from "../pack";
 import { Bar, fmtMin, Header, Ring } from "../ui/kit";
 import Settings from "./Settings";
+import { Icon, IconTile } from "../ui/icons";
 
 const SEC_COL: Record<string, string> = {
   Alphabet: "#e0452b", Writing: "#d29a2e", Pronunciation: "#7b4fb0", Grammar: "#2f4b8a", Vocabulary: "#3f8a4f", Phrases: "#e47aa0",
@@ -55,7 +56,7 @@ function Stats() {
             <div className="jp" style={{ fontSize: 22, fontWeight: 800 }}>{lvName.jp}</div>
             <div className="mu">{lvName.en} · {p.xp.toLocaleString()} XP</div>
             <div className="row mt8 gap16">
-              <div><div style={{ fontSize: 20, fontWeight: 800 }}>🔥 {p.streak.count}</div><div className="xs mu">day streak</div></div>
+              <div><div className="row gap4" style={{ fontSize: 20, fontWeight: 800 }}><Icon name="flame" size={19} color="#ff7a3d" />{p.streak.count}</div><div className="xs mu">day streak</div></div>
               <div><div style={{ fontSize: 20, fontWeight: 800 }}>{p.streak.best}</div><div className="xs mu">best</div></div>
               <div><div style={{ fontSize: 20, fontWeight: 800 }}>{activeDays}</div><div className="xs mu">active days</div></div>
             </div>
@@ -65,7 +66,7 @@ function Stats() {
 
       {(() => { const ps = pledgeStatus(p); const gs = goalStreak(p); return ps ? (
         <div className="card soft-gold mt12" style={{ boxShadow: "none" }}>
-          <div className="row"><span style={{ fontSize: 26 }}>🤝</span><div className="grow"><div style={{ fontWeight: 800 }}>Pledge: {ps.min} min a day</div><div className="xs mu">Day {ps.day} of {ps.days} · goal met {ps.kept} days · current run {gs.cur} · best {gs.best}</div></div></div>
+          <div className="row"><IconTile name="handshake" tone="gold" size={40} icon={21} /><div className="grow"><div style={{ fontWeight: 800 }}>Pledge: {ps.min} min a day</div><div className="xs mu">Day {ps.day} of {ps.days} · goal met {ps.kept} days · current run {gs.cur} · best {gs.best}</div></div></div>
           <div className="mt8"><Bar pct={ps.kept / ps.days} color="var(--gold)" /></div>
           <div className="xs mu mt4">Next badge: {gs.best < 3 ? "3" : gs.best < 7 ? "7" : gs.best < 21 ? "21" : "30"} days in a row</div>
         </div>) : null; })()}
@@ -136,7 +137,7 @@ function Stats() {
       <div className="grid3">
         {BADGES.map((b) => (
           <div key={b.id} className={"badge-tile" + (p.badges[b.id] ? "" : " locked")}>
-            <div className="b">{b.icon}</div><div className="t">{b.title}</div><div className="xs mu" style={{ lineHeight: 1.25 }}>{b.desc}</div>
+            <div className="b"><Icon name={b.icon} size={24} color="var(--gold)" /></div><div className="t">{b.title}</div><div className="xs mu" style={{ lineHeight: 1.25 }}>{b.desc}</div>
           </div>
         ))}
       </div>
@@ -150,7 +151,7 @@ function VoiceSection() {
   const log = p.voiceLog || [];
   if (!log.length) return (
     <><div className="section-title"><h2>Your voice</h2></div>
-      <div className="card sm mu">Tap the green 🎙 next to any word to record yourself. Your low / mid / high balance, loudness and scores will be tracked here.</div></>
+      <div className="card sm mu">Tap the green mic button next to any word to record yourself. Your low / mid / high balance, loudness and scores will be tracked here.</div></>
   );
   const recent = log.slice(-20);
   const avg = (k: (r: typeof log[0]) => number) => recent.reduce((a, r) => a + k(r), 0) / recent.length;

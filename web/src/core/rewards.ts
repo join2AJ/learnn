@@ -13,33 +13,33 @@ export function levelOf(xp: number) {
 
 export interface Badge { id: string; icon: string; title: string; desc: string; test: (p: Progress) => boolean; }
 export const BADGES: Badge[] = [
-  { id: "first", icon: "🌱", title: "First step", desc: "Earn your first XP", test: (p) => p.xp > 0 },
+  { id: "first", icon: "sprout", title: "First step", desc: "Earn your first XP", test: (p) => p.xp > 0 },
   { id: "kana10", icon: "あ", title: "Kana sprout", desc: "Answer 10 kana right", test: (p) => sumKana(p) >= 10 },
-  { id: "kana100", icon: "🈁", title: "Kana runner", desc: "Answer 100 kana right", test: (p) => sumKana(p) >= 100 },
+  { id: "kana100", icon: "zap", title: "Kana runner", desc: "Answer 100 kana right", test: (p) => sumKana(p) >= 100 },
   { id: "hira", icon: "ひ", title: "Hiragana master", desc: "Master all 46 basic hiragana", test: (p) => masteredSet(p, HIRA46) >= 46 },
   { id: "kata", icon: "カ", title: "Katakana master", desc: "Master all 46 basic katakana", test: (p) => masteredSet(p, KATA46) >= 46 },
-  { id: "w50", icon: "📗", title: "50 words", desc: "Mark 50 words as known", test: (p) => p.known.length >= 50 },
-  { id: "w100", icon: "📘", title: "100 words", desc: "≈65% of everyday speech", test: (p) => p.known.length >= 100 },
-  { id: "w300", icon: "📙", title: "300 words", desc: "Daily-life vocabulary", test: (p) => p.known.length >= 300 },
-  { id: "w1000", icon: "🏯", title: "1,000 words", desc: "Finish the core pack", test: (p) => p.known.length >= 1000 },
-  { id: "lesson1", icon: "📝", title: "Grammar begins", desc: "Finish your first grammar lesson", test: (p) => Object.keys(p.lessons).length >= 1 },
-  { id: "lesson10", icon: "🧠", title: "Grammar brain", desc: "Finish 10 grammar lessons", test: (p) => Object.keys(p.lessons).length >= 10 },
-  { id: "streak3", icon: "🔥", title: "On fire", desc: "3-day streak", test: (p) => p.streak.best >= 3 },
-  { id: "streak7", icon: "⚡", title: "One week", desc: "7-day streak", test: (p) => p.streak.best >= 7 },
-  { id: "streak30", icon: "🌸", title: "Sakura month", desc: "30-day streak", test: (p) => p.streak.best >= 30 },
-  { id: "review100", icon: "🃏", title: "Card shark", desc: "100 flashcard reviews", test: (p) => totalReviews(p) >= 100 },
-  { id: "speak10", icon: "🎤", title: "Loud & proud", desc: "10 words spoken correctly", test: (p) => p.speak.ok >= 10 },
-  { id: "write10", icon: "✍️", title: "Calligrapher", desc: "Practise writing 10 characters", test: (p) => p.writes >= 10 },
-  { id: "lab", icon: "📈", title: "Sound scientist", desc: "Open the Sound Lab mic", test: (p) => p.labSessions >= 1 },
-  { id: "culture", icon: "⛩️", title: "Culture curious", desc: "Read 5 culture sections", test: (p) => Object.keys(p.culturesRead).length >= 5 },
-  { id: "hour", icon: "⏱️", title: "Hour of power", desc: "Study 60 minutes total", test: (p) => totalMs(p) >= 3600_000 },
-  { id: "perfect", icon: "💯", title: "Perfect round", desc: "10/10 in a quiz", test: (p) => p.quiz.best >= 10 },
-  { id: "pledge", icon: "🤝", title: "Pledge made", desc: "Promised your daily study time", test: () => !!getSettings().pledge },
-  { id: "keep3", icon: "🎯", title: "Promise kept ×3", desc: "Daily goal met 3 days in a row", test: (p) => goalStreak(p).best >= 3 },
-  { id: "keep7", icon: "🏅", title: "Promise kept ×7", desc: "Daily goal met 7 days in a row", test: (p) => goalStreak(p).best >= 7 },
-  { id: "keep21", icon: "🥈", title: "Habit formed", desc: "Daily goal met 21 days in a row", test: (p) => goalStreak(p).best >= 21 },
-  { id: "keep30", icon: "🏆", title: "Pledge fulfilled", desc: "30 days of keeping your promise", test: (p) => goalStreak(p).best >= 30 },
-  { id: "voice10", icon: "🎙️", title: "Voice explorer", desc: "Record and compare 10 words", test: (p) => (p.voiceLog || []).length >= 10 },
+  { id: "w50", icon: "book", title: "50 words", desc: "Mark 50 words as known", test: (p) => p.known.length >= 50 },
+  { id: "w100", icon: "bookCheck", title: "100 words", desc: "≈65% of everyday speech", test: (p) => p.known.length >= 100 },
+  { id: "w300", icon: "library", title: "300 words", desc: "Daily-life vocabulary", test: (p) => p.known.length >= 300 },
+  { id: "w1000", icon: "landmark", title: "1,000 words", desc: "Finish the core pack", test: (p) => p.known.length >= 1000 },
+  { id: "lesson1", icon: "notebook", title: "Grammar begins", desc: "Finish your first grammar lesson", test: (p) => Object.keys(p.lessons).length >= 1 },
+  { id: "lesson10", icon: "brain", title: "Grammar brain", desc: "Finish 10 grammar lessons", test: (p) => Object.keys(p.lessons).length >= 10 },
+  { id: "streak3", icon: "flame", title: "On fire", desc: "3-day streak", test: (p) => p.streak.best >= 3 },
+  { id: "streak7", icon: "zap", title: "One week", desc: "7-day streak", test: (p) => p.streak.best >= 7 },
+  { id: "streak30", icon: "flower", title: "Sakura month", desc: "30-day streak", test: (p) => p.streak.best >= 30 },
+  { id: "review100", icon: "layers", title: "Card shark", desc: "100 flashcard reviews", test: (p) => totalReviews(p) >= 100 },
+  { id: "speak10", icon: "megaphone", title: "Loud & proud", desc: "10 words spoken correctly", test: (p) => p.speak.ok >= 10 },
+  { id: "write10", icon: "pen", title: "Calligrapher", desc: "Practise writing 10 characters", test: (p) => p.writes >= 10 },
+  { id: "lab", icon: "wave", title: "Sound scientist", desc: "Open the Sound Lab mic", test: (p) => p.labSessions >= 1 },
+  { id: "culture", icon: "earth", title: "Culture curious", desc: "Read 5 culture sections", test: (p) => Object.keys(p.culturesRead).length >= 5 },
+  { id: "hour", icon: "timer", title: "Hour of power", desc: "Study 60 minutes total", test: (p) => totalMs(p) >= 3600_000 },
+  { id: "perfect", icon: "target", title: "Perfect round", desc: "10/10 in a quiz", test: (p) => p.quiz.best >= 10 },
+  { id: "pledge", icon: "handshake", title: "Pledge made", desc: "Promised your daily study time", test: () => !!getSettings().pledge },
+  { id: "keep3", icon: "target", title: "Promise kept ×3", desc: "Daily goal met 3 days in a row", test: (p) => goalStreak(p).best >= 3 },
+  { id: "keep7", icon: "medal", title: "Promise kept ×7", desc: "Daily goal met 7 days in a row", test: (p) => goalStreak(p).best >= 7 },
+  { id: "keep21", icon: "award", title: "Habit formed", desc: "Daily goal met 21 days in a row", test: (p) => goalStreak(p).best >= 21 },
+  { id: "keep30", icon: "trophy", title: "Pledge fulfilled", desc: "30 days of keeping your promise", test: (p) => goalStreak(p).best >= 30 },
+  { id: "voice10", icon: "mic", title: "Voice explorer", desc: "Record and compare 10 words", test: (p) => (p.voiceLog || []).length >= 10 },
 ];
 
 const HIRA46 = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん";
@@ -88,7 +88,7 @@ export function award(xp: number, f?: (p: Progress) => void) {
   const lv = levelOf(after.xp).level;
   if (lv > lvBefore) {
     if (getSettings().haptics) vibrate(40);
-    emitUi({ type: "celebrate", title: "Level " + lv + "!", sub: "You levelled up. Keep the momentum going.", jp: "レベルアップ！", icon: "⭐" });
+    emitUi({ type: "celebrate", title: "Level " + lv + "!", sub: "You levelled up. Keep the momentum going.", jp: "レベルアップ！", icon: "star" });
   }
   checkBadges();
 }
@@ -118,7 +118,7 @@ export function checkGoal() {
   if (today(p).ms >= s.dailyGoalMin * 60_000) {
     updateProgress((q) => { q.goalHit[k] = true; });
     award(30);
-    emitUi({ type: "celebrate", title: "Daily goal reached", sub: s.dailyGoalMin + " minutes today. +30 XP bonus.", jp: "よくできました！", icon: "🎯" });
+    emitUi({ type: "celebrate", title: "Daily goal reached", sub: s.dailyGoalMin + " minutes today. +30 XP bonus.", jp: "よくできました！", icon: "target" });
   }
 }
 

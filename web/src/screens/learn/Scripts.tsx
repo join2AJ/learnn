@@ -4,6 +4,7 @@ import { go } from "../../core/router";
 import { updateProgress, useProgress } from "../../core/store";
 import { usePack } from "../../pack";
 import { Header, Jp, Md, Say } from "../../ui/kit";
+import { LangPill } from "../../ui/icons";
 
 export default function Scripts() {
   const pk = usePack();
@@ -59,7 +60,7 @@ export default function Scripts() {
       </div>
 
       <div className="card soft-gold mt16" style={{ boxShadow: "none" }}>
-        <div style={{ fontWeight: 800 }}>🇮🇳 Hindi speakers: a big head start</div>
+        <div className="row gap6" style={{ fontWeight: 800 }}><LangPill l="hi" /> Hindi speakers: a big head start</div>
         <div className="sm mt4" style={{ lineHeight: 1.6 }}>The kana chart (a i u e o · ka ki ku ke ko) was organised by Buddhist scholars who studied Sanskrit — it follows the same phonetic logic as <span className="hi">अ इ उ ए ओ · क कि कु के को</span>. Each kana is a syllable just like a Devanagari letter with its मात्रा.</div>
       </div>
       <button className="btn primary lg block mt16" onClick={() => go("/learn/kana/hira")}>Start hiragana <ArrowRight size={18} /></button>

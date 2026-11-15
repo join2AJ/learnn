@@ -8,7 +8,7 @@ import { conjugate, verbGroup } from "./verbs";
 import * as C from "./content";
 
 const japanese: LanguagePack = {
-  id: "ja", name: "Japanese", native: "日本語", flag: "🇯🇵", ttsLang: "ja-JP", status: "ready",
+  id: "ja", name: "Japanese", native: "日本語", flag: "日", ttsLang: "ja-JP", status: "ready",
   tagline: "Hiragana → 1,000 core words → real conversation",
   greeting: C.greeting,
   alphabets,

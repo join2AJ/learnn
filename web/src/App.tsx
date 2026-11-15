@@ -15,6 +15,7 @@ import Practice from "./screens/Practice";
 import Explore from "./screens/Explore";
 import Me from "./screens/Me";
 import Onboarding from "./screens/Onboarding";
+import { Icon, IconTile } from "./ui/icons";
 
 const TABS = [
   { id: "", label: "Home", Icon: HomeIcon },
@@ -91,7 +92,7 @@ export default function App() {
           </button>
         ))}
       </nav>
-      {toastMsg && <div className="toast" role="status">{toastMsg.tone === "warn" ? "⚠️" : toastMsg.tone === "ok" ? "✅" : "💡"} {toastMsg.text}</div>}
+      {toastMsg && <div className="toast" role="status"><Icon name={toastMsg.tone === "warn" ? "alert" : toastMsg.tone === "ok" ? "check" : "bulb"} size={18} /> {toastMsg.text}</div>}
       {xp && <div className="xp-pop" key={xp.k}>+{xp.n} XP</div>}
       <Confetti run={confetti} />
       <Sheet open={!!voice} onClose={() => setVoice(null)}>{voice && <VoiceCompare key={voice.text} text={voice.text} ro={voice.ro} en={voice.en} />}</Sheet>
@@ -99,7 +100,7 @@ export default function App() {
       {cele && (<>
         <div className="scrim" style={{ zIndex: 89 }} onClick={() => setCele(null)} />
         <div className="modal" role="dialog">
-          <div className="big">{cele.icon || "🎉"}</div>
+          <div className="big"><IconTile name={cele.icon || "party"} tone="gold" size={84} icon={42} round /></div>
           {cele.jp && <div className="jp" style={{ fontSize: 22, fontWeight: 700, color: "var(--shu)" }}>{cele.jp}</div>}
           <h2 style={{ margin: "6px 0 4px", fontSize: 22 }}>{cele.title}</h2>
           <p className="mu" style={{ margin: "0 0 18px" }}>{cele.sub}</p>

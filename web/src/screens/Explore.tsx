@@ -8,6 +8,7 @@ import { openExternal } from "../core/native";
 import { checkTask, phaseProgress } from "../core/path";
 import { usePack } from "../pack";
 import { Bar, Header, Jp, Say, Seg } from "../ui/kit";
+import { Icon, IconTile, LangPill } from "../ui/icons";
 
 export default function Explore({ route }: { route: Route }) {
   const [, sub, id] = route.parts;
@@ -39,7 +40,7 @@ function Hub() {
       <div className="grid2">
         {pk.culture.map((c) => (
           <button key={c.id} className={"tile " + TONE[c.tone][0]} style={{ boxShadow: "none" }} onClick={() => go("/explore/culture/" + c.id)}>
-            <span style={{ fontSize: 28 }}>{c.icon}</span>
+            <IconTile name={c.icon} tone={TONE[c.tone][1].slice(6, -1)} size={42} icon={21} />
             <span className="t">{c.title}</span>
             <span className="d">{c.items.length} insights {p.culturesRead[c.id] ? "· ✓" : ""}</span>
           </button>
@@ -59,7 +60,7 @@ function CultureList() {
   return (
     <div className="screen">
       <Header title="Culture" backTo="/explore" />
-      <div className="list">{pk.culture.map((c) => <button key={c.id} className="li" onClick={() => go("/explore/culture/" + c.id)}><span className={"ico " + TONE[c.tone][0]}>{c.icon}</span><span className="grow"><div className="t">{c.title}</div><div className="d">{c.intro}</div></span></button>)}</div>
+      <div className="list">{pk.culture.map((c) => <button key={c.id} className="li" onClick={() => go("/explore/culture/" + c.id)}><IconTile name={c.icon} tone={TONE[c.tone][1].slice(6, -1)} size={38} icon={19} /><span className="grow"><div className="t">{c.title}</div><div className="d">{c.intro}</div></span></button>)}</div>
     </div>
   );
 }
@@ -75,17 +76,17 @@ function CultureView({ id }: { id: string }) {
   const next = pk.culture[idx + 1];
   return (
     <div className="screen">
-      <Header title={c.icon + " " + c.title} backTo="/explore" />
+      <Header title={<span className="row" style={{ gap: 10 }}><IconTile name={c.icon} tone={TONE[c.tone][1].slice(6, -1)} size={34} icon={18} />{c.title}</span>} backTo="/explore" />
       <div className={"card " + TONE[c.tone][0]} style={{ boxShadow: "none" }}><div className="sm" style={{ fontWeight: 600, lineHeight: 1.55 }}>{c.intro}</div><div className="xs mu mt4">Tip: tap any <span className="jp-tap">日本語</span> to hear it.</div></div>
       {c.items.map((it, i) => (
         <div className="card" key={i} style={{ borderLeft: "4px solid " + TONE[c.tone][1] }}>
           <div style={{ fontWeight: 800, fontSize: 16 }}>{it.title}</div>
           {it.jp && <div className="row gap6"><span className="jp sm" style={{ color: TONE[c.tone][1], fontWeight: 600 }}>{it.jp}</span><Say text={it.jp.replace(/[(（].*$/, "").trim()} size="s" /></div>}
           <div className="sm mt4" style={{ lineHeight: 1.6 }}><Jp text={it.text} /></div>
-          {it.india && s.showHindi && <div className="sm mt8 soft-gold" style={{ padding: "8px 10px", borderRadius: 12, lineHeight: 1.5 }}>🇮🇳 <Jp text={it.india} /></div>}
+          {it.india && s.showHindi && <div className="sm mt8 soft-gold" style={{ padding: "8px 10px", borderRadius: 12, lineHeight: 1.5, display: "flex", gap: 8 }}><LangPill l="hi" /><span><Jp text={it.india} /></span></div>}
         </div>
       ))}
-      {next && <button className="btn primary block mt16" onClick={() => go("/explore/culture/" + next.id, true)}>Next: {next.icon} {next.title} <ArrowRight size={16} /></button>}
+      {next && <button className="btn primary block mt16" onClick={() => go("/explore/culture/" + next.id, true)}>Next: {next.title} <ArrowRight size={16} /></button>}
     </div>
   );
 }
@@ -147,7 +148,7 @@ function Roadmap() {
                   <span style={ok ? { textDecoration: "line-through", color: "var(--ink-3)" } : undefined}>{t.text}</span>
                 </div>); })}
             </div>
-            <div className="xs mt8" style={{ background: "var(--surface-2)", padding: "8px 10px", borderRadius: 10 }}>🏁 <b>Checkpoint:</b> {ph.checkpoint}</div>
+            <div className="xs mt8" style={{ background: "var(--surface-2)", padding: "8px 10px", borderRadius: 10, display: "flex", gap: 6, alignItems: "flex-start" }}><Icon name="flag" size={14} color="var(--matcha)" /><span><b>Checkpoint:</b> {ph.checkpoint}</span></div>
           </div>
         </div>
       ))}

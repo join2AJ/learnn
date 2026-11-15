@@ -2,7 +2,7 @@ import type { CultureSection } from "../../core/types";
 
 export const culture: CultureSection[] = [
   {
-    id: "values", title: "Core values", icon: "⛩️", tone: "value",
+    id: "values", title: "Core values", icon: "landmark", tone: "value",
     intro: "A few ideas explain most Japanese behaviour. Understand these and the rest makes sense.",
     items: [
       { title: "Wa — group harmony", jp: "和 (わ)", text: "Keeping the group smooth matters more than winning an argument. People avoid open conflict, and decisions are often made by quiet consensus (根回し nemawashi) before a meeting.", india: "Like keeping peace in a joint family — but expressed with far fewer words." },
@@ -15,7 +15,7 @@ export const culture: CultureSection[] = [
     ],
   },
   {
-    id: "likes", title: "What Japanese people love", icon: "💗", tone: "like",
+    id: "likes", title: "What Japanese people love", icon: "heart", tone: "like",
     intro: "Topics and things that reliably bring a smile and good conversation.",
     items: [
       { title: "Punctuality", text: "Trains run to the second (delays of 1 minute get an apology slip). Arriving 5–10 minutes early is the norm." },
@@ -30,7 +30,7 @@ export const culture: CultureSection[] = [
     ],
   },
   {
-    id: "dislikes", title: "What makes people uncomfortable", icon: "🙅", tone: "dislike",
+    id: "dislikes", title: "What makes people uncomfortable", icon: "ban", tone: "dislike",
     intro: "Not ‘rules’ people will shout about — Japanese rarely complain directly — but they will notice.",
     items: [
       { title: "Loudness in public", text: "Phone calls on trains are taboo (set phones to マナーモード, silent). Loud groups in restaurants or trains draw quiet stares.", india: "A big contrast with lively Indian public spaces — keep your voice down." },
@@ -45,7 +45,7 @@ export const culture: CultureSection[] = [
     ],
   },
   {
-    id: "do", title: "Etiquette: do this", icon: "✅", tone: "do",
+    id: "do", title: "Etiquette: do this", icon: "check", tone: "do",
     intro: "Small habits that make you look thoughtful and well-prepared.",
     items: [
       { title: "Bow", jp: "お辞儀 ojigi", text: "A light 15° nod for greetings, 30° for thanks or business, 45°+ for deep apology. Bowing while saying the phrase is natural." },
@@ -58,7 +58,7 @@ export const culture: CultureSection[] = [
     ],
   },
   {
-    id: "dont", title: "Etiquette: avoid this", icon: "⚠️", tone: "dont",
+    id: "dont", title: "Etiquette: avoid this", icon: "alert", tone: "dont",
     intro: "Mistakes visitors make most often.",
     items: [
       { title: "Chopsticks upright in rice", text: "Sticking chopsticks upright in rice resembles funeral incense. Also don’t pass food chopstick-to-chopstick (a funeral rite)." },
@@ -71,7 +71,7 @@ export const culture: CultureSection[] = [
     ],
   },
   {
-    id: "behaviour", title: "Behaviour and communication", icon: "🗣️", tone: "info",
+    id: "behaviour", title: "Behaviour and communication", icon: "chat", tone: "info",
     intro: "How conversation and relationships work.",
     items: [
       { title: "Aizuchi — listening noises", jp: "相槌", text: "Listeners say はい, ええ, そうですね, なるほど constantly to show they are following. Silence on the phone can feel like you hung up! Practise them.", india: "Like the Indian ‘हाँ जी… अच्छा… हम्म’." },
@@ -83,7 +83,7 @@ export const culture: CultureSection[] = [
     ],
   },
   {
-    id: "india", title: "Japan and India", icon: "🇮🇳", tone: "info",
+    id: "india", title: "Japan and India", icon: "earth", tone: "info",
     intro: "Surprising connections that make Japanese easier for Hindi speakers.",
     items: [
       { title: "The kana order comes from Sanskrit", text: "The gojūon table (a i u e o, ka ki ku…) was arranged by Buddhist scholars who studied Sanskrit phonetics — the same logic as Devanagari’s अ आ इ… क ख ग." },
@@ -94,7 +94,7 @@ export const culture: CultureSection[] = [
     ],
   },
   {
-    id: "life", title: "Daily life and festivals", icon: "🎏", tone: "info",
+    id: "life", title: "Daily life and festivals", icon: "party", tone: "info",
     intro: "What a year in Japan feels like.",
     items: [
       { title: "New Year — Shōgatsu", jp: "お正月", text: "The biggest holiday: families gather, visit shrines (初詣 hatsumōde) and children get money in envelopes (お年玉). Like Diwali in importance." },

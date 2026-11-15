@@ -9,6 +9,7 @@ import type { SoundRef, VowelRef } from "../../core/types";
 import { usePack } from "../../pack";
 import { Header, Seg, tap } from "../../ui/kit";
 import { toast } from "../../core/store";
+import { LangPill } from "../../ui/icons";
 
 /* ---------------- vowel chart ---------------- */
 const F2MAX = 2700, F2MIN = 600, F1MIN = 200, F1MAX = 950;
@@ -119,7 +120,7 @@ function Live() {
           <canvas ref={cv} className="spectro" style={{ height: H }} width={360} height={H} />
           <FreqAxis maxHz={MAXHZ} h={H} />
           {!on && <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", color: "#fff", textAlign: "center", padding: 20 }}>
-            <div><div style={{ fontSize: 30 }}>🎙️</div><div style={{ fontWeight: 800 }}>Live spectrogram</div><div className="sm" style={{ opacity: .75 }}>Time flows right → left. Bright bands are your formants — the “shape” of each vowel.</div></div>
+            <div><div style={{ display: "grid", placeItems: "center", marginBottom: 6 }}><Mic size={30} /></div><div style={{ fontWeight: 800 }}>Live spectrogram</div><div className="sm" style={{ opacity: .75 }}>Time flows right → left. Bright bands are your formants — the “shape” of each vowel.</div></div>
           </div>}
         </div>
         <div className="row mt12">
@@ -158,9 +159,9 @@ function Vowels() {
         <div style={{ fontWeight: 800 }}>The vowel map</div>
         <div className="sm mu mt4" style={{ lineHeight: 1.55 }}>Every vowel is defined by two resonances: <b>F1</b> (how open your mouth is) and <b>F2</b> (how far forward your tongue is). Japanese uses just 5 spots; English uses many more. Tap a dot to hear it.</div>
         <div className="row wrap mt12 gap6">
-          <button className={"chip" + (show.target ? " shu on" : "")} onClick={() => setShow({ ...show, target: !show.target })}>🇯🇵 Japanese</button>
-          <button className={"chip" + (show.en ? " on" : "")} onClick={() => setShow({ ...show, en: !show.en })}>🇬🇧 English</button>
-          <button className={"chip" + (show.hi ? " on" : "")} onClick={() => setShow({ ...show, hi: !show.hi })}>🇮🇳 Hindi</button>
+          <button className={"chip" + (show.target ? " shu on" : "")} onClick={() => setShow({ ...show, target: !show.target })}><LangPill l="ja" /> Japanese</button>
+          <button className={"chip" + (show.en ? " on" : "")} onClick={() => setShow({ ...show, en: !show.en })}><LangPill l="en" /> English</button>
+          <button className={"chip" + (show.hi ? " on" : "")} onClick={() => setShow({ ...show, hi: !show.hi })}><LangPill l="hi" /> Hindi</button>
         </div>
         <div className="mt12"><VowelChart refs={pk.vowels} show={show} onTap={play} height={300} /></div>
         {sel && <div className="feedback ok"><b>{sel.label}</b> · F1 {sel.f1} Hz · F2 {sel.f2} Hz {sel.lang !== "target" && <span className="xs mu">(synthesised)</span>}</div>}
@@ -316,7 +317,7 @@ function Pitch() {
           <button className={"btn " + (state === "rec" ? "dark" : "primary")} onClick={rec} disabled={state === "rec"}>{state === "rec" ? <><Square size={14} /> Recording 2s…</> : <><Mic size={16} /> Record me</>}</button>
         </div>
         {mine && <div className={"feedback " + (mine.every((x, k) => x === w.pattern[k]) ? "ok" : "bad")}>
-          <b>{mine.every((x, k) => x === w.pattern[k]) ? "✅ Your melody matches!" : "Melody differs — listen again and exaggerate the high beat."}</b>
+          <b>{mine.every((x, k) => x === w.pattern[k]) ? "Your melody matches! ✓" : "Melody differs — listen again and exaggerate the high beat."}</b>
           <div className="xs mu mt4">Target: {w.pattern.map((x) => (x ? "H" : "L")).join(" ")} · You: {mine.map((x) => (x ? "H" : "L")).join(" ")}</div>
         </div>}
       </div>

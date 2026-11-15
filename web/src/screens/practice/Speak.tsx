@@ -77,7 +77,7 @@ export default function Speak() {
         <div style={{ fontWeight: 700, marginTop: 4 }}>{item.en}</div>
         {s.showHindi && item.hi && <div className="hi">{item.hi}</div>}
         <div className="row mt12" style={{ justifyContent: "center" }}><Say text={item.jp} /><Say text={item.jp} slow /><RecBtn text={item.jp} ro={item.ro} en={item.en} size="m" /></div>
-        <div className="xs mu mt8">🎙 green button = record & see your voice’s spectrum vs the reference</div>
+        <div className="xs mu mt8">Green mic = record & see your voice’s spectrum vs the reference</div>
       </div>
 
       <div className="center mt24">
@@ -91,7 +91,7 @@ export default function Speak() {
         <div className={"feedback " + (state === "done" ? (ok ? "ok" : "bad") : "")} style={state !== "done" ? { background: "var(--surface-2)" } : undefined}>
           <div className="kicker">I heard</div>
           <div className="jp lg" style={{ fontWeight: 700 }}>{heard[0]}</div>
-          {state === "done" && <div className="mt8"><b>{ok ? "✅ " + pick(pk.praise).jp + " Match " + Math.round(score * 100) + "%" : "Close — " + Math.round(score * 100) + "% match. Listen again and copy the rhythm."}</b></div>}
+          {state === "done" && <div className="mt8"><b>{ok ? "✓ " + pick(pk.praise).jp + " Match " + Math.round(score * 100) + "%" : "Close — " + Math.round(score * 100) + "% match. Listen again and copy the rhythm."}</b></div>}
         </div>
       )}
       {err && <div className="feedback bad"><b>Didn’t catch that.</b><div className="sm">{err === "no-speech" || err.includes("7") ? "No speech detected — try again a bit louder." : err}</div></div>}

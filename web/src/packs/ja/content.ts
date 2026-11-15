@@ -4,7 +4,7 @@ type P = LanguagePack;
 const yt = (q: string) => "https://www.youtube.com/results?search_query=" + encodeURIComponent(q);
 
 export const phrases: P["phrases"] = [
-  { id: "greet", title: "Greetings", icon: "👋", items: [
+  { id: "greet", title: "Greetings", icon: "hand", items: [
     { jp: "おはようございます", ro: "ohayō gozaimasu", en: "Good morning", hi: "सुप्रभात" },
     { jp: "こんにちは", ro: "konnichiwa", en: "Hello / Good afternoon", hi: "नमस्ते" },
     { jp: "こんばんは", ro: "konbanwa", en: "Good evening", hi: "शुभ संध्या" },
@@ -14,14 +14,14 @@ export const phrases: P["phrases"] = [
     { jp: "お元気ですか", ro: "o genki desu ka", en: "How are you?", hi: "आप कैसे हैं?" },
     { jp: "元気です", ro: "genki desu", en: "I’m fine", hi: "मैं ठीक हूँ" },
   ] },
-  { id: "intro", title: "Introduce yourself", icon: "🙋", items: [
+  { id: "intro", title: "Introduce yourself", icon: "smile", items: [
     { jp: "はじめまして", ro: "hajimemashite", en: "Nice to meet you (first time)", hi: "आपसे मिलकर खुशी हुई" },
     { jp: "私はラヴィです", ro: "watashi wa ravi desu", en: "I am Ravi", hi: "मैं रवि हूँ", note: "Replace ラヴィ with your own name in katakana." },
     { jp: "インドから来ました", ro: "indo kara kimashita", en: "I came from India", hi: "मैं भारत से आया हूँ" },
     { jp: "日本語を勉強しています", ro: "nihongo o benkyō shite imasu", en: "I am studying Japanese", hi: "मैं जापानी सीख रहा हूँ" },
     { jp: "よろしくお願いします", ro: "yoroshiku onegai shimasu", en: "Please treat me well (said after intros)", hi: "कृपया मेरा ध्यान रखिए" },
   ] },
-  { id: "polite", title: "Thanks & sorry", icon: "🙏", items: [
+  { id: "polite", title: "Thanks & sorry", icon: "heartHand", items: [
     { jp: "ありがとうございます", ro: "arigatō gozaimasu", en: "Thank you very much", hi: "बहुत धन्यवाद" },
     { jp: "どういたしまして", ro: "dō itashimashite", en: "You’re welcome", hi: "कोई बात नहीं" },
     { jp: "すみません", ro: "sumimasen", en: "Excuse me / sorry", hi: "माफ़ कीजिए" },
@@ -29,7 +29,7 @@ export const phrases: P["phrases"] = [
     { jp: "大丈夫です", ro: "daijōbu desu", en: "It’s OK / I’m fine", hi: "ठीक है" },
     { jp: "お願いします", ro: "onegai shimasu", en: "Please (requesting)", hi: "कृपया" },
   ] },
-  { id: "help", title: "When you’re stuck", icon: "🆘", items: [
+  { id: "help", title: "When you’re stuck", icon: "help", items: [
     { jp: "分かりません", ro: "wakarimasen", en: "I don’t understand", hi: "मुझे समझ नहीं आया" },
     { jp: "もう一度お願いします", ro: "mō ichido onegai shimasu", en: "Once more, please", hi: "कृपया एक बार और" },
     { jp: "ゆっくり話してください", ro: "yukkuri hanashite kudasai", en: "Please speak slowly", hi: "कृपया धीरे बोलिए" },
@@ -37,7 +37,7 @@ export const phrases: P["phrases"] = [
     { jp: "これは日本語で何と言いますか", ro: "kore wa nihongo de nan to iimasu ka", en: "How do you say this in Japanese?", hi: "इसे जापानी में क्या कहते हैं?" },
     { jp: "助けてください", ro: "tasukete kudasai", en: "Please help me", hi: "कृपया मेरी मदद कीजिए" },
   ] },
-  { id: "food", title: "Food & restaurants", icon: "🍜", items: [
+  { id: "food", title: "Food & restaurants", icon: "food", items: [
     { jp: "いただきます", ro: "itadakimasu", en: "(before eating)", hi: "खाने से पहले" },
     { jp: "ごちそうさまでした", ro: "gochisōsama deshita", en: "(after eating — thanks for the meal)", hi: "खाने के बाद धन्यवाद" },
     { jp: "メニューをください", ro: "menyū o kudasai", en: "The menu, please", hi: "मेन्यू दीजिए" },
@@ -47,7 +47,7 @@ export const phrases: P["phrases"] = [
     { jp: "肉と魚は食べられません", ro: "niku to sakana wa taberaremasen", en: "I can’t eat meat or fish", hi: "मैं मांस और मछली नहीं खा सकता" },
     { jp: "お会計お願いします", ro: "okaikei onegai shimasu", en: "The bill, please", hi: "बिल दीजिए" },
   ] },
-  { id: "travel", title: "Getting around", icon: "🚆", items: [
+  { id: "travel", title: "Getting around", icon: "train", items: [
     { jp: "駅はどこですか", ro: "eki wa doko desu ka", en: "Where is the station?", hi: "स्टेशन कहाँ है?" },
     { jp: "トイレはどこですか", ro: "toire wa doko desu ka", en: "Where is the toilet?", hi: "शौचालय कहाँ है?" },
     { jp: "東京まで一枚", ro: "tōkyō made ichimai", en: "One ticket to Tokyo", hi: "टोक्यो का एक टिकट" },
@@ -55,13 +55,13 @@ export const phrases: P["phrases"] = [
     { jp: "まっすぐ行ってください", ro: "massugu itte kudasai", en: "Please go straight", hi: "सीधे जाइए" },
     { jp: "右 / 左", ro: "migi / hidari", en: "right / left", hi: "दाएँ / बाएँ" },
   ] },
-  { id: "shop", title: "Shopping", icon: "🛍️", items: [
+  { id: "shop", title: "Shopping", icon: "shop", items: [
     { jp: "いくらですか", ro: "ikura desu ka", en: "How much is it?", hi: "कितने का है?" },
     { jp: "カードで払えますか", ro: "kādo de haraemasu ka", en: "Can I pay by card?", hi: "क्या कार्ड से भुगतान कर सकते हैं?" },
     { jp: "袋はいりません", ro: "fukuro wa irimasen", en: "I don’t need a bag", hi: "थैली नहीं चाहिए" },
     { jp: "見ているだけです", ro: "mite iru dake desu", en: "I’m just looking", hi: "बस देख रहा हूँ" },
   ] },
-  { id: "feel", title: "Feelings & reactions", icon: "😊", items: [
+  { id: "feel", title: "Feelings & reactions", icon: "sparkles", items: [
     { jp: "すごい！", ro: "sugoi", en: "Amazing!", hi: "कमाल!" },
     { jp: "本当？", ro: "hontō", en: "Really?", hi: "सच में?" },
     { jp: "なるほど", ro: "naruhodo", en: "I see / that makes sense", hi: "अच्छा, समझ गया" },
