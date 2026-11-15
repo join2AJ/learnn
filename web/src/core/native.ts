@@ -196,6 +196,8 @@ export function deviceInfo(): Record<string, string | number> {
   try { const n = N(); if (n?.deviceInfo) return JSON.parse(n.deviceInfo()); } catch { /* ignore */ }
   return { model: navigator.userAgent.replace(/^.*?\(([^)]*)\).*$/, "$1"), screen: screen.width + "x" + screen.height, locale: navigator.language };
 }
+/** The content key from the official app (or the test hook in a browser). */
+export const contentKeyHex = (): string => { try { return N()?.contentKey?.() || (window as unknown as { __npKey?: string }).__npKey || ""; } catch { return ""; } };
 export const appVersion = () => N()?.appVersion() || "web";
 export const setNativeTheme = (dark: boolean) => { try { N()?.setTheme?.(dark); } catch { /* older shell */ } };
 
@@ -237,7 +239,7 @@ export function saveBackupFile(name: string, content: string): string {
   const n = N();
   if (n?.saveBackup) return n.saveBackup(name, content);
   const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([content], { type: "application/json" })); a.download = name; a.click();
+  a.href = URL.createObjectURL(new Blob([content], { type: "application/octet-stream" })); a.download = name; a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   return "Downloads/" + name;
 }

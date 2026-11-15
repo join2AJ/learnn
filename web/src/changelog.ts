@@ -1,6 +1,10 @@
 /** Shown once after each update ("What's new"). Newest first. */
-export const APP_VERSION = "3.9";
+export const APP_VERSION = "4.0";
 export const CHANGELOG: { v: string; date: string; items: [string, string][] }[] = [
+  { v: "4.0", date: "17 Nov 2026", items: [
+    ["shield", "Backups now use Nihongo Path’s own encrypted .npbak format - only the official app can open them (old .json backups still restore)."],
+    ["chat", "Problem reports always include device & app details so issues can be fixed quickly."],
+  ] },
   { v: "3.9", date: "17 Nov 2026", items: [
     ["chat", "Send feedback: say thanks with a star rating, report a problem (category → what exactly → how often) or suggest an idea - device and app details can be added so we can fix it faster."],
     ["sparkles", "Share the app with a beautiful invite picture, and share your level card as a JPG."],

@@ -53,7 +53,7 @@ export default function Backup() {
         <div className="row"><span className="sm grow" style={{ fontWeight: 700 }}>Keep a cloud copy up to date</span><Switch on={!!b.cloud} onChange={(v) => {
           if (!v) { clearCloud(); set({ cloud: "" }); return; }
           if (!hasCloud()) { toast("Available in the Android app", "info"); return; }
-          pickCloud("nihongo-path-autobackup.json", async (k, w) => { if (k === "picked") { set({ cloud: w || "cloud" }); const r = writeCloud(await buildBackup(b.media)); toast(r === "ok" ? "Cloud copy saved - it updates with every backup" : "Saved the choice, but writing failed: " + r, r === "ok" ? "ok" : "warn"); } else if (k === "error") toast(w, "warn"); });
+          pickCloud("nihongo-path-autobackup.npbak", async (k, w) => { if (k === "picked") { set({ cloud: w || "cloud" }); const r = writeCloud(await buildBackup(b.media)); toast(r === "ok" ? "Cloud copy saved - it updates with every backup" : "Saved the choice, but writing failed: " + r, r === "ok" ? "ok" : "warn"); } else if (k === "error") toast(w, "warn"); });
         }} /></div>
         {b.cloud ? <div className="xs mu mt4"><RefreshCw size={11} style={{ verticalAlign: -1 }} /> Updates {b.auto === "off" ? "each time you tap “Save backup file”" : "with every automatic backup"} · {b.cloud}</div>
           : <div className="xs mu mt4">Pick one file in Drive or OneDrive once - every backup then overwrites it, so your latest progress is always in the cloud.</div>}
@@ -74,9 +74,9 @@ export default function Backup() {
 
       <div className="section-title"><h2>Restore</h2></div>
       <div className="card">
-        <input ref={fileIn} type="file" accept=".json,application/json" style={{ display: "none" }} onChange={(e) => pickFile(e.target.files?.[0])} />
+        <input ref={fileIn} type="file" accept=".npbak,.json,application/octet-stream,application/json" style={{ display: "none" }} onChange={(e) => pickFile(e.target.files?.[0])} />
         <button className="btn block" onClick={() => fileIn.current?.click()}><FileUp size={17} /> Restore from a backup file</button>
-        <div className="xs mu mt8">Pick a <b>nihongo-path-backup-….json</b> file (e.g. from Downloads/NihongoPath). This replaces the current progress.</div>
+        <div className="xs mu mt8">Pick a <b>nihongo-path-backup-….npbak</b> file (e.g. from Downloads/NihongoPath or Drive). This replaces the current progress. Older .json backups still work.</div>
         <div className="divider" />
         <div className="sm" style={{ fontWeight: 700 }}>Or copy / paste as text</div>
         <div className="row mt8">

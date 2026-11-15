@@ -193,7 +193,7 @@ public class MainActivity extends Activity {
                 if (Build.VERSION.SDK_INT >= 29) {
                     ContentValues v = new ContentValues();
                     v.put(MediaStore.Downloads.DISPLAY_NAME, name);
-                    v.put(MediaStore.Downloads.MIME_TYPE, "application/json");
+                    v.put(MediaStore.Downloads.MIME_TYPE, "application/octet-stream");
                     v.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/NihongoPath");
                     Uri uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, v);
                     if (uri == null) return "error:could not create file";
@@ -245,14 +245,14 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void saveBackupAs(String name, String content) {
             pendingCloudContent = content;
             runOnUiThread(() -> {
-                Intent i = new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("application/json").putExtra(Intent.EXTRA_TITLE, name);
+                Intent i = new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("application/octet-stream").putExtra(Intent.EXTRA_TITLE, name);
                 try { startActivityForResult(i, REQ_CLOUD_SAVE); } catch (Exception e) { js("window.__npCloud&&window.__npCloud('error','No file picker available')"); }
             });
         }
         /** Choose one cloud file that automatic backups keep updating. */
         @JavascriptInterface public void pickCloudTarget(String name) {
             runOnUiThread(() -> {
-                Intent i = new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("application/json").putExtra(Intent.EXTRA_TITLE, name)
+                Intent i = new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("application/octet-stream").putExtra(Intent.EXTRA_TITLE, name)
                     .addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 try { startActivityForResult(i, REQ_CLOUD_PICK); } catch (Exception e) { js("window.__npCloud&&window.__npCloud('error','No file picker available')"); }
             });

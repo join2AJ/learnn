@@ -73,7 +73,7 @@ export default function Feedback() {
     ...(kind === "problem" && steps.trim() ? ["", "Steps to reproduce:", steps.trim()] : []),
     "",
     "From: " + (name.trim() || "-") + (contact.trim() ? " · " + contact.trim() : ""),
-    ...(diag ? ["", "--- Device & app details ---", ...info.map(([k, v]) => k + ": " + v)] : []),
+    ...(kind === "problem" || diag ? ["", "--- Device & app details ---", ...info.map(([k, v]) => k + ": " + v)] : []),
   ].join("\n");
 
   const send = (via: "wa" | "mail" | "share") => {
@@ -121,8 +121,8 @@ export default function Feedback() {
       </div>
 
       <div className="card mt12">
-        <div className="row"><div className="grow"><div style={{ fontWeight: 800 }}>Include device & app details</div><div className="xs mu">Helps us fix problems faster</div></div><Switch on={diag} onChange={setDiag} /></div>
-        {diag && <details className="mt8"><summary className="xs" style={{ fontWeight: 700, color: "var(--shu)" }}>See exactly what is included</summary>
+        <div className="row"><div className="grow"><div style={{ fontWeight: 800 }}>Include device & app details</div><div className="xs mu">{kind === "problem" ? "Always included in problem reports - we need it to find and fix the issue" : "Helps us understand your setup"}</div></div><Switch on={kind === "problem" || diag} onChange={(v) => { if (kind !== "problem") setDiag(v); }} /></div>
+        {(kind === "problem" || diag) && <details className="mt8"><summary className="xs" style={{ fontWeight: 700, color: "var(--shu)" }}>See exactly what is included</summary>
           <div className="mt8">{info.map(([k, v]) => <div key={k} className="row xs" style={{ padding: "3px 0" }}><span className="mu" style={{ width: 130, flex: "none" }}>{k}</span><span className="grow" style={{ fontWeight: 600 }}>{v}</span></div>)}</div>
         </details>}
         <div className="xs mu mt8">Nothing is uploaded by the app. Your message goes only through the app you pick below, and only when you press send.</div>
