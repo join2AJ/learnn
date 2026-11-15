@@ -4,7 +4,7 @@ export const lessons: Lesson[] = [
   /* ===================== UNIT 1 · FOUNDATIONS ===================== */
   {
     id: "map", unit: "1 · Foundations", title: "The map: what’s in Japanese grammar", jp: "文法の地図", minutes: 6,
-    summary: "Every part of speech in one page — and why Hindi speakers have a head start.",
+    summary: "Every part of speech in one page - and why Hindi speakers have a head start.",
     video: "Japanese grammar overview for beginners",
     blocks: [
       { kind: "text", text: "Japanese grammar is regular and logical. There are only **two tenses** (past and non-past), **no plural forms**, **no gender**, **no articles** (a/the), and verbs **do not change for the person** (I / you / he all use the same verb). What you must learn instead: particles, verb endings, and politeness levels." },
@@ -21,13 +21,13 @@ export const lessons: Lesson[] = [
         ["Conjunction", "接続詞", "でも demo (but)", "Starts a sentence"],
       ] },
       { kind: "compare", title: "Why Hindi helps", compare: {
-        en: "English: I (S) drink (V) water (O). — verb in the middle, prepositions BEFORE nouns (in Delhi).",
-        hi: "हिन्दी: मैं (S) पानी (O) पीता हूँ (V)। — verb at the end, postpositions AFTER nouns (दिल्ली में).",
-        jp: "日本語: 私は (S) 水を (O) 飲みます (V)。 — exactly the Hindi order! Particles は/を work like ने/को/में.",
+        en: "English: I (S) drink (V) water (O). - verb in the middle, prepositions BEFORE nouns (in Delhi).",
+        hi: "हिन्दी: मैं (S) पानी (O) पीता हूँ (V)। - verb at the end, postpositions AFTER nouns (दिल्ली में).",
+        jp: "日本語: 私は (S) 水を (O) 飲みます (V)。 - exactly the Hindi order! Particles は/を work like ने/को/में.",
       } },
       { kind: "examples", examples: [
         { jp: "私は水を飲みます。", ro: "watashi wa mizu o nomimasu", en: "I drink water.", hi: "मैं पानी पीता हूँ।" },
-        { jp: "東京に行きます。", ro: "tōkyō ni ikimasu", en: "(I) go to Tokyo.", hi: "(मैं) टोक्यो जाता हूँ।", note: "Subject dropped — clear from context." },
+        { jp: "東京に行きます。", ro: "tōkyō ni ikimasu", en: "(I) go to Tokyo.", hi: "(मैं) टोक्यो जाता हूँ।", note: "Subject dropped - clear from context." },
       ] },
       { kind: "tip", text: "Learn in this order: です sentences → particles → verb ます forms → past/negative → て-form → plain forms. Each step unlocks hundreds of sentences." },
     ],
@@ -39,7 +39,7 @@ export const lessons: Lesson[] = [
   },
   {
     id: "desu", unit: "1 · Foundations", title: "X is Y: です and だ", jp: "です・だ", minutes: 7,
-    summary: "The first sentence pattern: A は B です — ‘A is B’.",
+    summary: "The first sentence pattern: A は B です - ‘A is B’.",
     video: "Japanese desu da explained beginner",
     blocks: [
       { kind: "pattern", title: "Pattern", text: "A は B です。 → A is B (polite)\nA は B だ。 → A is B (casual)" },
@@ -58,9 +58,9 @@ export const lessons: Lesson[] = [
       { kind: "compare", compare: {
         en: "English changes the verb: I am / you are / he is.",
         hi: "Hindi changes too: मैं हूँ / तुम हो / वह है.",
-        jp: "Japanese never changes: 私は学生です / あなたは学生です / 彼は学生です — always です.",
+        jp: "Japanese never changes: 私は学生です / あなたは学生です / 彼は学生です - always です.",
       } },
-      { kind: "tip", text: "The u in です is almost silent: say “dess”. Add さん (san) after other people’s names — never your own." },
+      { kind: "tip", text: "The u in です is almost silent: say “dess”. Add さん (san) after other people’s names - never your own." },
     ],
     quiz: [
       { q: "“It was a holiday” (polite) → 休みで___。", options: ["す", "した", "しょう", "はない"], answer: 1, explain: "でした = was (polite)." },
@@ -76,7 +76,7 @@ export const lessons: Lesson[] = [
       { kind: "text", text: "は (written ha, said **wa**) marks the **topic**: what the sentence is about, often known information. が marks the **subject**, especially new or emphasised information, and it is used with likes, skills, existence and questions words." },
       { kind: "table", head: ["Use", "Particle", "Example"], rows: [
         ["Known topic / contrast", "は", "私は学生です (As for me, I’m a student)"],
-        ["New info / answer to who?", "が", "誰が来ましたか — 田中さんが来ました"],
+        ["New info / answer to who?", "が", "誰が来ましたか - 田中さんが来ました"],
         ["Likes, dislikes", "が", "猫が好きです (I like cats)"],
         ["Skills, wants", "が", "日本語が分かります (I understand Japanese)"],
         ["Exists (ある/いる)", "が", "犬がいます (There is a dog)"],
@@ -84,7 +84,7 @@ export const lessons: Lesson[] = [
       { kind: "examples", examples: [
         { jp: "象は鼻が長い。", ro: "zō wa hana ga nagai", en: "Elephants have long trunks. (As for elephants, the trunk is long.)", hi: "हाथी की सूँड लंबी होती है।" },
         { jp: "誰が来ましたか。", ro: "dare ga kimashita ka", en: "Who came?", hi: "कौन आया?" },
-        { jp: "私はカレーが好きです。", ro: "watashi wa karē ga suki desu", en: "I like curry.", hi: "मुझे करी पसंद है।", note: "Like Hindi ‘मुझे… पसंद है’ — the liked thing is the grammatical subject." },
+        { jp: "私はカレーが好きです。", ro: "watashi wa karē ga suki desu", en: "I like curry.", hi: "मुझे करी पसंद है।", note: "Like Hindi ‘मुझे… पसंद है’ - the liked thing is the grammatical subject." },
       ] },
       { kind: "tip", text: "Question words (誰 who, 何 what, どれ which) take が, never は. The answer also uses が." },
     ],
@@ -122,7 +122,7 @@ export const lessons: Lesson[] = [
   },
   {
     id: "kosoado", unit: "1 · Foundations", title: "This, that, that over there: こそあど", jp: "こそあど", minutes: 5,
-    summary: "One system for this/that/which — ko (near me), so (near you), a (far), do (question).",
+    summary: "One system for this/that/which - ko (near me), so (near you), a (far), do (question).",
     video: "Japanese kosoado kore sore are dore",
     blocks: [
       { kind: "table", head: ["", "こ (near me)", "そ (near you)", "あ (far)", "ど (?)"], rows: [
@@ -150,13 +150,13 @@ export const lessons: Lesson[] = [
     video: "Japanese nouns plural no articles beginner",
     blocks: [
       { kind: "text", text: "Japanese nouns never change form. 猫 (neko) = cat / cats / a cat / the cat. For people you may add たち (tachi): 私たち = we, 子供たち = children. Nouns join with の: 私の本 (my book), 日本の車 (a Japanese car)." },
-      { kind: "compare", compare: { en: "English: book → books; a/the; he/she/it.", hi: "Hindi: किताब → किताबें; and gender: अच्छा लड़का / अच्छी लड़की.", jp: "Japanese: 本 stays 本. No gender — adjectives never change for gender. One less thing to memorise!" } },
+      { kind: "compare", compare: { en: "English: book → books; a/the; he/she/it.", hi: "Hindi: किताब → किताबें; and gender: अच्छा लड़का / अच्छी लड़की.", jp: "Japanese: 本 stays 本. No gender - adjectives never change for gender. One less thing to memorise!" } },
       { kind: "examples", examples: [
         { jp: "猫が三匹います。", ro: "neko ga san biki imasu", en: "There are three cats.", hi: "तीन बिल्लियाँ हैं।", note: "Plural shown only by the number." },
         { jp: "私たちは友達です。", ro: "watashi tachi wa tomodachi desu", en: "We are friends.", hi: "हम दोस्त हैं।" },
         { jp: "母の車は赤いです。", ro: "haha no kuruma wa akai desu", en: "My mother’s car is red.", hi: "मेरी माँ की गाड़ी लाल है।" },
       ] },
-      { kind: "tip", text: "の works like Hindi का/की/के — but never changes for gender: 母の車, 母の本 (माँ की गाड़ी, माँ की किताब)." },
+      { kind: "tip", text: "の works like Hindi का/की/के - but never changes for gender: 母の車, 母の本 (माँ की गाड़ी, माँ की किताब)." },
     ],
     quiz: [
       { q: "‘Books’ in Japanese?", options: ["本たち", "本々", "本", "本ら"], answer: 2 },
@@ -170,7 +170,7 @@ export const lessons: Lesson[] = [
     video: "Japanese particles o ni de e explained",
     blocks: [
       { kind: "table", head: ["Particle", "Role", "Hindi", "Example"], rows: [
-        ["を (o)", "direct object", "को / —", "パンを食べる (eat bread)"],
+        ["を (o)", "direct object", "को / -", "パンを食べる (eat bread)"],
         ["に (ni)", "destination, time, target", "को / में / पर", "七時に起きる (get up at 7)"],
         ["で (de)", "place of action; by means of", "में / से", "家で勉強する (study at home); バスで (by bus)"],
         ["へ (e)", "direction (toward)", "की ओर", "日本へ行く (go toward Japan)"],
@@ -222,7 +222,7 @@ export const lessons: Lesson[] = [
         ["6", "六", "roku", "छह"], ["7", "七", "nana / shichi", "सात"], ["8", "八", "hachi", "आठ"], ["9", "九", "kyū / ku", "नौ"], ["10", "十", "jū", "दस"],
         ["100", "百", "hyaku", "सौ"], ["1,000", "千", "sen", "हज़ार"], ["10,000", "万", "man", "दस हज़ार"],
       ] },
-      { kind: "text", text: "Numbers build like Lego: 23 = 二十三 (ni-jū-san, ‘two-ten-three’). Japanese groups big numbers by **10,000 (万)** — like Hindi groups by लाख and करोड़ instead of the English million." },
+      { kind: "text", text: "Numbers build like Lego: 23 = 二十三 (ni-jū-san, ‘two-ten-three’). Japanese groups big numbers by **10,000 (万)** - like Hindi groups by लाख and करोड़ instead of the English million." },
       { kind: "table", title: "Key counters", head: ["Counter", "For", "Example"], rows: [
         ["〜つ", "general things (1–9)", "ひとつ, ふたつ, みっつ"], ["〜人 nin", "people", "一人 hitori, 二人 futari, 三人 san-nin"],
         ["〜枚 mai", "flat things (paper, shirts)", "二枚 ni-mai"], ["〜本 hon", "long things (pens, bottles)", "一本 ippon, 三本 sanbon"],
@@ -282,8 +282,8 @@ export const lessons: Lesson[] = [
         { jp: "お金がありません。", ro: "okane ga arimasen", en: "I don’t have money.", hi: "मेरे पास पैसे नहीं हैं।" },
         { jp: "兄弟がいますか。", ro: "kyōdai ga imasu ka", en: "Do you have siblings?", hi: "क्या आपके भाई-बहन हैं?" },
       ] },
-      { kind: "compare", compare: { en: "English: I have money.", hi: "Hindi: मेरे पास पैसे हैं — ‘near me there is money’.", jp: "Japanese: お金があります — ‘money exists’. Same logic as Hindi’s मेरे पास!" } },
-      { kind: "tip", text: "Plants and robots use ある (not alive in the ‘moving’ sense). Taxis with drivers — speakers often use いる!" },
+      { kind: "compare", compare: { en: "English: I have money.", hi: "Hindi: मेरे पास पैसे हैं - ‘near me there is money’.", jp: "Japanese: お金があります - ‘money exists’. Same logic as Hindi’s मेरे पास!" } },
+      { kind: "tip", text: "Plants and robots use ある (not alive in the ‘moving’ sense). Taxis with drivers - speakers often use いる!" },
     ],
     quiz: [
       { q: "There is a cat → 猫が___。", options: ["あります", "います", "です", "します"], answer: 1 },
@@ -333,7 +333,7 @@ export const lessons: Lesson[] = [
         ["Negative present", "I don’t eat", "मैं नहीं खाता", "食べません"],
         ["Negative past", "I didn’t eat", "मैंने नहीं खाया", "食べませんでした"],
       ] },
-      { kind: "text", text: "**Non-past** (ます / dictionary form) covers present habits AND the future — time words (明日 tomorrow) make it clear. **Past** (ました / た) covers simple past and most perfect meanings. **ている** adds ‘ongoing’ or ‘resulting state’." },
+      { kind: "text", text: "**Non-past** (ます / dictionary form) covers present habits AND the future - time words (明日 tomorrow) make it clear. **Past** (ました / た) covers simple past and most perfect meanings. **ている** adds ‘ongoing’ or ‘resulting state’." },
       { kind: "examples", examples: [
         { jp: "明日、東京に行きます。", ro: "ashita tōkyō ni ikimasu", en: "I will go to Tokyo tomorrow.", hi: "मैं कल टोक्यो जाऊँगा।" },
         { jp: "もう宿題をしました。", ro: "mō shukudai o shimashita", en: "I have already done my homework.", hi: "मैंने होमवर्क कर लिया है।" },
@@ -361,7 +361,7 @@ export const lessons: Lesson[] = [
         { jp: "昨日、映画を見ました。", ro: "kinō eiga o mimashita", en: "I watched a movie yesterday.", hi: "मैंने कल फ़िल्म देखी।" },
         { jp: "朝ご飯を食べませんでした。", ro: "asagohan o tabemasen deshita", en: "I didn’t eat breakfast.", hi: "मैंने नाश्ता नहीं किया।" },
       ] },
-      { kind: "tip", text: "Speak polite ます Japanese to strangers, shop staff, teachers and colleagues. It’s never wrong — casual forms are for friends and family." },
+      { kind: "tip", text: "Speak polite ます Japanese to strangers, shop staff, teachers and colleagues. It’s never wrong - casual forms are for friends and family." },
     ],
     quiz: [
       { q: "‘Did not go’ (polite) →", options: ["行きません", "行きませんでした", "行きました", "行かない"], answer: 1 },
@@ -371,7 +371,7 @@ export const lessons: Lesson[] = [
   },
   {
     id: "plain", unit: "3 · Verbs & tenses", title: "Casual verbs: ない, た, なかった", jp: "普通形", minutes: 9,
-    summary: "The plain forms friends use — and that grammar patterns are built on.",
+    summary: "The plain forms friends use - and that grammar patterns are built on.",
     video: "Japanese plain form nai ta conjugation",
     blocks: [
       { kind: "table", head: ["Group", "Dictionary", "ない (not)", "た (did)", "なかった (didn’t)"], rows: [
@@ -501,7 +501,7 @@ export const lessons: Lesson[] = [
         { jp: "紅茶の方が好きです。", ro: "kōcha no hō ga suki desu", en: "I prefer tea.", hi: "मुझे चाय ज़्यादा पसंद है।" },
         { jp: "富士山は日本で一番高い山です。", ro: "fujisan wa nihon de ichiban takai yama desu", en: "Mt Fuji is the highest mountain in Japan.", hi: "फ़ूजी पर्वत जापान का सबसे ऊँचा पहाड़ है।" },
       ] },
-      { kind: "compare", compare: { en: "English changes the adjective: big → bigger → biggest.", hi: "Hindi adds से / सबसे: से बड़ा, सबसे बड़ा.", jp: "Japanese adds より / 一番 and never changes the adjective — same as Hindi." } },
+      { kind: "compare", compare: { en: "English changes the adjective: big → bigger → biggest.", hi: "Hindi adds से / सबसे: से बड़ा, सबसे बड़ा.", jp: "Japanese adds より / 一番 and never changes the adjective - same as Hindi." } },
     ],
     quiz: [
       { q: "‘Than’ →", options: ["より", "方", "一番", "も"], answer: 0 },
@@ -526,7 +526,7 @@ export const lessons: Lesson[] = [
         { jp: "辛い物が食べられますか。", ro: "karai mono ga taberaremasu ka", en: "Can you eat spicy food?", hi: "क्या आप तीखा खा सकते हैं?" },
         { jp: "ピアノができます。", ro: "piano ga dekimasu", en: "I can play piano.", hi: "मैं पियानो बजा सकता हूँ।" },
       ] },
-      { kind: "tip", text: "With potential verbs the object usually takes が: 日本語が話せる. In casual speech people drop ら: 食べれる (ra-nuki) — understood, but say 食べられる in polite speech." },
+      { kind: "tip", text: "With potential verbs the object usually takes が: 日本語が話せる. In casual speech people drop ら: 食べれる (ra-nuki) - understood, but say 食べられる in polite speech." },
     ],
     quiz: [
       { q: "‘Can read’ from 読む →", options: ["読める", "読まれる", "読みられる", "読もう"], answer: 0 },
@@ -536,7 +536,7 @@ export const lessons: Lesson[] = [
   },
   {
     id: "if", unit: "5 · Next level", title: "If and when: たら・ば・と", jp: "条件", minutes: 8,
-    summary: "Three ways to say ‘if’. Start with たら — it works almost everywhere.",
+    summary: "Three ways to say ‘if’. Start with たら - it works almost everywhere.",
     video: "Japanese conditionals tara ba to nara",
     blocks: [
       { kind: "table", head: ["Form", "How", "Feel", "Example"], rows: [
@@ -579,18 +579,18 @@ export const lessons: Lesson[] = [
   },
   {
     id: "keigo", unit: "5 · Next level", title: "Politeness levels and keigo", jp: "敬語", minutes: 8,
-    summary: "Casual, polite, honorific, humble — and which one to use when.",
+    summary: "Casual, polite, honorific, humble - and which one to use when.",
     video: "Japanese keigo explained beginner",
     blocks: [
       { kind: "table", head: ["Level", "To whom", "‘to eat’", "Hindi feel"], rows: [
         ["Casual 普通形", "friends, family", "食べる", "तू / तुम खाओ"], ["Polite 丁寧語", "everyone else", "食べます", "आप खाइए"],
         ["Honorific 尊敬語", "raises the OTHER person", "召し上がる meshiagaru", "आप भोजन ग्रहण कीजिए"], ["Humble 謙譲語", "lowers YOURSELF", "いただく itadaku", "मैं ग्रहण करूँगा"],
       ] },
-      { kind: "compare", compare: { en: "English shows politeness with please / would you / sir.", hi: "Hindi builds it into pronouns and verbs: तू → तुम → आप; खा → खाओ → खाइए.", jp: "Japanese builds it into verbs and vocabulary — similar to Hindi’s आप system, with separate ‘raising’ and ‘lowering’ words." } },
+      { kind: "compare", compare: { en: "English shows politeness with please / would you / sir.", hi: "Hindi builds it into pronouns and verbs: तू → तुम → आप; खा → खाओ → खाइए.", jp: "Japanese builds it into verbs and vocabulary - similar to Hindi’s आप system, with separate ‘raising’ and ‘lowering’ words." } },
       { kind: "examples", examples: [
         { jp: "いらっしゃいませ。", ro: "irasshaimase", en: "Welcome! (shop staff)", hi: "पधारिए / स्वागत है।" },
         { jp: "少々お待ちください。", ro: "shōshō omachi kudasai", en: "Please wait a moment. (very polite)", hi: "कृपया थोड़ा प्रतीक्षा करें।" },
-        { jp: "いただきます。", ro: "itadakimasu", en: "(said before eating — ‘I humbly receive’)", hi: "भोजन से पहले कहा जाता है" },
+        { jp: "いただきます。", ro: "itadakimasu", en: "(said before eating - ‘I humbly receive’)", hi: "भोजन से पहले कहा जाता है" },
       ] },
       { kind: "tip", text: "As a learner, polite ます/です is all you need. You’ll HEAR keigo from staff; just recognise it." },
     ],
@@ -613,7 +613,7 @@ export const lessons: Lesson[] = [
         { jp: "今日は暑いですね。", ro: "kyō wa atsui desu ne", en: "It’s hot today, isn’t it?", hi: "आज गर्मी है ना?" },
         { jp: "この店、安いですよ。", ro: "kono mise, yasui desu yo", en: "This shop is cheap, you know.", hi: "यह दुकान सस्ती है, सच में।" },
       ] },
-      { kind: "tip", text: "Overusing よ can sound pushy. ね is your friend in small talk — it invites the other person to agree." },
+      { kind: "tip", text: "Overusing よ can sound pushy. ね is your friend in small talk - it invites the other person to agree." },
     ],
     quiz: [
       { q: "To seek agreement, add…", options: ["よ", "ね", "か", "な"], answer: 1 },

@@ -24,7 +24,7 @@ export default function Settings() {
         {PACKS.map((x) => (
           <button key={x.id} className="li" disabled={x.status !== "ready"} style={{ opacity: x.status === "ready" ? 1 : .5 }} onClick={() => { tap(); setSettings({ lang: x.id }); }}>
             <span className="ico soft-gold" style={{ fontSize: 22 }}>{x.flag}</span>
-            <span className="grow"><div className="t">{x.name} <span className="jp mu" style={{ fontWeight: 500 }}>{x.native}</span></div><div className="d">{x.status === "ready" ? x.tagline : "Planned — same engine, new content pack"}</div></span>
+            <span className="grow"><div className="t">{x.name} <span className="jp mu" style={{ fontWeight: 500 }}>{x.native}</span></div><div className="d">{x.status === "ready" ? x.tagline : "Planned - same engine, new content pack"}</div></span>
             {s.lang === x.id && <Check color="var(--matcha)" />}
           </button>
         ))}
@@ -52,14 +52,14 @@ export default function Settings() {
           <div className="row"><div className="t grow">Speech speed · {s.rate.toFixed(2)}×</div><button className="btn sm" onClick={() => speak("こんにちは、日本語を勉強しましょう。", { lang: pk.ttsLang, rate: s.rate })}><Volume2 size={15} /> Test</button></div>
           <input type="range" min={0.5} max={1.3} step={0.05} value={s.rate} onChange={(e) => setSettings({ rate: +e.target.value })} className="mt8" />
         </div>
-        <Row t="Japanese voice" d={tts.native ? (tts.ready ? (tts.voice ? "Installed ✓" : "Not installed — tap to install") : "Starting…") : "Using browser voices"}>
+        <Row t="Japanese voice" d={tts.native ? (tts.ready ? (tts.voice ? "Installed ✓" : "Not installed - tap to install") : "Starting…") : "Using browser voices"}>
           {tts.native && <button className="btn sm" onClick={openTtsSettings}>Open</button>}
         </Row>
       </div>
 
       <div className="section-title"><h2>Pledge & help</h2></div>
       <div className="list">
-        <Row t={s.pledge ? "Pledge: " + s.pledge.min + " min/day for 30 days" : "No pledge yet"} d={s.pledge ? "Started " + s.pledge.start + " — renew to start a new 30 days at your current goal" : "Promise a daily time and earn streak badges"}>
+        <Row t={s.pledge ? "Pledge: " + s.pledge.min + " min/day for 30 days" : "No pledge yet"} d={s.pledge ? "Started " + s.pledge.start + " - renew to start a new 30 days at your current goal" : "Promise a daily time and earn streak badges"}>
           <button className="btn sm" onClick={() => { setSettings({ pledge: { min: s.dailyGoalMin, start: dayKey(), days: 30 } }); toast("New 30-day pledge started", "ok"); }}>{s.pledge ? "Renew" : "Pledge"}</button>
         </Row>
         <Row t="Edit profile" d={[s.age, (s.reasons || []).join(", ")].filter(Boolean).join(" · ") || "Name, age, reasons"}><button className="btn sm" onClick={() => setSettings({ profiled: false })}>Edit</button></Row>
@@ -80,7 +80,7 @@ export default function Settings() {
 
       <div className="section-title"><h2>About</h2></div>
       <div className="card sm" style={{ lineHeight: 1.6 }}>
-        <div><b>Nihongo Path</b> · v2.5 ({appVersion()})</div>
+        <div><b>Nihongo Path</b> · v2.6 ({appVersion()})</div>
         <div className="mu mt4">Built as a multi-language engine: each language is a content pack (scripts, words, grammar, culture, sounds). Japanese is the first pack.</div>
         <div className="mu mt8">Credits: stroke order from <a onClick={() => openExternal("https://kanjivg.tagaini.net")}>KanjiVG</a> (CC BY-SA 3.0, Ulrich Apel). Word ranks from Mindomax (OpenSubtitles + Tatoeba) and the wordfreq project. Example sentences were AI-written and reviewed; treat them as study material. Formant values are rounded literature averages.</div>
       </div>

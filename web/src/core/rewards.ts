@@ -39,6 +39,9 @@ export const BADGES: Badge[] = [
   { id: "keep7", icon: "medal", title: "Promise kept ×7", desc: "Daily goal met 7 days in a row", test: (p) => goalStreak(p).best >= 7 },
   { id: "keep21", icon: "award", title: "Habit formed", desc: "Daily goal met 21 days in a row", test: (p) => goalStreak(p).best >= 21 },
   { id: "keep30", icon: "trophy", title: "Pledge fulfilled", desc: "30 days of keeping your promise", test: (p) => goalStreak(p).best >= 30 },
+  { id: "write50", icon: "pen", title: "Brush master", desc: "Check 50 drawings", test: (p) => p.writes >= 50 },
+  { id: "writeAce", icon: "target", title: "Sharp hand", desc: "Score 90%+ on 10 characters", test: (p) => Object.values(p.writeLog || {}).filter((v) => v.best >= 90).length >= 10 },
+  { id: "writeHira", icon: "ひ", title: "Hiragana by hand", desc: "Write all 46 hiragana at 70%+", test: (p) => Array.from(HIRA46).every((c) => (p.writeLog?.[c]?.best || 0) >= 70) },
   { id: "voice10", icon: "mic", title: "Voice explorer", desc: "Record and compare 10 words", test: (p) => (p.voiceLog || []).length >= 10 },
 ];
 
@@ -107,7 +110,7 @@ export function checkBadges() {
   if (!fresh.length) return;
   updateProgress((q) => { fresh.forEach((b) => (q.badges[b.id] = Date.now())); });
   const b = fresh[0];
-  emitUi({ type: "celebrate", title: "Badge unlocked", sub: b.title + " — " + b.desc, jp: "おめでとう！", icon: b.icon });
+  emitUi({ type: "celebrate", title: "Badge unlocked", sub: b.title + " - " + b.desc, jp: "おめでとう！", icon: b.icon });
 }
 
 export function checkGoal() {

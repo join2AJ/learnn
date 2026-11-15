@@ -1,6 +1,6 @@
-# Nihongo Path — learn Japanese fast (Android)
+# Nihongo Path - learn Japanese fast (Android)
 
-**Install:** download [`release/NihongoPath-v2.5.apk`](release/NihongoPath-v2.5.apk) to your phone, open it and allow "install unknown apps". Android 7.0+.
+**Install:** download [`release/NihongoPath-v2.6.apk`](release/NihongoPath-v2.6.apk) to your phone, open it and allow "install unknown apps". Android 7.0+.
 
 A beginner-first Japanese course with English **and Hindi** explanations:
 

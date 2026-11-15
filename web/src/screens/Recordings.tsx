@@ -35,7 +35,7 @@ export default function Recordings() {
     if (playing === r.t) { setPlaying(null); return; }
     const st = await getRec(r.t);
     if (!st) {
-      toast("No sound was saved for this one — it was recorded before v2.4. Opening it so you can record it again.", "info");
+      toast("No sound was saved for this one - it was recorded before v2.4. Opening it so you can record it again.", "info");
       const w = pk.words.find((x) => x.w === r.w);
       emitUi({ type: "voice", text: r.w, ro: w?.ro, en: w?.m, reviewT: r.t });
       return;

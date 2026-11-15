@@ -39,7 +39,7 @@ export const phrases: P["phrases"] = [
   ] },
   { id: "food", title: "Food & restaurants", icon: "food", items: [
     { jp: "いただきます", ro: "itadakimasu", en: "(before eating)", hi: "खाने से पहले" },
-    { jp: "ごちそうさまでした", ro: "gochisōsama deshita", en: "(after eating — thanks for the meal)", hi: "खाने के बाद धन्यवाद" },
+    { jp: "ごちそうさまでした", ro: "gochisōsama deshita", en: "(after eating - thanks for the meal)", hi: "खाने के बाद धन्यवाद" },
     { jp: "メニューをください", ro: "menyū o kudasai", en: "The menu, please", hi: "मेन्यू दीजिए" },
     { jp: "これをください", ro: "kore o kudasai", en: "This one, please", hi: "यह दीजिए" },
     { jp: "おいしいです", ro: "oishii desu", en: "It’s delicious", hi: "स्वादिष्ट है" },
@@ -121,7 +121,7 @@ export const resources: P["resources"] = [
     { title: "Jisho.org", url: "https://jisho.org", kind: "web", note: "Best free Japanese–English dictionary." },
     { title: "Tofugu: Learn Hiragana", url: "https://www.tofugu.com/japanese/learn-hiragana/", kind: "web", note: "Mnemonic-based hiragana guide." },
     { title: "Tae Kim’s Guide to Japanese", url: "https://guidetojapanese.org/learn/", kind: "web", note: "Free grammar guide from basics up." },
-    { title: "NHK World — Easy Japanese", url: "https://www.nhk.or.jp/lesson/en/", kind: "web", note: "Free 48-lesson audio course with Hindi option." },
+    { title: "NHK World - Easy Japanese", url: "https://www.nhk.or.jp/lesson/en/", kind: "web", note: "Free 48-lesson audio course with Hindi option." },
     { title: "NHK News Web Easy", url: "https://www3.nhk.or.jp/news/easy/", kind: "web", level: "N4+", note: "Real news in simple Japanese with furigana." },
     { title: "Marugoto (Japan Foundation)", url: "https://www.marugoto.org/en/", kind: "web", note: "Official course aligned with JF standards." },
     { title: "OJAD pitch-accent dictionary", url: "https://www.gavo.t.u-tokyo.ac.jp/ojad/eng/pages/home", kind: "web", note: "See the pitch pattern of any word." },
@@ -144,7 +144,7 @@ export const pronunciation: P["pronunciation"] = [
     examples: [{ jp: "あいうえお", ro: "a i u e o", en: "the five vowels", hi: "अ इ उ ए ओ" }, { jp: "いえ", ro: "ie", en: "house", hi: "घर" }, { jp: "あおい", ro: "aoi", en: "blue", hi: "नीला" }] },
   { id: "mora", title: "Rhythm: every beat is equal", text: "Japanese is timed by morae (beats). Each kana = one beat, ん = one beat, small っ = one beat of silence, long vowel = two beats. Speak like a metronome.",
     en: "English stresses some syllables (BA-na-na). Japanese gives every beat equal length and no stress: ba-na-na.",
-    hi: "Like reciting a Sanskrit shloka — each syllable gets its own measured beat.",
+    hi: "Like reciting a Sanskrit shloka - each syllable gets its own measured beat.",
     examples: [{ jp: "にほん", ro: "ni-ho-n", en: "Japan (3 beats)", hi: "जापान" }, { jp: "とうきょう", ro: "to-o-kyo-o", en: "Tokyo (4 beats, not 2!)", hi: "टोक्यो" }] },
   { id: "long", title: "Long vowels change meaning", text: "Holding a vowel twice as long makes a different word. Hiragana adds あいう (おかあさん); katakana uses ー (コーヒー).",
     en: "Like ‘ship’ vs ‘sheep’ but more systematic.",
@@ -154,7 +154,7 @@ export const pronunciation: P["pronunciation"] = [
     en: "Like the gap in ‘bookcase’ (boo-k-case).",
     hi: "Exactly like Hindi द्वित्व: पक्का (pakkā), बच्चा (bacchā), सत्ता.",
     examples: [{ jp: "きて", ro: "kite", en: "come (te-form)", hi: "आओ" }, { jp: "きって", ro: "kitte", en: "stamp", hi: "डाक टिकट" }, { jp: "がっこう", ro: "gakkō", en: "school", hi: "स्कूल" }] },
-  { id: "r", title: "The Japanese R", text: "Not English r, not l: a quick flap — the tongue tip taps the ridge behind your teeth once.",
+  { id: "r", title: "The Japanese R", text: "Not English r, not l: a quick flap - the tongue tip taps the ridge behind your teeth once.",
     en: "Like the ‘tt’ in American ‘butter’ or ‘d’ in ‘ladder’ said fast.",
     hi: "Very close to Hindi र (a single tap) or the flap ड़. Hindi speakers usually get this right naturally!",
     examples: [{ jp: "ありがとう", ro: "arigatō", en: "thank you", hi: "धन्यवाद" }, { jp: "りんご", ro: "ringo", en: "apple", hi: "सेब" }, { jp: "くるま", ro: "kuruma", en: "car", hi: "गाड़ी" }] },
@@ -163,8 +163,8 @@ export const pronunciation: P["pronunciation"] = [
     hi: "Use the UNaspirated row: क not ख, त not थ, प not फ. Japanese has no ख/थ/फ/घ/ध/भ distinction.",
     examples: [{ jp: "たこ", ro: "tako", en: "octopus", hi: "ऑक्टोपस" }, { jp: "ぱん", ro: "pan", en: "bread", hi: "ब्रेड" }] },
   { id: "fu", title: "Tricky sounds: ふ つ し ち ん", text: "ふ fu: blow softly through rounded lips (between f and h). つ tsu: t+s together. し shi, ち chi. ん changes to m before b/p/m (しんぶん → shimbun).",
-    en: "ふ is not English f — no teeth on lip. つ is the ‘ts’ in ‘cats’.",
-    hi: "ふ is between फ and ह (no teeth). つ = त्सु. ん is like अनुस्वार ं — it adapts to the next sound (संबंध).",
+    en: "ふ is not English f - no teeth on lip. つ is the ‘ts’ in ‘cats’.",
+    hi: "ふ is between फ and ह (no teeth). つ = त्सु. ん is like अनुस्वार ं - it adapts to the next sound (संबंध).",
     examples: [{ jp: "ふじさん", ro: "fujisan", en: "Mt Fuji", hi: "फ़ूजी पर्वत" }, { jp: "つなみ", ro: "tsunami", en: "tsunami", hi: "सुनामी" }, { jp: "しんぶん", ro: "shimbun", en: "newspaper", hi: "अख़बार" }] },
   { id: "devoice", title: "Whispered vowels", text: "i and u between voiceless consonants (k, s, t, h, p) are often whispered: です → ‘dess’, すき → ‘ski’.",
     en: "Like the barely-there vowel in ‘potato’ → ‘p’tato’.",
@@ -200,14 +200,14 @@ export const vowels: P["vowels"] = [
 ];
 
 export const sounds: P["sounds"] = [
-  { id: "a", label: "a", jp: "あ", kind: "vowel", f: [760, 1300, 2500], desc: "Open mouth, tongue low. F1 is HIGH (≈760 Hz) — the bands sit close together in the middle." },
-  { id: "i", label: "i", jp: "い", kind: "vowel", f: [300, 2250, 3000], desc: "Tongue high and front. F1 very low, F2 very high — the widest gap of any vowel." },
-  { id: "u", label: "u", jp: "う", kind: "vowel", f: [350, 1380, 2400], desc: "Lips relaxed, NOT rounded. F2 is higher than English ‘oo’ (≈1000 Hz) — the tell-tale Japanese u." },
+  { id: "a", label: "a", jp: "あ", kind: "vowel", f: [760, 1300, 2500], desc: "Open mouth, tongue low. F1 is HIGH (≈760 Hz) - the bands sit close together in the middle." },
+  { id: "i", label: "i", jp: "い", kind: "vowel", f: [300, 2250, 3000], desc: "Tongue high and front. F1 very low, F2 very high - the widest gap of any vowel." },
+  { id: "u", label: "u", jp: "う", kind: "vowel", f: [350, 1380, 2400], desc: "Lips relaxed, NOT rounded. F2 is higher than English ‘oo’ (≈1000 Hz) - the tell-tale Japanese u." },
   { id: "e", label: "e", jp: "え", kind: "vowel", f: [480, 1950, 2600], desc: "Mid-front. Halfway between あ and い on the chart." },
   { id: "o", label: "o", jp: "お", kind: "vowel", f: [500, 850, 2500], desc: "Lips slightly rounded, tongue back. F1 and F2 both low and close together." },
   { id: "n", label: "n", jp: "ん", kind: "nasal", f: [280, 1500, 2500], desc: "Nasal hum: strong energy below 400 Hz, weak higher bands." },
   { id: "s", label: "s", jp: "す", kind: "fricative", band: [4500, 8000], desc: "Hiss with energy high up (4.5–8 kHz)." },
-  { id: "sh", label: "sh", jp: "し", kind: "fricative", band: [2200, 5000], desc: "Lower, wider hiss than s (2–5 kHz) — tongue further back." },
+  { id: "sh", label: "sh", jp: "し", kind: "fricative", band: [2200, 5000], desc: "Lower, wider hiss than s (2–5 kHz) - tongue further back." },
   { id: "h", label: "h", jp: "は", kind: "fricative", band: [600, 3500], desc: "Soft breathy noise, shaped by the following vowel." },
 ];
 
@@ -269,9 +269,9 @@ export const particleQuiz: P["particleQuiz"] = [
 ];
 
 export const scriptsIntro: P["scriptsIntro"] = [
-  { title: "Japanese has no single alphabet — it has three scripts", text: "**Hiragana** (ひらがな) for grammar and native words, **Katakana** (カタカナ) for foreign words, and **Kanji** (漢字) for meaning-carrying word stems. A normal sentence mixes all three: 私**は**インド**から来ました**。" },
+  { title: "Japanese has no single alphabet - it has three scripts", text: "**Hiragana** (ひらがな) for grammar and native words, **Katakana** (カタカナ) for foreign words, and **Kanji** (漢字) for meaning-carrying word stems. A normal sentence mixes all three: 私**は**インド**から来ました**。" },
   { title: "Kana are syllables, not letters", text: "Each kana is a whole sound (ka, shi, tsu). That makes them much closer to Hindi Devanagari (क, कि, कु) than to English letters (k + a)." },
-  { title: "Learn them in this order", text: "1. Hiragana (1 week) → 2. Katakana (1 week) → 3. Kanji gradually, through words you already know. Romaji (Latin letters) is a crutch — drop it as soon as you can read kana." },
+  { title: "Learn them in this order", text: "1. Hiragana (1 week) → 2. Katakana (1 week) → 3. Kanji gradually, through words you already know. Romaji (Latin letters) is a crutch - drop it as soon as you can read kana." },
 ];
 
 export const compareTable: P["compareTable"] = {
@@ -280,7 +280,7 @@ export const compareTable: P["compareTable"] = {
     ["Script type", "Alphabet (letters)", "Abugida (consonant + vowel mark)", "Syllabary (kana) + logograms (kanji)"],
     ["Symbols to start", "26 letters", "~46 letters + मात्राएँ", "46 hiragana + 46 katakana"],
     ["Written order", "a, b, c, d…", "अ आ इ… क ख ग… (by mouth position)", "a i u e o, ka ki ku… (same phonetic logic as Hindi!)"],
-    ["Spaces between words", "Yes", "Yes", "No — kanji/kana switches show word breaks"],
+    ["Spaces between words", "Yes", "Yes", "No - kanji/kana switches show word breaks"],
     ["Spelling = sound?", "Often not (though, through)", "Almost always", "Kana: always. Kanji: must learn readings"],
     ["Vowels", "12–20 sounds", "10–11 (with long/short)", "5 (each short or long)"],
     ["Word order", "S-V-O", "S-O-V", "S-O-V"],
@@ -293,14 +293,14 @@ export const compareTable: P["compareTable"] = {
 };
 
 export const facts: P["facts"] = [
-  "The kana chart order (a-ka-sa-ta-na) was designed by monks who studied Sanskrit — it follows the same mouth-position logic as Devanagari.",
+  "The kana chart order (a-ka-sa-ta-na) was designed by monks who studied Sanskrit - it follows the same mouth-position logic as Devanagari.",
   "Japanese and Hindi share the same verb-at-the-end order: 私は水を飲みます = मैं पानी पीता हूँ.",
   "The top 100 words plus 30 grammar items cover about 65% of everyday spoken Japanese.",
   "カレーライス (curry rice) is one of Japan’s most popular home dishes.",
   "Japanese has only 2 irregular verbs: する (do) and 来る (come).",
   "The day names follow the same planets as Hindi: 火曜日 (Mars) = मंगलवार.",
   "ありがとう is 5 beats: a-ri-ga-to-u. Give each beat equal time.",
-  "Japanese has no plural, no gender and no articles — three things you never have to learn.",
+  "Japanese has no plural, no gender and no articles - three things you never have to learn.",
 ];
 
 export const greeting: P["greeting"] = (h) =>

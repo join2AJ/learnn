@@ -6,7 +6,12 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.media.AudioFormat;
+import android.media.AudioRecord;
+import android.media.MediaRecorder;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
+import android.util.Base64;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
@@ -32,6 +37,8 @@ import androidx.webkit.WebViewAssetLoader;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -44,7 +51,7 @@ import java.util.Locale;
 public class MainActivity extends Activity {
     private static final String HOST = "appassets.androidplatform.net";
     private static final String START = "https://" + HOST + "/assets/www/index.html";
-    private static final int REQ_MIC_WEB = 1, REQ_MIC_SPEECH = 2, REQ_MIC_JS = 3;
+    private static final int REQ_MIC_WEB = 1, REQ_MIC_SPEECH = 2, REQ_MIC_JS = 3, REQ_MIC_CAPTURE = 4;
 
     private WebView web;
     private TextToSpeech tts;
@@ -52,6 +59,8 @@ public class MainActivity extends Activity {
     private SpeechRecognizer recognizer;
     private String pendingSpeechLang = null;
     private PermissionRequest pendingWebPermission = null;
+    private String[] pendingCapture = null; // lang, ms, id
+    private SpeechRecognizer captureRecognizer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,6 +162,8 @@ public class MainActivity extends Activity {
         }
         @JavascriptInterface public void startListening(String lang) { runOnUiThread(() -> beginSpeech(lang)); }
         @JavascriptInterface public void stopListening() { runOnUiThread(() -> { if (recognizer != null) recognizer.stopListening(); }); }
+        /** Record ms of audio once; send the PCM to JS and (Android 13+) feed the same audio to speech recognition. */
+        @JavascriptInterface public void recordAndRecognize(String lang, int ms, String id) { runOnUiThread(() -> startCapture(lang, ms, id)); }
         @JavascriptInterface public boolean hasMic() { return hasMicPermission(); }
         @JavascriptInterface public void requestMic() { runOnUiThread(() -> askMic(REQ_MIC_JS)); }
         @JavascriptInterface
@@ -234,6 +245,79 @@ public class MainActivity extends Activity {
         } catch (Exception ignored) { }
     }
 
+    /* ---------------- one-shot capture + recognition ---------------- */
+    private void captureEvent(String id, String type, String pcm, ArrayList<String> texts, String err) {
+        try {
+            JSONObject o = new JSONObject();
+            o.put("id", id); o.put("type", type);
+            if (pcm != null) o.put("pcm", pcm);
+            if (texts != null) o.put("texts", new JSONArray(texts));
+            if (err != null) o.put("error", err);
+            js("window.__nativeCapture&&window.__nativeCapture(" + o + ")");
+        } catch (Exception ignored) { }
+    }
+
+    private void startCapture(final String lang, final int ms, final String id) {
+        if (!hasMicPermission()) { pendingCapture = new String[]{lang, String.valueOf(ms), id}; askMic(REQ_MIC_CAPTURE); return; }
+        final int sr = 16000;
+        final int minBuf = Math.max(AudioRecord.getMinBufferSize(sr, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT), 4096);
+        final AudioRecord ar;
+        try { ar = new AudioRecord(MediaRecorder.AudioSource.VOICE_RECOGNITION, sr, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, minBuf * 4); }
+        catch (Exception e) { captureEvent(id, "audio", null, null, "mic"); return; }
+        ParcelFileDescriptor[] pipe = null;
+        if (Build.VERSION.SDK_INT >= 33 && SpeechRecognizer.isRecognitionAvailable(this)) {
+            try {
+                pipe = ParcelFileDescriptor.createPipe();
+                if (captureRecognizer != null) captureRecognizer.destroy();
+                captureRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+                captureRecognizer.setRecognitionListener(new RecognitionListener() {
+                    boolean done = false;
+                    @Override public void onReadyForSpeech(Bundle b) { }
+                    @Override public void onBeginningOfSpeech() { }
+                    @Override public void onRmsChanged(float v) { }
+                    @Override public void onBufferReceived(byte[] b) { }
+                    @Override public void onEndOfSpeech() { }
+                    @Override public void onError(int code) { if (done) return; done = true; captureEvent(id, "asr", null, null, "code" + code); }
+                    @Override public void onResults(Bundle b) { if (done) return; done = true; ArrayList<String> r = b.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION); captureEvent(id, "asr", null, r == null ? new ArrayList<>() : r, null); }
+                    @Override public void onPartialResults(Bundle b) { }
+                    @Override public void onEvent(int t, Bundle b) { }
+                });
+                Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                i.putExtra(RecognizerIntent.EXTRA_LANGUAGE, lang);
+                i.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
+                i.putExtra(RecognizerIntent.EXTRA_AUDIO_SOURCE, pipe[0]);
+                i.putExtra(RecognizerIntent.EXTRA_AUDIO_SOURCE_CHANNEL_COUNT, 1);
+                i.putExtra(RecognizerIntent.EXTRA_AUDIO_SOURCE_ENCODING, AudioFormat.ENCODING_PCM_16BIT);
+                i.putExtra(RecognizerIntent.EXTRA_AUDIO_SOURCE_SAMPLING_RATE, sr);
+                captureRecognizer.startListening(i);
+            } catch (Exception e) { pipe = null; captureEvent(id, "asr", null, null, "unsupported"); }
+        } else {
+            captureEvent(id, "asr", null, null, "unsupported");
+        }
+        final ParcelFileDescriptor[] fp = pipe;
+        new Thread(() -> {
+            ByteArrayOutputStream all = new ByteArrayOutputStream();
+            FileOutputStream out = null;
+            try { if (fp != null) out = new FileOutputStream(fp[1].getFileDescriptor()); } catch (Exception ignored) { }
+            byte[] buf = new byte[minBuf];
+            long end = System.currentTimeMillis() + ms;
+            try {
+                ar.startRecording();
+                while (System.currentTimeMillis() < end) {
+                    int n = ar.read(buf, 0, buf.length);
+                    if (n <= 0) continue;
+                    all.write(buf, 0, n);
+                    if (out != null) { try { out.write(buf, 0, n); } catch (Exception e) { out = null; } }
+                }
+            } catch (Exception ignored) { }
+            try { ar.stop(); } catch (Exception ignored) { }
+            ar.release();
+            try { if (out != null) out.close(); if (fp != null) { fp[1].close(); } } catch (Exception ignored) { }
+            captureEvent(id, "audio", Base64.encodeToString(all.toByteArray(), Base64.NO_WRAP), null, null);
+        }).start();
+    }
+
     /* ---------------- permissions ---------------- */
     private boolean hasMicPermission() {
         return Build.VERSION.SDK_INT < 23 || checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
@@ -254,6 +338,10 @@ public class MainActivity extends Activity {
             if (ok && pendingSpeechLang != null) beginSpeech(pendingSpeechLang);
             else speechEvent("error", null, "Microphone permission denied.");
             pendingSpeechLang = null;
+        } else if (code == REQ_MIC_CAPTURE && pendingCapture != null) {
+            String[] c = pendingCapture; pendingCapture = null;
+            if (ok) startCapture(c[0], Integer.parseInt(c[1]), c[2]);
+            else captureEvent(c[2], "audio", null, null, "denied");
         } else if (code == REQ_MIC_JS) {
             js("window.__nativePerm&&window.__nativePerm(" + ok + ")");
         }
@@ -283,6 +371,7 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         if (tts != null) { tts.stop(); tts.shutdown(); }
         if (recognizer != null) recognizer.destroy();
+        if (captureRecognizer != null) captureRecognizer.destroy();
         if (web != null) web.destroy();
         super.onDestroy();
     }

@@ -81,7 +81,7 @@ export function Jp({ text }: { text: string }) {
     : <span key={i}>{p}</span>))}</>;
 }
 
-/** **bold** markdown only — enough for lesson copy. Japanese inside is tappable. */
+/** **bold** markdown only - enough for lesson copy. Japanese inside is tappable. */
 export function Md({ text }: { text: string }) {
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
   return <>{parts.map((p, i) => (p.startsWith("**") ? <b key={i}><Jp text={p.slice(2, -2)} /></b> : <Jp key={i} text={p} />))}</>;

@@ -16,6 +16,7 @@ interface NativeApi {
   openExternal(url: string): void;
   appVersion(): string;
   setTheme?(dark: boolean): void;
+  recordAndRecognize?(lang: string, ms: number, id: string): void;
 }
 
 declare global {
@@ -24,6 +25,7 @@ declare global {
     __nativeTts?: (e: { type: string; id: string }) => void;
     __nativeSpeech?: (e: { type: string; texts?: string[]; error?: string }) => void;
     __nativePerm?: (granted: boolean) => void;
+    __nativeCapture?: (e: { id: string; type: string; pcm?: string; texts?: string[]; error?: string }) => void;
     webkitSpeechRecognition?: any;
     SpeechRecognition?: any;
     webkitAudioContext?: typeof AudioContext;
@@ -60,7 +62,7 @@ export function speak(text: string, opts: { lang?: string; rate?: number; id?: s
   if (n) {
     try {
       const st = JSON.parse(n.ttsStatus() || "{}");
-      if (st.ready && !st.voice) warn("Japanese voice missing — Settings → Voice to install it.");
+      if (st.ready && !st.voice) warn("Japanese voice missing - Settings → Voice to install it.");
     } catch { /* ignore */ }
     setSpeaking(id);
     n.speak(text, lang, rate, id);
@@ -161,3 +163,35 @@ export function openExternal(url: string) {
 }
 export const appVersion = () => N()?.appVersion() || "web";
 export const setNativeTheme = (dark: boolean) => { try { N()?.setTheme?.(dark); } catch { /* older shell */ } };
+
+/* ---------------- one-shot capture: audio + what was said ---------------- */
+export interface Capture { pcm: Float32Array | null; sr: number; texts: string[] | null; asrError?: string }
+const capWait = new Map<string, (e: { type: string; pcm?: string; texts?: string[]; error?: string }) => void>();
+if (typeof window !== "undefined") window.__nativeCapture = (e) => capWait.get(e.id)?.(e);
+/** Codes that mean "this phone can't recognise from our audio" (not "you said something else"). */
+const UNSUPPORTED = new Set(["unsupported", "code3", "code5", "code8", "code10", "code11", "code12", "code13", "code14", "timeout"]);
+export const captureSupported = () => !!N()?.recordAndRecognize;
+
+export function captureNative(lang: string, ms: number): Promise<Capture> {
+  const id = "c" + Date.now();
+  return new Promise((res) => {
+    let pcm: Float32Array | null = null, gotAudio = false, texts: string[] | null = null, asrDone = false, err: string | undefined;
+    let timer: number | undefined;
+    const finish = () => { if (!gotAudio || !asrDone) return; capWait.delete(id); clearTimeout(timer); res({ pcm, sr: 16000, texts, asrError: err }); };
+    capWait.set(id, (e) => {
+      if (e.type === "audio") {
+        gotAudio = true;
+        if (e.pcm) { const b = atob(e.pcm); const n = b.length >> 1; pcm = new Float32Array(n); for (let i = 0; i < n; i++) { let v = b.charCodeAt(2 * i) | (b.charCodeAt(2 * i + 1) << 8); if (v >= 32768) v -= 65536; pcm[i] = v / 32768; } }
+        else err = e.error || "mic";
+        if (!asrDone) timer = window.setTimeout(() => { asrDone = true; err = err || "timeout"; finish(); }, 6000);
+        finish();
+      } else if (e.type === "asr") {
+        asrDone = true;
+        if (e.texts) texts = e.texts; else err = e.error;
+        finish();
+      }
+    });
+    N()!.recordAndRecognize!(lang, ms, id);
+  });
+}
+export const asrUnsupported = (c: Capture) => c.texts === null && (!c.asrError || UNSUPPORTED.has(c.asrError));

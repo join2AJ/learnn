@@ -11,6 +11,13 @@ import { Bar, Header, pick, Say, Seg, tap } from "../../ui/kit";
 import { RecBtn } from "../../ui/VoiceCompare";
 import { Icon } from "../../ui/icons";
 
+const DECKS = [
+  { id: "words", top: "Words", sub: "शब्द", name: "Words (1,000 core)", en: "the most-used Japanese words, with meaning and an example sentence.", hi: "सबसे ज़्यादा इस्तेमाल होने वाले 1,000 जापानी शब्द - अर्थ और वाक्य के साथ।" },
+  { id: "hira", top: "ひらがな", sub: "Hiragana", name: "Hiragana", en: "the basic Japanese alphabet used for native words and grammar endings.", hi: "मूल जापानी वर्णमाला - जापानी शब्दों और व्याकरण के लिए।" },
+  { id: "kata", top: "カタカナ", sub: "Katakana", name: "Katakana", en: "the same sounds in angular shapes, used for foreign words like コーヒー (coffee).", hi: "वही ध्वनियाँ, कोणीय अक्षर - विदेशी शब्दों के लिए (जैसे コーヒー = कॉफ़ी)।" },
+  { id: "kanji", top: "漢字", sub: "Kanji", name: "Kanji", en: "characters from Chinese that carry meaning, like 日 (sun/day) and 山 (mountain).", hi: "चीनी से आए अर्थ वाले अक्षर - जैसे 日 (सूर्य/दिन), 山 (पहाड़)।" },
+];
+
 type Card = { id: string; front: string; reading?: string; romaji?: string; meaning: string; hindi?: string; s?: string; sr?: string; st?: string; speakText: string; kind: "word" | "kana" };
 
 export default function Flashcards({ deck }: { deck: string }) {
@@ -55,8 +62,15 @@ export default function Flashcards({ deck }: { deck: string }) {
   };
 
   const deckSel = (
-    <Seg value={deck} options={[["words", "Words"], ["hira", <span className="jp">ひらがな</span>], ["kata", <span className="jp">カタカナ</span>], ["kanji", <span className="jp">漢字</span>]]}
-      onChange={(v) => go("/practice/cards?deck=" + v, true)} />
+    <>
+      <Seg value={deck} options={DECKS.map((d) => [d.id, <span style={{ display: "flex", flexDirection: "column", lineHeight: 1.15 }}><span className={d.id === "words" ? "" : "jp"}>{d.top}</span><span style={{ fontSize: 10, fontWeight: 600, opacity: .75 }}>{d.sub}</span></span>] as [string, React.ReactNode])}
+        onChange={(v) => go("/practice/cards?deck=" + v, true)} />
+      {(() => { const d = DECKS.find((x) => x.id === deck)!; return (
+        <div className="card flat mt8" style={{ padding: "10px 12px", background: "transparent" }}>
+          <div className="sm"><b>{d.name}</b> - {d.en}</div>
+          {s.showHindi && <div className="sm hi">{d.hi}</div>}
+        </div>); })()}
+    </>
   );
 
   if (!card) {
@@ -69,7 +83,7 @@ export default function Flashcards({ deck }: { deck: string }) {
           <div style={{ display: "grid", placeItems: "center" }}><Icon name="party" size={52} /></div>
           <div className="jp" style={{ fontSize: 26, fontWeight: 800 }}>{pr.jp}</div>
           <div style={{ fontWeight: 800, fontSize: 20 }}>{total ? "Session complete" : "Nothing due right now"}</div>
-          <div className="sm mu mt4">{total ? stats.done + " cards reviewed · " + stats.again + " to relearn" : "Come back later — reviews appear right before you’d forget."}</div>
+          <div className="sm mu mt4">{total ? stats.done + " cards reviewed · " + stats.again + " to relearn" : "Come back later - reviews appear right before you’d forget."}</div>
           <div className="row mt16" style={{ justifyContent: "center" }}>
             <button className="btn white" onClick={() => go("/practice/cards?deck=" + deck + "&r=" + Date.now(), true)}><RotateCcw size={16} /> More cards</button>
             <button className="btn ghost" style={{ color: "#fff", boxShadow: "inset 0 0 0 1.5px rgba(255,255,255,.5)" }} onClick={() => go("/practice/quiz/listen")}>Listening quiz</button>
@@ -124,7 +138,7 @@ export default function Flashcards({ deck }: { deck: string }) {
       ) : (
         <button className="btn primary lg block mt16" onClick={doFlip}>Show answer</button>
       )}
-      <div className="xs mu center mt12">Say the answer out loud before you flip — active recall is 2× faster than re-reading.</div>
+      <div className="xs mu center mt12">Say the answer out loud before you flip - active recall is 2× faster than re-reading.</div>
     </div>
   );
 }

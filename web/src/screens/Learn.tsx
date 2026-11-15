@@ -42,7 +42,7 @@ function LearnHub() {
   );
   return (
     <div className="screen">
-      <Header title="Learn" sub="Follow top to bottom — that’s the fastest path" />
+      <Header title="Learn" sub="Follow top to bottom - that’s the fastest path" />
       <div className="section-title" style={{ marginTop: 6 }}><h2>1 · Scripts & sounds</h2></div>
       <div className="list">
         <Item to="/learn/scripts" tint="soft-gold" icon={<Languages size={19} color="var(--gold)" />} title="The 3 scripts, compared" desc="Hiragana, katakana, kanji vs English & Hindi" />
@@ -63,7 +63,7 @@ function LearnHub() {
       <div className="section-title"><h2>3 · Words & phrases</h2></div>
       <div className="list">
         <Item to="/learn/words" tint="soft-gold" icon={<BookA size={19} color="var(--gold)" />} title="1,000 core words" desc={p.known.length + " known · by frequency, with Hindi + sentences"} pct={p.known.length / 1000} />
-        <Item to="/learn/phrases" tint="soft-sakura" icon={<MessageCircle size={19} color="var(--sakura)" />} title="Survival phrases" desc="Greetings, food, travel, shopping — tap to hear" />
+        <Item to="/learn/phrases" tint="soft-sakura" icon={<MessageCircle size={19} color="var(--sakura)" />} title="Survival phrases" desc="Greetings, food, travel, shopping - tap to hear" />
       </div>
     </div>
   );

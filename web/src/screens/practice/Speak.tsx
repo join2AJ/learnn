@@ -5,27 +5,9 @@ import { bumpDay, updateProgress, useProgress, useSettings } from "../../core/st
 import { award } from "../../core/rewards";
 import { listen, speak, speechSupported, stopListening } from "../../core/native";
 import { usePack } from "../../pack";
-import { toHira } from "../../packs/ja/kana";
+import { matchScore } from "../../core/match";
 import { Header, pick, Say, Seg, shuffle, tap } from "../../ui/kit";
 import { RecBtn } from "../../ui/VoiceCompare";
-
-const norm = (s: string) => toHira(s).replace(/[\s、。！？!?,.・「」『』〜~]/g, "").toLowerCase();
-function lev(a: string, b: string) {
-  const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
-  for (let j = 1; j <= b.length; j++) d[0][j] = j;
-  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
-  return d[a.length][b.length];
-}
-export function matchScore(heard: string[], targets: string[]) {
-  let best = 0;
-  for (const h of heard) for (const t of targets) {
-    const a = norm(h), b = norm(t);
-    if (!a || !b) continue;
-    if (a === b || a.includes(b)) return 1;
-    best = Math.max(best, 1 - lev(a, b) / Math.max(a.length, b.length));
-  }
-  return best;
-}
 
 type Item = { jp: string; alt: string[]; ro: string; en: string; hi?: string };
 
@@ -91,10 +73,10 @@ export default function Speak() {
         <div className={"feedback " + (state === "done" ? (ok ? "ok" : "bad") : "")} style={state !== "done" ? { background: "var(--surface-2)" } : undefined}>
           <div className="kicker">I heard</div>
           <div className="jp lg" style={{ fontWeight: 700 }}>{heard[0]}</div>
-          {state === "done" && <div className="mt8"><b>{ok ? "✓ " + pick(pk.praise).jp + " Match " + Math.round(score * 100) + "%" : "Close — " + Math.round(score * 100) + "% match. Listen again and copy the rhythm."}</b></div>}
+          {state === "done" && <div className="mt8"><b>{ok ? "✓ " + pick(pk.praise).jp + " Match " + Math.round(score * 100) + "%" : "Close - " + Math.round(score * 100) + "% match. Listen again and copy the rhythm."}</b></div>}
         </div>
       )}
-      {err && <div className="feedback bad"><b>Didn’t catch that.</b><div className="sm">{err === "no-speech" || err.includes("7") ? "No speech detected — try again a bit louder." : err}</div></div>}
+      {err && <div className="feedback bad"><b>Didn’t catch that.</b><div className="sm">{err === "no-speech" || err.includes("7") ? "No speech detected - try again a bit louder." : err}</div></div>}
 
       <div className="row mt16">
         <button className="btn grow" onClick={() => { tap(); setIdx(idx + 1); }}><SkipForward size={16} /> Next</button>

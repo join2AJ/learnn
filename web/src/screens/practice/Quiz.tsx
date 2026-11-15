@@ -59,7 +59,7 @@ function makeQuestions(mode: string, set: string, pk: LanguagePack, hindi: boole
     return shuffle(pk.particleQuiz).slice(0, N).map((x) => ({
       prompt: <div className="jp" style={{ fontSize: 28, lineHeight: 1.5 }}>{x.before}<span style={{ display: "inline-block", minWidth: 44, borderBottom: "3px solid var(--shu)", margin: "0 4px" }}>&nbsp;</span>{x.after}</div>,
       speakText: x.before + x.answer + x.after, answer: x.answer, options: shuffle(x.options).map((o) => ({ key: o, label: o, jp: true })),
-      explain: <span><span className="jp">{x.before}<b style={{ color: "var(--shu)" }}>{x.answer}</b>{x.after}</span> — {x.en}</span>,
+      explain: <span><span className="jp">{x.before}<b style={{ color: "var(--shu)" }}>{x.answer}</b>{x.after}</span> - {x.en}</span>,
     }));
   }
   if (mode === "build") {
@@ -78,7 +78,7 @@ function makeQuestions(mode: string, set: string, pk: LanguagePack, hindi: boole
       return {
         prompt: <div><div className="jp" style={{ fontSize: 40, fontWeight: 700 }}>{v.w}</div><div className="mu">{v.m}</div><div className="tag mt8" style={{ background: "var(--ai)", color: "#fff", height: 28, fontSize: 13 }}>→ {f.label}</div></div>,
         speakText: f.jp, answer: f.jp, options: shuffle([f, ...others]).map((o) => ({ key: o.jp, label: o.jp, jp: true })),
-        explain: <span><span className="jp">{f.jp}</span> ({f.ro}) — {f.en}</span>,
+        explain: <span><span className="jp">{f.jp}</span> ({f.ro}) - {f.en}</span>,
       };
     });
   }
@@ -147,7 +147,7 @@ export default function Quiz({ mode, set }: { mode: string; set: string }) {
           <div style={{ display: "grid", placeItems: "center" }}><Icon name={pct === 1 ? "trophy" : pct >= 0.8 ? "star" : pct >= 0.5 ? "rocket" : "sprout"} size={54} /></div>
           <div className="jp" style={{ fontSize: 24, fontWeight: 800 }}>{pct >= 0.8 ? pick(pk.praise).jp : "頑張って！"}</div>
           <div style={{ fontSize: 40, fontWeight: 800 }}>{score} / {qs.length}</div>
-          <div className="sm mu">{pct === 1 ? "Perfect round! +15 XP bonus" : pct >= 0.8 ? "Excellent — you’re ready for more." : "Every mistake is a future right answer. Try again!"}</div>
+          <div className="sm mu">{pct === 1 ? "Perfect round! +15 XP bonus" : pct >= 0.8 ? "Excellent - you’re ready for more." : "Every mistake is a future right answer. Try again!"}</div>
           <div className="row mt16" style={{ justifyContent: "center" }}>
             <button className="btn white" onClick={restart}><RotateCcw size={16} /> Again</button>
             <button className="btn ghost" style={{ color: "#fff", boxShadow: "inset 0 0 0 1.5px rgba(255,255,255,.5)" }} onClick={() => go("/practice")}>Done</button>

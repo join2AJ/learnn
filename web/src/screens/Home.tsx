@@ -133,7 +133,7 @@ export default function Home() {
   );
 }
 
-/** Four concrete tasks for today, ticked automatically — answers "what do I do now?". */
+/** Four concrete tasks for today, ticked automatically - answers "what do I do now?". */
 function TodayPlan() {
   const p = useProgress();
   const s = useSettings();
@@ -150,7 +150,7 @@ function TodayPlan() {
   const done = tasks.filter((t) => t[0]).length;
   return (
     <div className="card mt16">
-      <div className="row"><div className="grow"><div className="kicker">Today’s plan</div><div style={{ fontWeight: 800, fontSize: 17 }}>{done === 4 ? "All done — お疲れさま！" : done + " of 4 done"}</div></div>
+      <div className="row"><div className="grow"><div className="kicker">Today’s plan</div><div style={{ fontWeight: 800, fontSize: 17 }}>{done === 4 ? "All done - お疲れさま！" : done + " of 4 done"}</div></div>
         <Ring pct={done / 4} size={44} stroke={5} color="var(--matcha)"><span className="xs" style={{ fontWeight: 800 }}>{done}/4</span></Ring></div>
       <div className="mt8">
         {tasks.map(([ok, t, n, to]) => (

@@ -129,7 +129,7 @@ b, strong { font-weight: 700; }
 .chips::-webkit-scrollbar { display: none; }
 .tag { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 7px; font-size: 11px; font-weight: 700; letter-spacing: .02em; background: var(--surface-2); color: var(--ink-2); }
 .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: var(--surface-2); border-radius: 14px; padding: 4px; gap: 4px; }
-.seg button { height: 38px; border-radius: 11px; font-weight: 700; font-size: 13px; color: var(--ink-2); transition: all .2s; }
+.seg button { min-height: 38px; padding: 4px 2px; border-radius: 11px; font-weight: 700; font-size: 13px; color: var(--ink-2); transition: all .2s; }
 .seg button.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-1); }
 .say { width: 36px; height: 36px; border-radius: 50%; display: inline-grid; place-items: center; background: var(--shu-soft); color: var(--shu); flex: none; transition: transform .15s; vertical-align: middle; }
 .say:active { transform: scale(.9); }
@@ -281,3 +281,7 @@ input[type=range] { width: 100%; accent-color: var(--shu); }
 .jp-tap { font: inherit; color: inherit; font-family: var(--jp); text-decoration: underline dotted color-mix(in srgb, var(--shu) 70%, transparent); text-underline-offset: 3px; text-decoration-thickness: 1.5px; padding: 0 1px; border-radius: 4px; display: inline; text-align: inherit; }
 .jp-tap:active { background: var(--shu-soft); }
 .hint-tap { font-size: 11px; color: var(--ink-3); display: inline-flex; gap: 4px; align-items: center; }
+
+.kana-cycle { position: relative; height: 150px; }
+.kana-cycle span { position: absolute; left: 0; top: 0; font-family: var(--jp-serif); font-size: 140px; font-weight: 700; line-height: 1; opacity: 0; animation: kanaCycle 8s infinite; }
+@keyframes kanaCycle { 0% { opacity: 0; transform: translateY(14px) scale(.96); } 6%, 22% { opacity: 1; transform: none; } 28%, 100% { opacity: 0; transform: translateY(-10px); } }

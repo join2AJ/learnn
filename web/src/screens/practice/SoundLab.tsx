@@ -8,47 +8,16 @@ import { closeMic, Mic as MicH, openMic, record, toBuffer } from "../../core/mic
 import type { SoundRef, VowelRef } from "../../core/types";
 import { usePack } from "../../pack";
 import { Header, Seg, tap } from "../../ui/kit";
+import { VowelChart } from "../../ui/VowelChart";
 import { toast } from "../../core/store";
 import { LangPill } from "../../ui/icons";
-
-/* ---------------- vowel chart ---------------- */
-const F2MAX = 2700, F2MIN = 600, F1MIN = 200, F1MAX = 950;
-const COL: Record<string, string> = { target: "var(--shu)", en: "var(--ai)", hi: "var(--gold)" };
-function VowelChart({ refs, show, live, trail, scale = 1, onTap, height = 260 }: { refs: VowelRef[]; show: Record<string, boolean>; live?: [number, number] | null; trail?: [number, number][]; scale?: number; onTap?: (v: VowelRef) => void; height?: number }) {
-  const W = 340, H = height, pl = 40, pr = 10, pt = 14, pb = 30;
-  const x = (f2: number) => pl + ((F2MAX - f2) / (F2MAX - F2MIN)) * (W - pl - pr);
-  const y = (f1: number) => pt + ((f1 - F1MIN) / (F1MAX - F1MIN)) * (H - pt - pb);
-  const target = refs.filter((r) => r.lang === "target");
-  const poly = ["i", "e", "a", "o", "ɯ"].map((ipa) => target.find((t) => t.ipa === ipa)).filter(Boolean) as VowelRef[];
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" className="chart" style={{ background: "var(--surface)", borderRadius: 18 }}>
-      {[1000, 1500, 2000, 2500].map((f) => <g key={f}><line x1={x(f)} x2={x(f)} y1={pt} y2={H - pb} stroke="var(--line)" /><text x={x(f)} y={H - 12} textAnchor="middle">{f}</text></g>)}
-      <text x={(W + pl) / 2} y={H - 1} textAnchor="middle" style={{ fontWeight: 700, fontSize: 9 }}>F2 Hz — tongue position: front (い) ← → back (お)</text>
-      <text x={9} y={(H - pb + pt) / 2} textAnchor="middle" transform={`rotate(-90 9 ${(H - pb + pt) / 2})`} style={{ fontWeight: 700, fontSize: 9 }}>F1 Hz — mouth opening ↓</text>
-      {[300, 500, 700, 900].map((f) => <g key={f}><line x1={pl} x2={W - pr} y1={y(f)} y2={y(f)} stroke="var(--line)" /><text x={pl - 3} y={y(f) + 3} textAnchor="end">{f}</text></g>)}
-      <text x={W - pr - 2} y={pt + 9} textAnchor="end" style={{ fontWeight: 700 }}>closed mouth</text>
-      <text x={W - pr - 2} y={H - pb - 4} textAnchor="end" style={{ fontWeight: 700 }}>open mouth</text>
-      {show.target && <polygon points={poly.map((v) => x(v.f2 * scale) + "," + y(v.f1 * scale)).join(" ")} fill="var(--shu-soft)" stroke="var(--shu)" strokeOpacity=".4" />}
-      {refs.filter((r) => show[r.lang]).map((r, i) => (
-        <g key={i} onClick={() => onTap?.(r)} style={{ cursor: "pointer" }}>
-          <circle cx={x(r.f2 * scale)} cy={y(r.f1 * scale)} r={r.lang === "target" ? 15 : 5} fill={r.lang === "target" ? COL.target : "var(--surface)"} stroke={COL[r.lang]} strokeWidth={r.lang === "target" ? 0 : 2} />
-          {r.lang === "target"
-            ? <text x={x(r.f2 * scale)} y={y(r.f1 * scale) + 5} textAnchor="middle" style={{ fill: "#fff", fontSize: 14, fontFamily: "var(--jp)", fontWeight: 700 }}>{r.label.split(" ")[0]}</text>
-            : <text x={x(r.f2 * scale) + 7} y={y(r.f1 * scale) + 3} style={{ fill: COL[r.lang], fontSize: 9, fontWeight: 700 }}>{r.label.replace(/^(EN|हि) /, "")}</text>}
-        </g>
-      ))}
-      {trail?.map(([f1, f2], i) => <circle key={i} cx={x(f2)} cy={y(f1)} r={3} fill="var(--matcha)" opacity={(i + 1) / trail.length * 0.6} />)}
-      {live && <g><circle cx={x(live[1])} cy={y(live[0])} r={10} fill="var(--matcha)" stroke="#fff" strokeWidth="3" /><text x={x(live[1]) + 13} y={y(live[0]) + 4} style={{ fill: "var(--matcha)", fontWeight: 800, fontSize: 11 }}>you</text></g>}
-    </svg>
-  );
-}
 
 /* ---------------- screen ---------------- */
 export default function SoundLab() {
   const [tab, setTab] = useState<"live" | "vowels" | "sounds" | "pitch">("live");
   return (
     <div className="screen">
-      <Header title="Sound Lab" sub="See what Japanese sounds look like — and how yours compare" backTo="/practice" />
+      <Header title="Sound Lab" sub="See what Japanese sounds look like - and how yours compare" backTo="/practice" />
       <Seg value={tab} options={[["live", "Live"], ["vowels", "Vowels"], ["sounds", "Sounds"], ["pitch", "Pitch"]]} onChange={setTab} />
       <div className="mt12">
         {tab === "live" && <Live />}
@@ -122,7 +91,7 @@ function Live() {
           <canvas ref={cv} className="spectro" style={{ height: H }} width={360} height={H} />
           <FreqAxis maxHz={MAXHZ} h={H} />
           {!on && <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", color: "#fff", textAlign: "center", padding: 20 }}>
-            <div><div style={{ display: "grid", placeItems: "center", marginBottom: 6 }}><Mic size={30} /></div><div style={{ fontWeight: 800 }}>Live spectrogram</div><div className="sm" style={{ opacity: .75 }}>Time flows right → left. Bright bands are your formants — the “shape” of each vowel.</div></div>
+            <div><div style={{ display: "grid", placeItems: "center", marginBottom: 6 }}><Mic size={30} /></div><div style={{ fontWeight: 800 }}>Live spectrogram</div><div className="sm" style={{ opacity: .75 }}>Time flows right → left. Bright bands are your formants - the “shape” of each vowel.</div></div>
           </div>}
         </div>
         <div className="row mt12">
@@ -140,7 +109,7 @@ function Live() {
         <div className="mt8"><VowelChart refs={pk.vowels} show={{ target: true, en: false, hi: false }} live={read && read.f1 ? [read.f1, read.f2] : null} trail={trail} scale={scale} onTap={(v) => speak(v.example || v.label, { lang: pk.ttsLang })} /></div>
         <div className="mt8"><Seg value={String(scale)} options={[["1", "Lower voice"], ["1.15", "Higher voice"]]} onChange={(v) => setScale(+v)} /></div>
         <FormantHelp />
-        <div className="xs mu mt8" style={{ lineHeight: 1.5 }}>Targets are average adult values; higher voices have formants ~15% higher, so switch the scale. Estimates come from LPC analysis on your phone — use quiet surroundings.</div>
+        <div className="xs mu mt8" style={{ lineHeight: 1.5 }}>Targets are average adult values; higher voices have formants ~15% higher, so switch the scale. Estimates come from LPC analysis on your phone - use quiet surroundings.</div>
       </div>
     </div>
   );
@@ -172,9 +141,9 @@ function Vowels() {
       <div className="card soft-gold" style={{ boxShadow: "none" }}>
         <div style={{ fontWeight: 800 }}>What the map tells you</div>
         <ul className="sm" style={{ lineHeight: 1.65, paddingLeft: 18, margin: "6px 0 0" }}>
-          <li>Japanese <b className="jp">う</b> sits much further <b>forward</b> (higher F2) than English “oo” or Hindi ऊ — keep your lips relaxed, not rounded.</li>
+          <li>Japanese <b className="jp">う</b> sits much further <b>forward</b> (higher F2) than English “oo” or Hindi ऊ - keep your lips relaxed, not rounded.</li>
           <li>Hindi <span className="hi">इ ए ओ आ</span> land almost exactly on Japanese <span className="jp">い え お あ</span>. You already own 4 of 5 vowels!</li>
-          <li>English speakers: avoid gliding “ay”/“oh” — Japanese <span className="jp">え</span> and <span className="jp">お</span> are pure, steady points.</li>
+          <li>English speakers: avoid gliding “ay”/“oh” - Japanese <span className="jp">え</span> and <span className="jp">お</span> are pure, steady points.</li>
         </ul>
       </div>
       <div className="card"><FormantHelp open /></div>
@@ -221,7 +190,7 @@ function Sounds() {
         ))}
       </div>
       <div className="card mt12" style={{ padding: 12 }}>
-        <div className="row"><div className="grow"><div style={{ fontWeight: 800 }}><span className="jp">{sel.jp}</span> “{sel.label}” — what it looks like</div><div className="xs mu">Synthesised reference · 0–6 kHz</div></div>
+        <div className="row"><div className="grow"><div style={{ fontWeight: 800 }}><span className="jp">{sel.jp}</span> “{sel.label}” - what it looks like</div><div className="xs mu">Synthesised reference · 0–6 kHz</div></div>
           <button className="btn sm" onClick={() => buf.current && playBuffer(buf.current)}><Play size={14} /> Tone</button>
           <button className="btn sm" onClick={() => speak(sel.jp, { lang: pk.ttsLang })}><Volume2 size={14} /> Voice</button></div>
         <div style={{ position: "relative" }} className="mt8">
@@ -265,7 +234,7 @@ function Pitch() {
     for (let i = 0; i + size < data.length; i += hop) ps.push(pitch(data.subarray(i, i + size), sr));
     // keep the voiced region
     const first = ps.findIndex((x) => x > 0), last = ps.length - 1 - [...ps].reverse().findIndex((x) => x > 0);
-    if (first < 0) { toast("No voice detected — speak louder.", "warn"); return; }
+    if (first < 0) { toast("No voice detected - speak louder.", "warn"); return; }
     const seg = ps.slice(first, last + 1);
     // remove octave jumps with a median filter
     const med = seg.map((_, i) => { const win = seg.slice(Math.max(0, i - 3), i + 4).filter((x) => x > 0).sort((a, b) => a - b); return win.length ? win[win.length >> 1] : 0; });
@@ -321,7 +290,7 @@ function Pitch() {
           <button className={"btn " + (state === "rec" ? "dark" : "primary")} onClick={rec} disabled={state === "rec"}>{state === "rec" ? <><Square size={14} /> Recording 2s…</> : <><Mic size={16} /> Record me</>}</button>
         </div>
         {mine && <div className={"feedback " + (mine.every((x, k) => x === w.pattern[k]) ? "ok" : "bad")}>
-          <b>{mine.every((x, k) => x === w.pattern[k]) ? "Your melody matches! ✓" : "Melody differs — listen again and exaggerate the high beat."}</b>
+          <b>{mine.every((x, k) => x === w.pattern[k]) ? "Your melody matches! ✓" : "Melody differs - listen again and exaggerate the high beat."}</b>
           <div className="xs mu mt4">Target: {w.pattern.map((x) => (x ? "H" : "L")).join(" ")} · You: {mine.map((x) => (x ? "H" : "L")).join(" ")}</div>
         </div>}
       </div>

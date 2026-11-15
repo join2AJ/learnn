@@ -22,7 +22,7 @@ export interface Settings {
 
 export interface SrsCard { due: number; ivl: number; ease: number; reps: number; lapses: number; last: number; }
 /** Summary of one voice recording (audio itself is not stored). */
-export interface VoiceRec { t: number; w: string; bands: [number, number, number]; ref: [number, number, number]; db: number; dur: number; exp: number; f0: [number, number]; score: number; }
+export interface VoiceRec { t: number; w: string; bands: [number, number, number]; ref: [number, number, number]; db: number; dur: number; exp: number; f0: [number, number]; score: number; match?: number; }
 export interface DayStat { ms: number; sec: Record<string, number>; xp: number; reviews: number; correct: number; wrong: number; learned: number; spoke?: number; }
 
 export interface Progress {

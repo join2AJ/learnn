@@ -23,7 +23,7 @@ export default function Scripts() {
           </div>
           <Say text={sample} />
         </div>
-        <div className="sm mu">watashi wa indo kara kimashita — “I came from India.” · मैं भारत से आया हूँ।</div>
+        <div className="sm mu">watashi wa indo kara kimashita - “I came from India.” · मैं भारत से आया हूँ।</div>
         <div className="row wrap mt12 gap6 xs">
           <span className="tag" style={{ background: "rgba(159,224,169,.2)", color: "#c8f0cf" }}>Kanji = meaning</span>
           <span className="tag" style={{ background: "rgba(255,179,159,.2)", color: "#ffd3c7" }}>Hiragana = grammar</span>
@@ -61,7 +61,7 @@ export default function Scripts() {
 
       <div className="card soft-gold mt16" style={{ boxShadow: "none" }}>
         <div className="row gap6" style={{ fontWeight: 800 }}><LangPill l="hi" /> Hindi speakers: a big head start</div>
-        <div className="sm mt4" style={{ lineHeight: 1.6 }}>The kana chart (a i u e o · ka ki ku ke ko) was organised by Buddhist scholars who studied Sanskrit — it follows the same phonetic logic as <span className="hi">अ इ उ ए ओ · क कि कु के को</span>. Each kana is a syllable just like a Devanagari letter with its मात्रा.</div>
+        <div className="sm mt4" style={{ lineHeight: 1.6 }}>The kana chart (a i u e o · ka ki ku ke ko) was organised by Buddhist scholars who studied Sanskrit - it follows the same phonetic logic as <span className="hi">अ इ उ ए ओ · क कि कु के को</span>. Each kana is a syllable just like a Devanagari letter with its मात्रा.</div>
       </div>
       <button className="btn primary lg block mt16" onClick={() => go("/learn/kana/hira")}>Start hiragana <ArrowRight size={18} /></button>
     </div>

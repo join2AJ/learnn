@@ -41,7 +41,7 @@ export function GrammarList() {
         </div>
       ))}
       <button className="card tap mt16" onClick={() => go("/learn/verbs")}>
-        <div className="row"><div className="grow"><div style={{ fontWeight: 800 }}>Verb conjugator</div><div className="sm mu">See all 20 forms of any verb — present, past, negative, て, potential…</div></div><ArrowRight size={18} /></div>
+        <div className="row"><div className="grow"><div style={{ fontWeight: 800 }}>Verb conjugator</div><div className="sm mu">See all 20 forms of any verb - present, past, negative, て, potential…</div></div><ArrowRight size={18} /></div>
       </button>
     </div>
   );
@@ -138,7 +138,7 @@ export function LessonView({ id }: { id: string }) {
           </div>
           {picked !== null && (
             <div className={"feedback " + (picked === q.answer ? "ok" : "bad")}>
-              <b>{picked === q.answer ? pick(pk.praise).jp + " Correct." : "Not quite — answer: " + q.options[q.answer]}</b>
+              <b>{picked === q.answer ? pick(pk.praise).jp + " Correct." : "Not quite - answer: " + q.options[q.answer]}</b>
               {q.explain && <div className="sm mt4">{q.explain}</div>}
               <button className="btn primary block mt12" onClick={advance}>{qi + 1 < l.quiz.length ? "Next question" : "Finish lesson"}</button>
             </div>
@@ -148,7 +148,7 @@ export function LessonView({ id }: { id: string }) {
         <div className="card center tint-matcha">
           <div style={{ display: "grid", placeItems: "center" }}><Icon name={score === l.quiz.length ? "trophy" : "check"} size={46} /></div>
           <div style={{ fontWeight: 800, fontSize: 20 }}>Lesson complete · {score}/{l.quiz.length}</div>
-          <div className="sm mu mt4">Say each example out loud once more — speaking is what makes it stick.</div>
+          <div className="sm mu mt4">Say each example out loud once more - speaking is what makes it stick.</div>
           {next ? <button className="btn white block mt16" onClick={() => go("/learn/grammar/" + next.id, true)}>Next: {next.title} <ArrowRight size={16} /></button>
             : <button className="btn white block mt16" onClick={() => go("/learn/grammar")}>Back to course</button>}
         </div>

@@ -10,6 +10,7 @@ import { usePack } from "../pack";
 import { Bar, fmtMin, Header, Ring, Seg } from "../ui/kit";
 import Settings from "./Settings";
 import Recordings from "./Recordings";
+import MyWriting from "./MyWriting";
 import { Icon, IconTile } from "../ui/icons";
 
 const SEC_COL: Record<string, string> = {
@@ -21,6 +22,7 @@ const SEC_COL: Record<string, string> = {
 export default function Me({ route }: { route: Route }) {
   if (route.parts[1] === "settings") return <Settings />;
   if (route.parts[1] === "recordings") return <Recordings />;
+  if (route.parts[1] === "writing") return <MyWriting />;
   return <Stats />;
 }
 
@@ -217,7 +219,7 @@ function PracticeLog() {
   const shown = all ? rows : rows.slice(0, 8);
   return (
     <>
-      <div className="section-title"><h2>Practice log</h2><span className="mu">{wl.length} characters · {vl.length} words</span></div>
+      <div className="section-title"><h2>Practice log</h2><span className="row gap6"><button className="sm" style={{ color: "var(--shu)", fontWeight: 700 }} onClick={() => go("/me/writing")}>My writing →</button></span></div>
       <div className="card">
         <Seg value={tab} options={[["write", "Writing (" + wTries + ")"], ["voice", "Speaking (" + vTries + ")"]]} onChange={(v) => { setTab(v); setAll(false); }} />
         {tab === "write" && wl.length > 0 && (
@@ -232,7 +234,7 @@ function PracticeLog() {
           </div>
         )}
         {rows.length === 0 ? (
-          <div className="sm mu mt12">{tab === "write" ? "Nothing written yet — open Practice → Write and check a character." : "Nothing recorded yet — tap the green mic next to any word."}</div>
+          <div className="sm mu mt12">{tab === "write" ? "Nothing written yet - open Practice → Write and check a character." : "Nothing recorded yet - tap the green mic next to any word."}</div>
         ) : (
           <div className="mt12">
             <div className="row xs mu2" style={{ fontWeight: 700, padding: "0 0 4px" }}><span className="grow">{tab === "write" ? "CHARACTER" : "WORD"}</span><span style={{ width: 46, textAlign: "center" }}>TRIES</span><span style={{ width: 46, textAlign: "center" }}>BEST</span><span style={{ width: 46, textAlign: "center" }}>LAST</span></div>

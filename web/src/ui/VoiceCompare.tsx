@@ -5,7 +5,10 @@ import { closeMic, openMic, record, toBuffer } from "../core/mic";
 import { decode, getRec, saveRec } from "../core/recStore";
 import { emitUi, getProgress, toast, updateProgress, bumpDay, useSettings, VoiceRec } from "../core/store";
 import { award, checkBadges } from "../core/rewards";
-import { speak } from "../core/native";
+import { asrUnsupported, captureNative, captureSupported, listen, speak, speechSupported, stopListening } from "../core/native";
+import { matchScore } from "../core/match";
+import { VowelChart, VowelPoint } from "./VowelChart";
+import { formants } from "../core/dsp";
 import { go } from "../core/router";
 import { romaji } from "../packs/ja/verbs";
 import { usePack } from "../pack";
@@ -36,10 +39,11 @@ export default function VoiceCompare({ text, ro, en, reviewT }: { text: string; 
   const myCv = useRef<HTMLCanvasElement>(null);
   const refBuf = useRef<AudioBuffer | null>(null);
   const [refBands, setRefBands] = useState<[number, number, number]>([0.4, 0.35, 0.25]);
-  const [state, setState] = useState<"idle" | "rec" | "done">("idle");
+  const [state, setState] = useState<"idle" | "rec" | "checking" | "done">("idle");
   const [count, setCount] = useState(0);
   const [res, setRes] = useState<Result | null>(null);
   const [noAudio, setNoAudio] = useState(false);
+  const [check, setCheck] = useState<{ heard: string; score: number } | null>(null);
   const exp = expectedDuration(roma);
   const recSec = Math.min(6, Math.max(2, exp * 1.8 + 0.8));
   const history = (getProgress().voiceLog || []).filter((v) => v.w === text);
@@ -73,16 +77,51 @@ export default function VoiceCompare({ text, ro, en, reviewT }: { text: string; 
     });
   }, [reviewT]); // eslint-disable-line
 
+  const alts = [text, word?.r, word?.w].filter(Boolean) as string[];
+  const needCheck = text.replace(/[^\u3040-\u30ff\u3400-\u9fff]/g, "").length >= 2;
+
+  /** Ask the recogniser what was said (separate listen, used when the phone can't recognise our own recording). */
+  const listenOnce = () => new Promise<string[] | null>((resolve) => {
+    if (!speechSupported()) { resolve(null); return; }
+    let best: string[] | null = null, done = false;
+    const end = (v: string[] | null) => { if (!done) { done = true; resolve(v); } };
+    listen(pk.ttsLang, (e) => {
+      if (e.type === "result" && e.texts) end(e.texts);
+      else if (e.type === "partial" && e.texts) best = e.texts;
+      else if (e.type === "error") end(e.error === "no-speech" ? [] : best);
+      else if (e.type === "end") window.setTimeout(() => end(best || []), 300);
+    });
+    window.setTimeout(() => { stopListening(); end(best || []); }, 8000);
+  });
+
   const go2 = async () => {
     tap(20);
-    const m = await openMic(); if (!m) return;
-    setState("rec"); setRes(null); setNoAudio(false);
-    setCount(Math.ceil(recSec));
+    setRes(null); setNoAudio(false); setCheck(null);
+    let data: Float32Array, sr: number, heard: string[] | null = null;
+    setState("rec"); setCount(Math.ceil(recSec));
     const iv = window.setInterval(() => setCount((c) => Math.max(0, c - 1)), 1000);
-    const { data, sr } = await record(m, recSec);
-    window.clearInterval(iv); closeMic(m);
+    if (captureSupported()) {
+      const c = await captureNative(pk.ttsLang, Math.round(recSec * 1000));
+      window.clearInterval(iv);
+      if (!c.pcm) { setState("idle"); toast("Microphone is not available - allow microphone access and try again.", "warn"); return; }
+      data = c.pcm; sr = c.sr;
+      heard = asrUnsupported(c) ? null : (c.texts || []);
+    } else {
+      const m = await openMic(); if (!m) { window.clearInterval(iv); setState("idle"); return; }
+      const r = await record(m, recSec); window.clearInterval(iv); closeMic(m);
+      data = r.data; sr = r.sr;
+    }
     const cut = trimSilence(data, sr);
-    if (!cut || cut.length < sr * 0.15) { setState("idle"); toast("I couldn’t hear you — hold the phone closer and speak loudly.", "warn"); return; }
+    if (!cut || cut.length < sr * 0.15) { setState("idle"); toast("I couldn’t hear you - hold the phone closer and speak loudly.", "warn"); return; }
+    // 1) Check the words first: only analyse if you said the right thing (≥ 80% match).
+    let match: number | undefined;
+    if (needCheck) {
+      if (heard === null) { setState("checking"); heard = await listenOnce(); }
+      if (heard !== null) {
+        match = matchScore(heard, alts);
+        if (match < 0.8) { setCheck({ heard: heard[0] || "", score: match }); setState("idle"); tap(40); return; }
+      }
+    }
     const { bands, db } = bandProfile(cut, sr);
     const { contour, range } = pitchTrack(cut, sr);
     const dur = cut.length / sr;
@@ -90,7 +129,7 @@ export default function VoiceCompare({ text, ro, en, reviewT }: { text: string; 
     const loud = db < -32 ? 0.6 : db < -26 ? 0.85 : 1;
     const pace = Math.min(dur, exp) / Math.max(dur, exp);
     const score = Math.round(Math.max(0, Math.min(1, (1 - bandDiff * 1.6) * 0.55 + loud * 0.25 + pace * 0.2)) * 100);
-    const rec: VoiceRec = { t: Date.now(), w: text, bands, ref: refBands, db, dur, exp, f0: range, score };
+    const rec: VoiceRec = { t: Date.now(), w: text, bands, ref: refBands, db, dur, exp, f0: range, score, match };
     updateProgress((p) => { p.voiceLog = [...(p.voiceLog || []), rec].slice(-300); bumpDay(p, (d) => { d.spoke = (d.spoke || 0) + 1; }); });
     saveRec(rec.t, text, cut, sr, contour).then((ok) => { if (!ok) toast("Couldn’t save the sound of this recording on the phone (storage full?). The analysis is saved.", "warn"); });
     award(3); checkBadges();
@@ -101,16 +140,16 @@ export default function VoiceCompare({ text, ro, en, reviewT }: { text: string; 
 
   const tips: string[] = [];
   if (res) {
-    if (res.db < -32) tips.push("volume|Too quiet — speak LOUDER, from your chest. Loud practice builds confidence and clearer sounds.");
-    else if (res.db < -26) tips.push("volumeLow|A bit soft — a little louder will sound more confident.");
+    if (res.db < -32) tips.push("volume|Too quiet - speak LOUDER, from your chest. Loud practice builds confidence and clearer sounds.");
+    else if (res.db < -26) tips.push("volumeLow|A bit soft - a little louder will sound more confident.");
     else tips.push("check|Great volume.");
-    if (res.dur > res.exp * 1.6) tips.push("turtle|Slower than natural — keep every beat short and even.");
-    else if (res.dur < res.exp * 0.6) tips.push("zap|Very fast — give each mora its own beat.");
+    if (res.dur > res.exp * 1.6) tips.push("turtle|Slower than natural - keep every beat short and even.");
+    else if (res.dur < res.exp * 0.6) tips.push("zap|Very fast - give each mora its own beat.");
     else tips.push("timer|Good pace.");
     const d = res.bands.map((b, i) => b - res.ref[i]);
-    if (d[2] < -0.05) tips.push("sparkles|High band is weak — make s / sh / ts and い・え crisper.");
-    if (d[0] > 0.06) tips.push("sliders|Lots of low energy — open your mouth more and push the sound forward.");
-    if (res.f0[1] && res.f0[1] / Math.max(1, res.f0[0]) < 1.12 && res.exp > 0.4) tips.push("music|Very flat melody — Japanese words rise and fall (pitch accent). Copy the voice’s ups and downs.");
+    if (d[2] < -0.05) tips.push("sparkles|High band is weak - make s / sh / ts and い・え crisper.");
+    if (d[0] > 0.06) tips.push("sliders|Lots of low energy - open your mouth more and push the sound forward.");
+    if (res.f0[1] && res.f0[1] / Math.max(1, res.f0[0]) < 1.12 && res.exp > 0.4) tips.push("music|Very flat melody - Japanese words rise and fall (pitch accent). Copy the voice’s ups and downs.");
   }
   const when = reviewT ? new Date(reviewT) : null;
 
@@ -135,16 +174,27 @@ export default function VoiceCompare({ text, ro, en, reviewT }: { text: string; 
           <canvas ref={myCv} className="spectro mt4" style={{ height: 90, opacity: res?.mine ? 1 : 0.35 }} />
         </div>
       </div>
-      {noAudio && <div className="xs mu mt4">Audio wasn’t saved for this one (recorded before v2.4) — the analysis is still here.</div>}
+      {noAudio && <div className="xs mu mt4">Audio wasn’t saved for this one (recorded before v2.4) - the analysis is still here.</div>}
 
-      <button className={"btn lg block mt12 " + (state === "rec" ? "dark" : "primary")} onClick={go2} disabled={state === "rec"}>
-        {state === "rec" ? <>● Recording… {count}s — say it now, loudly</> : state === "done" ? <><RotateCcw size={17} /> Record again</> : <><Mic size={18} /> Record me ({recSec.toFixed(1)}s)</>}
+      <button className={"btn lg block mt12 " + (state === "rec" || state === "checking" ? "dark" : "primary")} onClick={go2} disabled={state === "rec" || state === "checking"}>
+        {state === "checking" ? <>● Say it once more - checking the words…</> : state === "rec" ? <>● Recording… {count}s - say it now, loudly</> : state === "done" ? <><RotateCcw size={17} /> Record again</> : <><Mic size={18} /> Record me ({recSec.toFixed(1)}s)</>}
       </button>
 
+      {check && (
+        <div className="feedback bad">
+          <div className="row top" style={{ gap: 10 }}><Icon name="alert" size={22} color="var(--shu)" />
+            <div className="grow">
+              <b>That didn’t sound like 「{text}」 - please try again</b>
+              <div className="sm mt4">I heard: <span className="jp" style={{ fontWeight: 700 }}>{check.heard || "(nothing clear)"}</span> · match {Math.round(check.score * 100)}% (need 80%)</div>
+              <div className="xs mu mt4">Tap the speaker, listen, then record again. Details appear once the words match.</div>
+            </div></div>
+        </div>
+      )}
       {res && (
         <div className="mt12">
+          {res.match !== undefined && <div className="xs mt4 row gap4" style={{ color: "var(--matcha)", fontWeight: 700 }}><Icon name="check" size={14} /> Words checked: {Math.round(res.match * 100)}% match</div>}
           <div className="row"><div style={{ fontSize: 34, fontWeight: 800, color: res.score >= 70 ? "var(--matcha)" : res.score >= 50 ? "var(--gold)" : "var(--shu)" }}>{res.score}</div>
-            <div className="grow sm"><b>{res.score >= 75 ? "すごい！ Very close" : res.score >= 55 ? "いいね！ Getting there" : "Keep going — listen & repeat"}</b><div className="xs mu">Sound-shape match · volume · pace</div></div>
+            <div className="grow sm"><b>{res.score >= 75 ? "すごい！ Very close" : res.score >= 55 ? "いいね！ Getting there" : "Keep going - listen & repeat"}</b><div className="xs mu">Sound-shape match · volume · pace</div></div>
             {res.mine && <button className="btn sm" onClick={() => playBuffer(res.mine!)}><Play size={14} /> Mine</button>}</div>
 
           <div className="card flat mt8" style={{ padding: 12 }}>
@@ -168,6 +218,7 @@ export default function VoiceCompare({ text, ro, en, reviewT }: { text: string; 
           </div>
 
           {res.contour.some((x) => x > 0) && <MoraMelody c={res.contour} roma={roma} />}
+          {res.mine && <VowelMap buf={res.mine} contour={res.contour} roma={roma} f0={res.f0} />}
           <WhereYouStand r={res} />
           <div className="feedback ok" style={{ background: "var(--surface-2)" }}>{tips.map((t) => { const [ic, msg] = t.split("|"); return <div key={t} className="sm row top" style={{ padding: "3px 0", gap: 8 }}><span style={{ color: "var(--matcha)", marginTop: 1 }}><Icon name={ic} size={16} /></span><span>{msg}</span></div>; })}</div>
           <Explain />
@@ -224,7 +275,7 @@ function MoraMelody({ c, roma }: { c: number[]; roma: string }) {
           <text x={cx} y={H - 1} textAnchor="middle" style={{ fontSize: 8, fill: col[s.lvl], fontWeight: 800 }}>{s.lvl}</text></g>; })}
       </svg>
       <div className="xs mu mt4" style={{ lineHeight: 1.45 }}>
-        Your pattern: <b>{seg.map((s) => s.lvl).join(" ")}</b>. {flat ? "Your voice stayed almost flat — Japanese words step up and down between beats." : "Compare with the speaker voice: in Japanese the pitch usually jumps between the 1st and 2nd beat (up or down)."}
+        Your pattern: <b>{seg.map((s) => s.lvl).join(" ")}</b>. {flat ? "Your voice stayed almost flat - Japanese words step up and down between beats." : "Compare with the speaker voice: in Japanese the pitch usually jumps between the 1st and 2nd beat (up or down)."}
       </div>
     </div>
   );
@@ -281,15 +332,68 @@ function Explain() {
       {open && (
         <div className="sm mt8" style={{ lineHeight: 1.6 }}>
           <p style={{ margin: "0 0 8px" }}><b>Two different things are measured:</b></p>
-          <p style={{ margin: "0 0 8px" }}><b>1. Frequency balance (Low / Mid / High bands)</b> — how your sound energy is spread, like the bass, mid and treble on a speaker.
+          <p style={{ margin: "0 0 8px" }}><b>1. Frequency balance (Low / Mid / High bands)</b> - how your sound energy is spread, like the bass, mid and treble on a speaker.
             <br />• <b>Low</b> (80–500 Hz): the “body” of your voice and the base of every vowel.
             <br />• <b>Mid</b> (500–2000 Hz): what makes あ sound different from お or う.
             <br />• <b>High</b> (2000–6000 Hz): the hiss of s, sh, ts and the brightness of い and え.
             <br />If your High is lower than the reference, your consonants are soft; if Low is much higher, the sound is muffled.</p>
-          <p style={{ margin: "0 0 8px" }}><b>2. Voice pitch (Hz)</b> — how fast your vocal cords vibrate: deep voices ≈ 85–155 Hz, higher voices ≈ 165–255 Hz. Everyone is different and that’s fine; what matters in Japanese is the <b>melody</b> — each beat is higher or lower than the one before (pitch accent). The melody chart labels each beat <b>H</b> / <b>M</b> / <b>L</b> within your own range.</p>
-          {s.showHindi && <p className="hi" style={{ margin: 0 }}>Low/Mid/High बैंड = आवाज़ का बेस, बीच और तीखापन (स्पीकर के bass/treble जैसा)। Pitch (Hz) = आवाज़ कितनी भारी या पतली है। जापानी में हर अक्षर (mora) ऊँचा या नीचा बोला जाता है — इसे pitch accent कहते हैं।</p>}
+          <p style={{ margin: "0 0 8px" }}><b>2. Voice pitch (Hz)</b> - how fast your vocal cords vibrate: deep voices ≈ 85–155 Hz, higher voices ≈ 165–255 Hz. Everyone is different and that’s fine; what matters in Japanese is the <b>melody</b> - each beat is higher or lower than the one before (pitch accent). The melody chart labels each beat <b>H</b> / <b>M</b> / <b>L</b> within your own range.</p>
+          {s.showHindi && <p className="hi" style={{ margin: 0 }}>Low/Mid/High बैंड = आवाज़ का बेस, बीच और तीखापन (स्पीकर के bass/treble जैसा)। Pitch (Hz) = आवाज़ कितनी भारी या पतली है। जापानी में हर अक्षर (mora) ऊँचा या नीचा बोला जाता है - इसे pitch accent कहते हैं।</p>}
         </div>
       )}
+    </div>
+  );
+}
+
+const VOWEL_LABEL: Record<string, string> = { a: "あ", i: "い", u: "う", e: "え", o: "お" };
+
+/** Plots the vowel of every beat you said on the vowel map, next to the Japanese target. */
+function VowelMap({ buf, contour, roma, f0 }: { buf: AudioBuffer; contour: number[]; roma: string; f0: [number, number] }) {
+  const pk = usePack();
+  const x = buf.getChannelData(0), sr = buf.sampleRate;
+  const morae = moraeOf(roma);
+  const scale = (f0[0] + f0[1]) / 2 > 165 ? 1.15 : 1;
+  const targets = pk.vowels.filter((v) => v.lang === "target");
+  const first = contour.findIndex((v) => v > 0), last = contour.length - 1 - [...contour].reverse().findIndex((v) => v > 0);
+  const hop = sr / 100, n = Math.max(1, morae.length);
+  const pts: (VowelPoint & { v: string; tip: string })[] = [];
+  if (first >= 0) morae.forEach((m, k) => {
+    const v = m.slice(-1); if (!"aiueo".includes(v)) return;
+    const a = first + ((last - first + 1) * k) / n, b = first + ((last - first + 1) * (k + 1)) / n;
+    const mid = Math.floor(((a + b) / 2) * hop), win = Math.floor(sr * 0.04);
+    const est: { f1: number; f2: number }[] = [];
+    for (const off of [-win, 0, win]) { const s0 = Math.max(0, mid + off - win / 2); const r = formants(x.subarray(s0, s0 + win), sr); if (r && r.f1 < 1000 && r.f2 < 3000) est.push(r); }
+    if (!est.length) return;
+    est.sort((p, q) => p.f1 - q.f1); const e = est[est.length >> 1];
+    const t = targets.find((q) => q.label.startsWith(VOWEL_LABEL[v]))!;
+    const tf1 = t.f1 * scale, tf2 = t.f2 * scale;
+    const ok = Math.abs(e.f1 - tf1) < 160 && Math.abs(e.f2 - tf2) < 380;
+    let tip = "on target";
+    if (!ok) {
+      const tips: string[] = [];
+      if (e.f1 - tf1 > 160) tips.push("close your mouth a little");
+      if (tf1 - e.f1 > 160) tips.push("open your mouth wider");
+      if (e.f2 - tf2 > 380) tips.push("pull your tongue back");
+      if (tf2 - e.f2 > 380) tips.push(v === "u" ? "keep lips relaxed, tongue more forward" : "move your tongue forward");
+      tip = tips.join(", ");
+    }
+    pts.push({ f1: e.f1, f2: e.f2, label: VOWEL_LABEL[v], target: [tf1, tf2], ok, v: m, tip });
+  });
+  if (!pts.length) return null;
+  return (
+    <div className="card flat mt12" style={{ padding: 12 }}>
+      <div className="xs mu" style={{ fontWeight: 700 }}>WHERE YOUR VOWELS LAND · each beat on the mouth map</div>
+      <div className="xs mu2 mt4">Red circles = Japanese targets · green = your vowel close to target · gold = off target (dashed line shows how far). Up = closed mouth, down = open; left = tongue forward, right = back.</div>
+      <div className="mt8"><VowelChart refs={pk.vowels} show={{ target: true, en: false, hi: false }} scale={scale} points={pts} height={240} /></div>
+      <div className="mt8">
+        {pts.map((p, i) => (
+          <div key={i} className="row sm" style={{ padding: "3px 0" }}>
+            <span className="tag" style={{ background: p.ok ? "var(--matcha)" : "var(--gold)", color: "#fff", minWidth: 44, justifyContent: "center" }}>{p.v}</span>
+            <span className="grow">{p.ok ? "Good - on the target" : p.tip}</span>
+            <span className="xs mu2">F1 {Math.round(p.f1)} · F2 {Math.round(p.f2)}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

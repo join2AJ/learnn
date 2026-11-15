@@ -30,31 +30,56 @@ export default function Onboarding() {
   </>);
 
   if (step === 0) return (
-    <div className="onb tint-shu" style={{ position: "relative", overflow: "hidden" }}>
-      <div className="serif" style={{ position: "absolute", top: "8vh", right: -20, fontSize: 260, opacity: .12, lineHeight: 1, fontWeight: 700 }}>道</div>
-      <div className="kicker">Welcome · ようこそ</div>
-      <div className="big-jp" style={{ margin: "14px 0 10px" }}>日本語<br />の道</div>
-      <h1 style={{ fontSize: 30, margin: "0 0 10px", letterSpacing: "-.02em" }}>Nihongo Path</h1>
-      <p className="mu" style={{ fontSize: 16, margin: "0 0 26px", maxWidth: 420 }}>From your very first あ to real conversations — explained in English and हिन्दी.</p>
-      <button className="btn white lg block" onClick={() => { next(); speak("ようこそ", { lang: "ja-JP" }); }}>Let’s begin <ArrowRight size={18} /></button>
+    <div className="onb tint-shu" style={{ position: "relative", overflow: "hidden", justifyContent: "space-between" }}>
+      <div className="serif" style={{ position: "absolute", top: "6vh", right: -24, fontSize: 250, opacity: .1, lineHeight: 1, fontWeight: 700 }}>道</div>
+      <div style={{ paddingTop: "8vh" }}>
+        <div className="kicker">Welcome · ようこそ · स्वागत है</div>
+        <div className="kana-cycle mt16" aria-hidden="true">{["あ", "ア", "日", "語"].map((k, i) => <span key={k} style={{ animationDelay: i * 2 + "s" }}>{k}</span>)}</div>
+      </div>
+      <div>
+        <h1 style={{ fontSize: 34, margin: "0 0 6px", letterSpacing: "-.02em", lineHeight: 1.1 }}>Nihongo Path</h1>
+        <p style={{ fontSize: 17, margin: "0 0 18px", opacity: .92, lineHeight: 1.45 }}>Learn Japanese from your very first あ to real conversations - explained in English and हिन्दी.</p>
+        <div className="col" style={{ gap: 8, marginBottom: 22 }}>
+          {[["timer", "Just 20 minutes a day, with a clear plan"], ["bookCheck", "1,000 words that cover about 80% of daily speech"], ["mic", "See your voice and your handwriting scored"], ["trophy", "XP, streaks, badges and a 30-day pledge"]].map(([ic, t]) => (
+            <div key={t} className="row" style={{ gap: 10 }}><span style={{ width: 32, height: 32, borderRadius: 10, background: "rgba(255,255,255,.18)", display: "grid", placeItems: "center", flex: "none" }}><Icon name={ic} size={17} /></span><span className="sm" style={{ fontWeight: 600 }}>{t}</span></div>
+          ))}
+        </div>
+        <button className="btn white lg block" onClick={() => { next(); speak("ようこそ", { lang: "ja-JP" }); }}>Let’s begin <ArrowRight size={18} /></button>
+        <div className="xs center mt8" style={{ opacity: .8 }}>Takes about one minute to set up</div>
+      </div>
     </div>
   );
 
   if (step === 1) return (
     <div className="onb" style={{ justifyContent: "flex-start", paddingTop: 32 }}>
-      <Head kicker="How it works" title="One clear path, 20 minutes a day" />
-      {[["1", "あ", "Read", "Hiragana & katakana in 2 weeks — sound, Hindi hint, memory trick and animated stroke order."],
-        ["2", "volume", "Listen & speak", "Every word and sentence is spoken. Record yourself and see your voice’s spectrum vs a reference."],
-        ["3", "文", "Understand", "Short grammar lessons comparing English, Hindi and Japanese, then 1,000 most-used words."],
-        ["4", "repeat", "Remember", "Flashcards come back right before you’d forget. Quizzes, writing and speaking checks."],
-        ["5", "landmark", "Connect", "Culture: what Japanese people love, dislike and expect — so you behave right, not just speak right."]].map(([n, ic, t, d]) => (
-        <div key={n} className="row top card" style={{ marginTop: 10, padding: 14 }}>
-          <div className="jp" style={{ width: 42, height: 42, borderRadius: 13, background: "var(--shu-soft)", color: "var(--shu)", display: "grid", placeItems: "center", fontSize: 20, fontWeight: 700, flex: "none" }}><Icon name={ic} size={20} /></div>
-          <div><div style={{ fontWeight: 800 }}>{t}</div><div className="sm mu">{d}</div></div>
+      <Head kicker="Your journey" title="Here’s how you’ll go from zero to talking" />
+      <div style={{ position: "relative", marginTop: 4 }}>
+        <div style={{ position: "absolute", left: 20, top: 24, bottom: 24, width: 2, background: "linear-gradient(var(--shu), var(--matcha))", opacity: .5 }} />
+        {[["あ", "Week 1–2", "Read the alphabets", "Hiragana and katakana with sound, Hindi hints, memory tricks and stroke order.", "var(--shu)"],
+          ["語", "Week 2–4", "First 100 words + simple sentences", "Already about 65% of everyday spoken Japanese. Introduce yourself.", "#e8793a"],
+          ["文", "Month 1–3", "Grammar, verbs and tenses", "Compared with English and Hindi - Japanese uses the same word order as Hindi.", "var(--ai)"],
+          ["話", "Month 3–5", "1,000 words · JLPT N5", "Hold short conversations about daily life, food, travel and work.", "var(--matcha)"]].map(([k, when, t, d, c]) => (
+          <div key={when} className="row top" style={{ gap: 12, padding: "8px 0", position: "relative" }}>
+            <div className="jp" style={{ width: 42, height: 42, borderRadius: 14, background: c, color: "#fff", display: "grid", placeItems: "center", fontSize: 20, fontWeight: 700, flex: "none", boxShadow: "0 0 0 4px var(--bg)" }}>{k}</div>
+            <div className="card grow" style={{ padding: "10px 12px", marginTop: 0 }}>
+              <div className="kicker" style={{ color: c }}>{when}</div>
+              <div style={{ fontWeight: 800 }}>{t}</div>
+              <div className="xs mu">{d}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="card mt8" style={{ padding: 12 }}>
+        <div className="kicker">Every day</div>
+        <div className="grid2 mt8" style={{ gap: 8 }}>
+          {[["layers", "Review flashcards"], ["book", "One short lesson"], ["mic", "Speak & record"], ["pen", "Write characters"]].map(([ic, t]) => (
+            <div key={t} className="row sm" style={{ gap: 8, fontWeight: 600 }}><span style={{ color: "var(--shu)" }}><Icon name={ic} size={17} /></span>{t}</div>
+          ))}
         </div>
-      ))}
+        <div className="xs mu mt8">Home shows a “Today’s plan” that ticks itself as you go.</div>
+      </div>
       <div style={{ flex: 1 }} />
-      <button className="btn primary lg block mt24" onClick={next}>Sounds good <ArrowRight size={18} /></button>
+      <button className="btn primary lg block mt16" onClick={next}>Sounds good <ArrowRight size={18} /></button>
     </div>
   );
 
@@ -77,9 +102,9 @@ export default function Onboarding() {
 
   if (step === 3) return (
     <div className="onb" style={{ justifyContent: "flex-start", paddingTop: 32 }}>
-      <Head kicker="About you" title="Nice to meet you! What’s your name?" sub="はじめまして — we’ll use it to cheer you on." />
+      <Head kicker="About you" title="Nice to meet you! What’s your name?" sub="はじめまして - we’ll use it to cheer you on." />
       <input type="text" value={name} placeholder="Your name" onChange={(e) => setName(e.target.value)} autoComplete="given-name" />
-      {name.trim() && <div className="card soft-shu mt12" style={{ boxShadow: "none" }}><div className="jp" style={{ fontSize: 20, fontWeight: 700 }}>はじめまして、{name.trim()}さん！</div><div className="xs mu">hajimemashite, {name.trim()}-san — nice to meet you</div></div>}
+      {name.trim() && <div className="card soft-shu mt12" style={{ boxShadow: "none" }}><div className="jp" style={{ fontSize: 20, fontWeight: 700 }}>はじめまして、{name.trim()}さん！</div><div className="xs mu">hajimemashite, {name.trim()}-san - nice to meet you</div></div>}
       <div className="sm mu mt16" style={{ fontWeight: 700 }}>Your age</div>
       <div className="row wrap mt8 gap6">{AGES.map((a) => <button key={a} className={"chip" + (age === a ? " shu on" : "")} onClick={() => { tap(); setAge(a); }}>{a}</button>)}</div>
       <div className="xs mu mt8">Used only on this phone to suggest a sensible daily pace.</div>
@@ -109,7 +134,7 @@ export default function Onboarding() {
     const young = age === "Under 13";
     return (
       <div className="onb" style={{ justifyContent: "flex-start", paddingTop: 32 }}>
-        <Head kicker="Commitment" title="How much time can you give every day?" sub={young ? "10–20 minutes a day is perfect for your age." : "Choose what you can do even on a busy day — consistency beats long sessions."} />
+        <Head kicker="Commitment" title="How much time can you give every day?" sub={young ? "10–20 minutes a day is perfect for your age." : "Choose what you can do even on a busy day - consistency beats long sessions."} />
         <div className="grid3">
           {TIMES.map((m) => (
             <button key={m} className="tile" style={{ minHeight: 80, alignItems: "center", justifyContent: "center", boxShadow: mins === m ? "inset 0 0 0 2px var(--shu), var(--shadow-1)" : undefined, background: mins === m ? "var(--shu-soft)" : undefined }}
@@ -167,10 +192,10 @@ function Pledge({ name, mins, reasons, back }: { name: string; mins: number; rea
         <div className="serif" style={{ position: "absolute", right: -6, bottom: -30, fontSize: 130, opacity: .07, fontWeight: 700 }}>約束</div>
         <div className="kicker">I promise</div>
         <p style={{ fontSize: 19, lineHeight: 1.55, margin: "10px 0", fontWeight: 600 }}>
-          I, <b style={{ color: "var(--shu)" }}>{name}</b>, will study Japanese for <b style={{ color: "var(--shu)" }}>{mins} minutes every day</b> for the next <b>30 days</b>{why.length ? <> — because I want to <b>{why.slice(0, 2).join(" and ")}</b></> : null}.
+          I, <b style={{ color: "var(--shu)" }}>{name}</b>, will study Japanese for <b style={{ color: "var(--shu)" }}>{mins} minutes every day</b> for the next <b>30 days</b>{why.length ? <> - because I want to <b>{why.slice(0, 2).join(" and ")}</b></> : null}.
         </p>
         <p className="sm mu" style={{ margin: 0 }}>Even on busy days I’ll do at least a few flashcards. Every day I keep my promise earns XP, and streaks of 3, 7, 21 and 30 days unlock badges.</p>
-        <div className="jp mt12" style={{ fontSize: 18, fontWeight: 700 }}>毎日頑張ります！ <span className="sm mu" style={{ fontFamily: "var(--font)", fontWeight: 500 }}>(mainichi ganbarimasu — I’ll do my best every day)</span></div>
+        <div className="jp mt12" style={{ fontSize: 18, fontWeight: 700 }}>毎日頑張ります！ <span className="sm mu" style={{ fontFamily: "var(--font)", fontWeight: 500 }}>(mainichi ganbarimasu - I’ll do my best every day)</span></div>
       </div>
       <div className="center mt24">
         <button aria-label="Press and hold to sign the pledge" onPointerDown={start} onPointerUp={stop} onPointerLeave={stop} onPointerCancel={stop}
@@ -181,7 +206,7 @@ function Pledge({ name, mins, reasons, back }: { name: string; mins: number; rea
         <div className="sm mu mt12">{done ? "Signed! お約束ありがとう。" : "Press and hold to sign"}</div>
       </div>
       <div style={{ flex: 1 }} />
-      <button className="btn primary lg block mt24" disabled={!done} onClick={finish}>I’m in — start my first day <ArrowRight size={18} /></button>
+      <button className="btn primary lg block mt24" disabled={!done} onClick={finish}>I’m in - start my first day <ArrowRight size={18} /></button>
     </div>
   );
 }
