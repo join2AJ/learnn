@@ -14,6 +14,7 @@ interface NativeApi {
   requestMic(): void;
   vibrate(ms: number): void;
   openExternal(url: string): void;
+  shareText?(subject: string, text: string): void;
   appVersion(): string;
   setTheme?(dark: boolean): void;
   recordAndRecognize?(lang: string, ms: number, id: string): void;
@@ -165,6 +166,14 @@ export function openExternal(url: string) {
   const n = N();
   if (n) n.openExternal(url);
   else window.open(url, "_blank", "noopener");
+}
+/** Opens the Android share sheet (WhatsApp, Gmail, …); returns false when not available. */
+export function shareText(subject: string, text: string): boolean {
+  const n = N();
+  if (n?.shareText) { n.shareText(subject, text); return true; }
+  const nav = navigator as Navigator & { share?: (d: { title: string; text: string }) => Promise<void> };
+  if (nav.share) { nav.share({ title: subject, text }).catch(() => {}); return true; }
+  return false;
 }
 export const appVersion = () => N()?.appVersion() || "web";
 export const setNativeTheme = (dark: boolean) => { try { N()?.setTheme?.(dark); } catch { /* older shell */ } };

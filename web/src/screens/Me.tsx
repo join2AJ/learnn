@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Heart, Lock, Settings as Cog } from "lucide-react";
+import { ChevronRight, Heart, Lock, Settings as Cog, Smartphone } from "lucide-react";
 import type { Route } from "../core/router";
 import { go } from "../core/router";
 import { dayKey, emptyDay, useProgress, useSettings } from "../core/store";
@@ -13,6 +13,7 @@ import Recordings from "./Recordings";
 import MyWriting from "./MyWriting";
 import Privacy from "./Privacy";
 import Backup from "./Backup";
+import About from "./About";
 import Support from "./Support";
 import PolicyText from "./PolicyText";
 import { Icon, IconTile } from "../ui/icons";
@@ -31,6 +32,7 @@ export default function Me({ route }: { route: Route }) {
   if (route.parts[1] === "privacy") return <Privacy />;
   if (route.parts[1] === "backup") return <Backup />;
   if (route.parts[1] === "support") return <Support />;
+  if (route.parts[1] === "about") return <About />;
   if (route.parts[1] === "policy") return <div className="screen"><Header title="Privacy policy" backTo="/me/privacy" /><div className="card"><PolicyText /></div></div>;
   return <Stats />;
 }
@@ -149,6 +151,9 @@ function Stats() {
         <div className="row sm mt8 mu"><span className="grow">Speaking: {p.speak.ok}/{p.speak.tries} correct</span><span>Writing: {p.writes} characters</span></div>
       </div>
 
+      <button className="card tap mt16" onClick={() => go("/me/about")}>
+        <div className="row"><Smartphone size={22} color="var(--ai)" /><div className="grow"><div style={{ fontWeight: 800 }}>About · build your own app</div><div className="xs mu">Why I made Nihongo Path · request an Android app for you</div></div><ChevronRight size={18} /></div>
+      </button>
       {!childMode() && <button className="card tap mt16 soft-sakura" style={{ boxShadow: "none" }} onClick={() => go("/me/support")}>
         <div className="row"><Heart size={22} color="var(--sakura)" /><div className="grow"><div style={{ fontWeight: 800 }}>Support Nihongo Path</div><div className="xs mu">Free forever - help keep it that way</div></div></div>
       </button>}

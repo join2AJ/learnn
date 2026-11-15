@@ -10,6 +10,8 @@ import { usePack } from "../pack";
 import { Bar, Header, Jp, Say, Seg } from "../ui/kit";
 import { Icon, IconTile, LangPill } from "../ui/icons";
 import JapanMap from "./JapanMap";
+import { FAMOUS_FOR, SIGHTS } from "../packs/ja/attractions";
+import { SightGrid, SightPhoto } from "../ui/Sights";
 
 export default function Explore({ route }: { route: Route }) {
   const [, sub, id] = route.parts;
@@ -17,6 +19,7 @@ export default function Explore({ route }: { route: Route }) {
   if (sub === "roadmap") return <Roadmap />;
   if (sub === "resources") return <Resources />;
   if (sub === "map") return <JapanMap />;
+  if (sub === "famous") return <Famous />;
   return <Hub />;
 }
 
@@ -47,6 +50,10 @@ function Hub() {
       </button>
 
       <div className="section-title"><h2>Know the people · 日本の文化</h2><span className="mu">{Object.keys(p.culturesRead).length}/{pk.culture.length} read</span></div>
+      <button className="card tap" style={{ padding: 0, overflow: "hidden", textAlign: "left", marginBottom: 12 }} onClick={() => go("/explore/famous")}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 2 }}>{["fuji", "inari", "kinkaku"].map((id) => <SightPhoto key={id} s={SIGHTS.find((x) => x.id === id)!} h={74} radius={0} />)}</div>
+        <div className="row" style={{ padding: 12 }}><div className="grow"><div style={{ fontWeight: 800 }}>Japan is famous for… · 名所</div><div className="sm mu">{FAMOUS_FOR.length} things Japan is known for + {SIGHTS.length} top attractions with photos</div></div><ArrowRight size={18} /></div>
+      </button>
       <div className="grid2">
         {pk.culture.map((c) => (
           <button key={c.id} className={"tile " + TONE[c.tone][0]} style={{ boxShadow: "none" }} onClick={() => go("/explore/culture/" + c.id)}>
@@ -195,6 +202,30 @@ function Resources() {
         </div>
       ))}
       <div className="xs mu mt16">Channels marked with a search link open a YouTube search so you always reach the current channel. Listed for learning; not affiliated.</div>
+    </div>
+  );
+}
+
+function Famous() {
+  const s = useSettings();
+  const [kind, setKind] = useState("All");
+  const kinds = ["All", ...Array.from(new Set(SIGHTS.map((x) => x.kind)))];
+  return (
+    <div className="screen">
+      <Header title="Japan is famous for" sub="有名なもの · top attractions" backTo="/explore" />
+      <div className="list">
+        {FAMOUS_FOR.map(([ic, t, d, hi]) => (
+          <div key={t} className="li" style={{ alignItems: "flex-start" }}>
+            <IconTile name={ic} tone="shu" size={38} icon={19} />
+            <div className="grow"><div style={{ fontWeight: 800 }}>{t}</div><div className="sm">{d}</div>{s.showHindi && <div className="sm hi">{hi}</div>}</div>
+          </div>
+        ))}
+      </div>
+      <div className="section-title"><h2>Top attractions · 名所</h2><span className="mu">{SIGHTS.length}</span></div>
+      <div className="chips">{kinds.map((k) => <button key={k} className={"chip" + (kind === k ? " on" : "")} onClick={() => setKind(k)}>{k}</button>)}</div>
+      <div className="mt8"><SightGrid list={kind === "All" ? SIGHTS : SIGHTS.filter((x) => x.kind === kind)} /></div>
+      <button className="btn white block mt16" onClick={() => go("/explore/map")}><Map size={16} /> See them on the map</button>
+      <div className="xs mu mt12">Photos from Wikimedia Commons under Creative Commons licences - the author and licence are shown on each place.</div>
     </div>
   );
 }

@@ -240,6 +240,12 @@ public class MainActivity extends Activity {
             });
         }
         @JavascriptInterface public void openExternal(String url) { runOnUiThread(() -> openExternalUri(Uri.parse(url))); }
+        @JavascriptInterface public void shareText(String subject, String text) {
+            runOnUiThread(() -> {
+                Intent i = new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_SUBJECT, subject).putExtra(Intent.EXTRA_TEXT, text);
+                try { startActivity(Intent.createChooser(i, subject)); } catch (Exception e) { /* no share target */ }
+            });
+        }
         @JavascriptInterface
         public String appVersion() {
             try { return getPackageManager().getPackageInfo(getPackageName(), 0).versionName; } catch (Exception e) { return "android"; }

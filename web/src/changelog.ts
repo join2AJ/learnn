@@ -1,6 +1,11 @@
 /** Shown once after each update ("What's new"). Newest first. */
-export const APP_VERSION = "3.1";
+export const APP_VERSION = "3.2";
 export const CHANGELOG: { v: string; date: string; items: [string, string][] }[] = [
+  { v: "3.2", date: "17 Nov 2026", items: [
+    ["earth", "Map of Japan: new Landscape view (seas, neighbours, Mt Fuji, Japanese Alps, Lake Biwa, the 4 main islands) and Sights view with famous places on the map."],
+    ["landmark", "Explore: “Japan is famous for…” - 10 things Japan is known for and 18 top attractions with photos, best season and tips (English & Hindi)."],
+    ["help", "About page: why this app was made, and a form to request your own Android app - pick category, features, budget and timeline."],
+  ] },
   { v: "3.1", date: "16 Nov 2026", items: [
     ["compass", "Map of Japan (Explore): 47 prefectures in 8 regions - tap to hear names in Japanese, see the capital and what each is famous for (English & Hindi), zoom into regions, big-city tips and phrases."],
     ["target", "New game: “Find the prefecture” on the map."],

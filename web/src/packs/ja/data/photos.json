@@ -1,0 +1,110 @@
+{
+ "fuji": {
+  "file": "photos/fuji.webp",
+  "author": "Suicasmo",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:View_of_Mount_Fuji_from_Ōwakudani_20211202.jpg"
+ },
+ "inari": {
+  "file": "photos/inari.webp",
+  "author": "Basile Morin",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Torii_path_with_lantern_at_Fushimi_Inari_Taisha_Shrine,_Kyoto,_Japan.jpg"
+ },
+ "kinkaku": {
+  "file": "photos/kinkaku.webp",
+  "author": "Nacaru",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Golden_Pavilion_Kinkaku-ji_water_mirror_2024.jpg"
+ },
+ "sensoji": {
+  "file": "photos/sensoji.webp",
+  "author": "Akonnchiroll",
+  "license": "CC0",
+  "source": "https://commons.wikimedia.org/wiki/File:Sensoji_2023.jpg"
+ },
+ "shibuya": {
+  "file": "photos/shibuya.webp",
+  "author": "David Kernan",
+  "license": "CC BY 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Shibuya_Crossing,_Aerial.jpg"
+ },
+ "skytree": {
+  "file": "photos/skytree.webp",
+  "author": "Kakidai",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Tokyo_Skytree_2014_Ⅲ.jpg"
+ },
+ "itsukushima": {
+  "file": "photos/itsukushima.webp",
+  "author": "redlegsfan21",
+  "license": "CC BY-SA 2.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Itsukushima_Shrine_Torii_Gate_(13890465459).jpg"
+ },
+ "himeji": {
+  "file": "photos/himeji.webp",
+  "author": "Nikos Kitsakis",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Himeji_castle_in_may_2015.jpg"
+ },
+ "arashiyama": {
+  "file": "photos/arashiyama.webp",
+  "author": "lumoplank",
+  "license": "CC0",
+  "source": "https://commons.wikimedia.org/wiki/File:Arashiyama,_Part_II_-_Arashiyama7534.jpg"
+ },
+ "nikko": {
+  "file": "photos/nikko.webp",
+  "author": "663highland",
+  "license": "CC BY-SA 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:200801_Nikko_Tosho-gu_Nikko_Japan03s3.jpg"
+ },
+ "snowfest": {
+  "file": "photos/snowfest.webp",
+  "author": "Materialscientist",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:SapporoFestival8.JPG"
+ },
+ "monkeys": {
+  "file": "photos/monkeys.webp",
+  "author": "NY066",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Jigokudani_Hotspring_Gorakuen.JPG"
+ },
+ "dotonbori": {
+  "file": "photos/dotonbori.webp",
+  "author": "Type specimen",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Osaka_Dotonbori_Ebisu_Bridge.jpg"
+ },
+ "kamakura": {
+  "file": "photos/kamakura.webp",
+  "author": "ProtoplasmaKid",
+  "license": "CC BY 4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Templo_Kōtoku-in,_Kamakura_-_2026_-_05.jpg"
+ },
+ "peace": {
+  "file": "photos/peace.webp",
+  "author": "Oilstreet",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Genbaku_Dome04-r.JPG"
+ },
+ "shirakawago": {
+  "file": "photos/shirakawago.webp",
+  "author": "663highland",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Ogi_Shirakawa-gō,_Gifu,_Japan.jpg"
+ },
+ "osakajo": {
+  "file": "photos/osakajo.webp",
+  "author": "663highland",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Osaka_Castle_03bs3200.jpg"
+ },
+ "todaiji": {
+  "file": "photos/todaiji.webp",
+  "author": "Wiiii",
+  "license": "CC BY-SA 3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Tōdai-ji_Kon-dō.jpg"
+ }
+}
