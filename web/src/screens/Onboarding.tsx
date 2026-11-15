@@ -64,7 +64,7 @@ export default function Onboarding() {
       <div className="list mt8">
         {PACKS.map((pk) => (
           <button key={pk.id} className="li" disabled={pk.status !== "ready"} style={{ opacity: pk.status === "ready" ? 1 : .55 }} onClick={() => { tap(); setSettings({ lang: pk.id }); }}>
-            <span className="ico soft-gold jp" style={{ fontSize: 16, fontWeight: 800, color: "var(--gold)" }}>{pk.flag}</span>
+            <span className="ico soft-gold" style={{ fontSize: 22 }}>{pk.flag}</span>
             <span className="grow"><div className="t">{pk.name} <span className="mu jp" style={{ fontWeight: 500 }}>{pk.native}</span></div><div className="d">{pk.status === "ready" ? pk.tagline : "Coming soon"}</div></span>
             {s.lang === pk.id && pk.status === "ready" && <Check color="var(--matcha)" />}
           </button>

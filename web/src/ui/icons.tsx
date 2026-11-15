@@ -34,8 +34,8 @@ export function IconTile({ name, tone = "shu", size = 40, icon = 20, round }: { 
   );
 }
 
-/** Small language pill used instead of flag emoji. */
+/** Country flag used to label English / Hindi / Japanese explanations. */
 export function LangPill({ l }: { l: "en" | "hi" | "ja" }) {
-  const m = { en: ["EN", "ai"], hi: ["हि", "gold"], ja: ["日", "shu"] }[l];
-  return <span style={{ minWidth: 26, height: 22, padding: "0 6px", borderRadius: 7, display: "inline-grid", placeItems: "center", flex: "none", fontSize: 11, fontWeight: 800, background: `var(--${m[1]})`, color: "#fff" }}>{m[0]}</span>;
+  const flag = { en: "🇬🇧", hi: "🇮🇳", ja: "🇯🇵" }[l];
+  return <span role="img" aria-label={{ en: "English", hi: "Hindi", ja: "Japanese" }[l]} style={{ fontSize: 18, lineHeight: 1, flex: "none" }}>{flag}</span>;
 }
