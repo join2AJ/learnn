@@ -39,8 +39,9 @@ export function sectionOf(parts: string[]): string {
     kana: "Alphabet", scripts: "Alphabet", write: "Writing", pron: "Pronunciation", grammar: "Grammar", verbs: "Grammar",
     words: "Vocabulary", phrases: "Phrases", cards: "Flashcards", quiz: "Quizzes", speak: "Speaking", lab: "Sound Lab",
     culture: "Culture", roadmap: "Roadmap", resources: "Resources", me: "Stats", settings: "Settings",
+    recordings: "Speaking",
     learn: "Learn hub", practice: "Practice hub", explore: "Explore hub",
   };
-  if ((a === "learn" || a === "practice" || a === "explore") && b && map[b]) return map[b];
+  if ((a === "learn" || a === "practice" || a === "explore" || a === "me") && b && map[b]) return map[b];
   return map[a] || "Other";
 }

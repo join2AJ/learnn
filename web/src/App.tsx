@@ -38,7 +38,7 @@ export default function App() {
   const [tour, setTour] = useState(false);
 
   useEffect(() => { startTracker(); setWarn((m) => toast(m, "warn")); }, []);
-  useEffect(() => { setSection(sectionOf(route.parts)); window.scrollTo(0, 0); }, [route.path]);
+  useEffect(() => { setSection(sectionOf(route.parts)); window.scrollTo(0, 0); setVoice(null); }, [route.path]);
 
   // theme
   useEffect(() => {
@@ -95,7 +95,7 @@ export default function App() {
       {toastMsg && <div className="toast" role="status"><Icon name={toastMsg.tone === "warn" ? "alert" : toastMsg.tone === "ok" ? "check" : "bulb"} size={18} /> {toastMsg.text}</div>}
       {xp && <div className="xp-pop" key={xp.k}>+{xp.n} XP</div>}
       <Confetti run={confetti} />
-      <Sheet open={!!voice} onClose={() => setVoice(null)}>{voice && <VoiceCompare key={voice.text} text={voice.text} ro={voice.ro} en={voice.en} />}</Sheet>
+      <Sheet open={!!voice} onClose={() => setVoice(null)}>{voice && <VoiceCompare key={voice.text + (voice.reviewT || "")} text={voice.text} ro={voice.ro} en={voice.en} reviewT={voice.reviewT} />}</Sheet>
       {(tour || !settings.toured) && !cele && <Tour onDone={() => { setTour(false); if (!settings.toured) setSettings({ toured: true }); }} />}
       {cele && (<>
         <div className="scrim" style={{ zIndex: 89 }} onClick={() => setCele(null)} />

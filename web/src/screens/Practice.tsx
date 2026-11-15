@@ -1,4 +1,4 @@
-import { ArrowRight, AudioLines, Ear, Layers, ListOrdered, Mic, PenLine, Puzzle, Repeat, Type } from "lucide-react";
+import { ArrowRight, AudioLines, Play, Ear, Layers, ListOrdered, Mic, PenLine, Puzzle, Repeat, Type } from "lucide-react";
 import type { Route } from "../core/router";
 import { go } from "../core/router";
 import { useProgress } from "../core/store";
@@ -55,6 +55,7 @@ function Hub() {
         <button className="tile" onClick={() => go("/practice/speak")}><span className="ico soft-matcha"><Mic size={20} color="var(--matcha)" /></span><span className="t">Speak aloud</span><span className="d">Speech recognition checks you</span></button>
         <button className="tile" onClick={() => go("/practice/write")}><span className="ico soft-gold"><PenLine size={20} color="var(--gold)" /></span><span className="t">Write</span><span className="d">Trace with stroke order</span></button>
         <button className="tile" onClick={() => go("/lab")}><span className="ico soft-plum"><AudioLines size={20} color="var(--plum)" /></span><span className="t">Sound Lab</span><span className="d">Spectrogram & pitch</span></button>
+        <button className="tile" onClick={() => go("/me/recordings")}><span className="ico soft-matcha"><Play size={20} color="var(--matcha)" /></span><span className="t">My recordings</span><span className="d">Replay & review all</span></button>
         <button className="tile" onClick={() => go("/practice/cards?deck=hira")}><span className="ico soft-shu jp" style={{ color: "var(--shu)", fontWeight: 700 }}>か</span><span className="t">Kana cards</span><span className="d">Hiragana deck</span></button>
       </div>
       <div className="section-title"><h2>Quizzes</h2><span className="mu">10 questions · XP for each</span></div>

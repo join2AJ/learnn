@@ -9,6 +9,7 @@ import { pendingMs } from "../core/timeTracker";
 import { usePack } from "../pack";
 import { Bar, fmtMin, Header, Ring } from "../ui/kit";
 import Settings from "./Settings";
+import Recordings from "./Recordings";
 import { Icon, IconTile } from "../ui/icons";
 
 const SEC_COL: Record<string, string> = {
@@ -19,6 +20,7 @@ const SEC_COL: Record<string, string> = {
 
 export default function Me({ route }: { route: Route }) {
   if (route.parts[1] === "settings") return <Settings />;
+  if (route.parts[1] === "recordings") return <Recordings />;
   return <Stats />;
 }
 
@@ -161,7 +163,7 @@ function VoiceSection() {
   const last = log.slice(-12);
   return (
     <>
-      <div className="section-title"><h2>Your voice</h2><span className="mu">{log.length} recordings</span></div>
+      <div className="section-title"><h2>Your voice</h2><button className="sm" style={{ color: "var(--shu)", fontWeight: 700 }} onClick={() => go("/me/recordings")}>All {log.length} recordings →</button></div>
       <div className="card">
         <div className="grid3">
           <div className="stat" style={{ boxShadow: "none", background: "var(--surface-2)" }}><div className="v">{Math.round(score)}</div><div className="k">Avg score</div></div>
@@ -184,7 +186,7 @@ function VoiceSection() {
         </svg>
         <div className="mt8">
           {log.slice(-5).reverse().map((r) => (
-            <button key={r.t} className="row" style={{ width: "100%", padding: "6px 0" }} onClick={() => emitUi({ type: "voice", text: r.w })}>
+            <button key={r.t} className="row" style={{ width: "100%", padding: "6px 0" }} onClick={() => emitUi({ type: "voice", text: r.w, reviewT: r.t })}>
               <span className="jp grow" style={{ textAlign: "left", fontWeight: 600 }}>{r.w}</span>
               <span className="xs mu">{Math.round(r.db)} dB · {r.dur.toFixed(1)}s</span>
               <span className="tag" style={{ background: r.score >= 70 ? "var(--matcha)" : r.score >= 50 ? "var(--gold)" : "var(--shu)", color: "#fff" }}>{r.score}</span>

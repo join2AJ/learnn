@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { Mic, Play, RotateCcw, Volume2 } from "lucide-react";
-import { bandProfile, expectedDuration, pitchTrack, playBuffer, renderSpectrogram, synthWord, trimSilence } from "../core/dsp";
+import { ChevronDown, ChevronUp, Mic, Play, RotateCcw, Volume2 } from "lucide-react";
+import { bandProfile, expectedDuration, moraeOf, pitchTrack, playBuffer, renderSpectrogram, synthWord, trimSilence } from "../core/dsp";
 import { closeMic, openMic, record, toBuffer } from "../core/mic";
-import { emitUi, getProgress, toast, updateProgress, bumpDay, VoiceRec } from "../core/store";
+import { decode, getRec, saveRec } from "../core/recStore";
+import { emitUi, getProgress, toast, updateProgress, bumpDay, useSettings, VoiceRec } from "../core/store";
 import { award, checkBadges } from "../core/rewards";
 import { speak } from "../core/native";
+import { go } from "../core/router";
 import { romaji } from "../packs/ja/verbs";
 import { usePack } from "../pack";
 import { tap } from "./kit";
@@ -23,11 +25,13 @@ export function RecBtn({ text, ro, en, size = "s" }: { text: string; ro?: string
 const BAND_NAMES = ["Low", "Mid", "High"];
 const BAND_DESC = ["80–500 Hz · voice body, vowels’ base", "500–2000 Hz · vowel colour (a/o/u)", "2–6 kHz · consonants s, sh, ts, i/e"];
 
-type Result = VoiceRec & { mine: AudioBuffer; contour: number[] };
+type Result = VoiceRec & { mine: AudioBuffer | null; contour: number[] };
 
-export default function VoiceCompare({ text, ro, en }: { text: string; ro?: string; en?: string }) {
+export default function VoiceCompare({ text, ro, en, reviewT }: { text: string; ro?: string; en?: string; reviewT?: number }) {
   const pk = usePack();
-  const roma = (ro || romaji(text)).replace(/[^a-zA-Zāīūēō' ]/g, " ").trim();
+  const word = pk.words.find((w) => w.w === text);
+  const roma = (ro || word?.ro || romaji(text)).replace(/[^a-zA-Zāīūēō' ]/g, " ").trim();
+  const meaning = en || word?.m;
   const refCv = useRef<HTMLCanvasElement>(null);
   const myCv = useRef<HTMLCanvasElement>(null);
   const refBuf = useRef<AudioBuffer | null>(null);
@@ -35,9 +39,12 @@ export default function VoiceCompare({ text, ro, en }: { text: string; ro?: stri
   const [state, setState] = useState<"idle" | "rec" | "done">("idle");
   const [count, setCount] = useState(0);
   const [res, setRes] = useState<Result | null>(null);
+  const [noAudio, setNoAudio] = useState(false);
   const exp = expectedDuration(roma);
   const recSec = Math.min(6, Math.max(2, exp * 1.8 + 0.8));
-  const history = (getProgress().voiceLog || []).filter((v) => v.w === text).slice(-5);
+  const history = (getProgress().voiceLog || []).filter((v) => v.w === text);
+
+  const drawMine = (x: Float32Array, sr: number) => requestAnimationFrame(() => { const c = myCv.current; if (c) { c.width = 320; c.height = 120; renderSpectrogram(c, x, sr, 6000); } });
 
   useEffect(() => {
     let live = true;
@@ -51,10 +58,25 @@ export default function VoiceCompare({ text, ro, en }: { text: string; ro?: stri
     return () => { live = false; };
   }, [roma]);
 
-  const go = async () => {
+  // Review mode: open a saved recording with its audio and analysis.
+  useEffect(() => {
+    if (!reviewT) return;
+    const rec = (getProgress().voiceLog || []).find((r) => r.t === reviewT);
+    if (!rec) return;
+    getRec(reviewT).then((st) => {
+      if (st) {
+        const x = decode(st);
+        setRes({ ...rec, mine: toBuffer(x, st.sr), contour: st.contour });
+        drawMine(x, st.sr);
+      } else { setRes({ ...rec, mine: null, contour: [] }); setNoAudio(true); }
+      setState("done");
+    });
+  }, [reviewT]); // eslint-disable-line
+
+  const go2 = async () => {
     tap(20);
     const m = await openMic(); if (!m) return;
-    setState("rec"); setRes(null);
+    setState("rec"); setRes(null); setNoAudio(false);
     setCount(Math.ceil(recSec));
     const iv = window.setInterval(() => setCount((c) => Math.max(0, c - 1)), 1000);
     const { data, sr } = await record(m, recSec);
@@ -70,10 +92,11 @@ export default function VoiceCompare({ text, ro, en }: { text: string; ro?: stri
     const score = Math.round(Math.max(0, Math.min(1, (1 - bandDiff * 1.6) * 0.55 + loud * 0.25 + pace * 0.2)) * 100);
     const rec: VoiceRec = { t: Date.now(), w: text, bands, ref: refBands, db, dur, exp, f0: range, score };
     updateProgress((p) => { p.voiceLog = [...(p.voiceLog || []), rec].slice(-300); bumpDay(p, (d) => { d.spoke = (d.spoke || 0) + 1; }); });
+    saveRec(rec.t, text, cut, sr, contour);
     award(3); checkBadges();
     setRes({ ...rec, mine: toBuffer(cut, sr), contour });
     setState("done");
-    requestAnimationFrame(() => { const c = myCv.current; if (c) { c.width = 320; c.height = 120; renderSpectrogram(c, cut, sr, 6000); } });
+    drawMine(cut, sr);
   };
 
   const tips: string[] = [];
@@ -89,14 +112,15 @@ export default function VoiceCompare({ text, ro, en }: { text: string; ro?: stri
     if (d[0] > 0.06) tips.push("sliders|Lots of low energy — open your mouth more and push the sound forward.");
     if (res.f0[1] && res.f0[1] / Math.max(1, res.f0[0]) < 1.12 && res.exp > 0.4) tips.push("music|Very flat melody — Japanese words rise and fall (pitch accent). Copy the voice’s ups and downs.");
   }
+  const when = reviewT ? new Date(reviewT) : null;
 
   return (
     <div>
       <div className="row top">
         <div className="grow">
-          <div className="kicker">Record & compare</div>
+          <div className="kicker">{when ? "Recording · " + when.toLocaleDateString() + " " + when.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "Record & compare"}</div>
           <div className="jp" style={{ fontSize: text.length > 10 ? 22 : 32, fontWeight: 700, lineHeight: 1.3 }}>{text}</div>
-          <div className="sm mu">{roma}{en ? " · " + en : ""}</div>
+          <div className="sm mu">{roma}{meaning ? " · " + meaning : ""}</div>
         </div>
         <button className="say" onClick={() => speak(text, { lang: pk.ttsLang, rate: 0.85 })} aria-label="Listen"><Volume2 size={18} /></button>
       </div>
@@ -107,12 +131,13 @@ export default function VoiceCompare({ text, ro, en }: { text: string; ro?: stri
           <canvas ref={refCv} className="spectro mt4" style={{ height: 90 }} />
         </div>
         <div>
-          <div className="xs mu" style={{ fontWeight: 700 }}>You {res && <button className="xs" style={{ color: "var(--shu)", fontWeight: 700 }} onClick={() => playBuffer(res.mine)}>▶ play</button>}</div>
-          <canvas ref={myCv} className="spectro mt4" style={{ height: 90, opacity: res ? 1 : 0.35 }} />
+          <div className="xs mu" style={{ fontWeight: 700 }}>You {res?.mine && <button className="xs" style={{ color: "var(--shu)", fontWeight: 700 }} onClick={() => playBuffer(res.mine!)}>▶ play</button>}</div>
+          <canvas ref={myCv} className="spectro mt4" style={{ height: 90, opacity: res?.mine ? 1 : 0.35 }} />
         </div>
       </div>
+      {noAudio && <div className="xs mu mt4">Audio wasn’t saved for this one (recorded before v2.4) — the analysis is still here.</div>}
 
-      <button className={"btn lg block mt12 " + (state === "rec" ? "dark" : "primary")} onClick={go} disabled={state === "rec"}>
+      <button className={"btn lg block mt12 " + (state === "rec" ? "dark" : "primary")} onClick={go2} disabled={state === "rec"}>
         {state === "rec" ? <>● Recording… {count}s — say it now, loudly</> : state === "done" ? <><RotateCcw size={17} /> Record again</> : <><Mic size={18} /> Record me ({recSec.toFixed(1)}s)</>}
       </button>
 
@@ -120,7 +145,7 @@ export default function VoiceCompare({ text, ro, en }: { text: string; ro?: stri
         <div className="mt12">
           <div className="row"><div style={{ fontSize: 34, fontWeight: 800, color: res.score >= 70 ? "var(--matcha)" : res.score >= 50 ? "var(--gold)" : "var(--shu)" }}>{res.score}</div>
             <div className="grow sm"><b>{res.score >= 75 ? "すごい！ Very close" : res.score >= 55 ? "いいね！ Getting there" : "Keep going — listen & repeat"}</b><div className="xs mu">Sound-shape match · volume · pace</div></div>
-            <button className="btn sm" onClick={() => playBuffer(res.mine)}><Play size={14} /> Mine</button></div>
+            {res.mine && <button className="btn sm" onClick={() => playBuffer(res.mine!)}><Play size={14} /> Mine</button>}</div>
 
           <div className="card flat mt8" style={{ padding: 12 }}>
             <div className="xs mu" style={{ fontWeight: 700, marginBottom: 6 }}>FREQUENCY BALANCE · you vs reference</div>
@@ -141,27 +166,130 @@ export default function VoiceCompare({ text, ro, en }: { text: string; ro?: stri
             <div className="stat"><div className="v" style={{ fontSize: 19 }}>{res.dur.toFixed(1)}s</div><div className="k">Length (≈{res.exp.toFixed(1)}s)</div></div>
             <div className="stat"><div className="v" style={{ fontSize: 19 }}>{res.f0[0] ? Math.round(res.f0[0]) + "–" + Math.round(res.f0[1]) : "–"}</div><div className="k">Pitch Hz</div></div>
           </div>
-          {res.contour.some((x) => x > 0) && <Contour c={res.contour} />}
+
+          {res.contour.some((x) => x > 0) && <MoraMelody c={res.contour} roma={roma} />}
+          <WhereYouStand r={res} />
           <div className="feedback ok" style={{ background: "var(--surface-2)" }}>{tips.map((t) => { const [ic, msg] = t.split("|"); return <div key={t} className="sm row top" style={{ padding: "3px 0", gap: 8 }}><span style={{ color: "var(--matcha)", marginTop: 1 }}><Icon name={ic} size={16} /></span><span>{msg}</span></div>; })}</div>
+          <Explain />
         </div>
       )}
 
       {history.length > 0 && (
-        <div className="xs mu mt12">Your recent scores for this: {history.map((h) => h.score).join(" → ")}</div>
+        <div className="mt16">
+          <div className="row"><div className="xs mu grow" style={{ fontWeight: 700 }}>ALL YOUR ATTEMPTS AT THIS ({history.length})</div>
+            <button className="xs" style={{ color: "var(--shu)", fontWeight: 700 }} onClick={() => { history.length && go("/me/recordings"); }}>All recordings →</button></div>
+          <div className="row wrap gap6 mt8">
+            {history.slice(-12).reverse().map((h) => (
+              <button key={h.t} className="chip" style={h.t === res?.t ? { boxShadow: "inset 0 0 0 2px var(--shu)" } : undefined} onClick={() => emitUi({ type: "voice", text, ro, en, reviewT: h.t })}>
+                <b style={{ color: h.score >= 70 ? "var(--matcha)" : h.score >= 50 ? "var(--gold)" : "var(--shu)" }}>{h.score}</b>
+                <span className="xs mu">{new Date(h.t).toLocaleDateString(undefined, { day: "numeric", month: "short" })}</span>
+              </button>
+            ))}
+          </div>
+        </div>
       )}
-      <div className="xs mu2 mt8" style={{ lineHeight: 1.45 }}>The reference is generated from the sounds of the word (not a recording of a native speaker), so use it for the overall shape: vowels in the low/mid bands, s/sh/ts hiss up high. Always copy the speaker voice for the real sound.</div>
+      <div className="xs mu2 mt12" style={{ lineHeight: 1.45 }}>The reference is generated from the sounds of the word (not a recording of a native speaker), so use it for the overall shape: vowels in the low/mid bands, s/sh/ts hiss up high. Always copy the speaker voice for the real sound.</div>
     </div>
   );
 }
 
-function Contour({ c }: { c: number[] }) {
+/** Pitch contour split into the word's beats; each beat labelled High / Mid / Low relative to your own range. */
+function MoraMelody({ c, roma }: { c: number[]; roma: string }) {
   const v = c.filter((x) => x > 0); const lo = Math.min(...v), hi = Math.max(...v);
-  const W = 320, H = 54; let d = "", pen = false;
-  c.forEach((x, i) => { if (!x) { pen = false; return; } const px = (i / Math.max(1, c.length - 1)) * W, py = H - 6 - ((x - lo) / Math.max(1, hi - lo)) * (H - 12); d += (pen ? "L" : "M") + px.toFixed(1) + "," + py.toFixed(1); pen = true; });
+  const morae = moraeOf(roma);
+  const first = c.findIndex((x) => x > 0), last = c.length - 1 - [...c].reverse().findIndex((x) => x > 0);
+  const W = 320, H = 96, top = 8, bot = 22;
+  const y = (f: number) => top + (1 - (f - lo) / Math.max(1, hi - lo)) * (H - top - bot);
+  let d = "", pen = false;
+  c.forEach((f, i) => { if (!f) { pen = false; return; } const px = (i / Math.max(1, c.length - 1)) * W; d += (pen ? "L" : "M") + px.toFixed(1) + "," + y(f).toFixed(1); pen = true; });
+  const n = Math.max(1, morae.length);
+  const seg = Array.from({ length: n }, (_, k) => {
+    const a = first + Math.floor(((last - first + 1) * k) / n), b = first + Math.floor(((last - first + 1) * (k + 1)) / n);
+    const part = c.slice(a, b).filter((x) => x > 0);
+    const avg = part.length ? part.reduce((s, x) => s + x, 0) / part.length : 0;
+    const rel = avg ? (avg - lo) / Math.max(1, hi - lo) : -1;
+    return { a, b, avg, lvl: rel < 0 ? "–" : rel > 0.66 ? "H" : rel > 0.33 ? "M" : "L" };
+  });
+  const col = { H: "var(--shu)", M: "var(--gold)", L: "var(--ai)", "–": "var(--ink-3)" } as Record<string, string>;
+  const flat = hi / Math.max(1, lo) < 1.12;
   return (
-    <div className="mt8">
-      <div className="xs mu" style={{ fontWeight: 700 }}>YOUR MELODY (pitch over time)</div>
-      <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ background: "var(--surface-2)", borderRadius: 12, marginTop: 4 }}><path d={d} fill="none" stroke="var(--matcha)" strokeWidth="3" strokeLinecap="round" /></svg>
+    <div className="mt12">
+      <div className="xs mu" style={{ fontWeight: 700 }}>YOUR MELODY · each beat High / Mid / Low (in your own range)</div>
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ background: "var(--surface-2)", borderRadius: 12, marginTop: 4 }}>
+        {[["H", 0.83], ["M", 0.5], ["L", 0.17]].map(([l, r]) => <g key={l as string}><line x1="0" x2={W} y1={top + (1 - (r as number)) * (H - top - bot)} y2={top + (1 - (r as number)) * (H - top - bot)} stroke="var(--line)" strokeDasharray="3 4" /><text x="3" y={top + (1 - (r as number)) * (H - top - bot) - 2} style={{ fontSize: 8, fill: "var(--ink-3)", fontWeight: 700 }}>{l === "H" ? "high" : l === "M" ? "mid" : "low"}</text></g>)}
+        {seg.map((s, k) => k > 0 && <line key={k} x1={(s.a / Math.max(1, c.length - 1)) * W} x2={(s.a / Math.max(1, c.length - 1)) * W} y1={top} y2={H - bot + 4} stroke="var(--line-2)" />)}
+        <path d={d} fill="none" stroke="var(--matcha)" strokeWidth="3" strokeLinecap="round" />
+        {seg.map((s, k) => { const cx = (((s.a + s.b) / 2) / Math.max(1, c.length - 1)) * W; return <g key={"m" + k}>
+          <text x={cx} y={H - 9} textAnchor="middle" style={{ fontSize: 9, fill: "var(--ink)", fontWeight: 700 }}>{morae[k] || ""}</text>
+          <text x={cx} y={H - 1} textAnchor="middle" style={{ fontSize: 8, fill: col[s.lvl], fontWeight: 800 }}>{s.lvl}</text></g>; })}
+      </svg>
+      <div className="xs mu mt4" style={{ lineHeight: 1.45 }}>
+        Your pattern: <b>{seg.map((s) => s.lvl).join(" ")}</b>. {flat ? "Your voice stayed almost flat — Japanese words step up and down between beats." : "Compare with the speaker voice: in Japanese the pitch usually jumps between the 1st and 2nd beat (up or down)."}
+      </div>
+    </div>
+  );
+}
+
+/** Gauge with coloured zones and a marker for where you are. */
+function Gauge({ label, value, min, max, zones, unit, show, range }: { label: string; value: number; min: number; max: number; zones: [number, string, string][]; unit: string; show: string; range?: [number, number] }) {
+  const pct = (x: number) => Math.max(0, Math.min(100, ((x - min) / (max - min)) * 100));
+  const zone = zones.find(([to]) => value <= to) || zones[zones.length - 1];
+  let from = min;
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <div className="row xs"><b className="grow">{label}</b><span style={{ fontWeight: 800, color: zone[2] }}>{show} · {zone[1]}</span></div>
+      <div style={{ position: "relative", height: 26, marginTop: 4 }}>
+        <div style={{ position: "absolute", top: 8, left: 0, right: 0, height: 10, borderRadius: 5, overflow: "hidden", display: "flex" }}>
+          {zones.map(([to, , c]) => { const w = pct(Math.min(to, max)) - pct(from); from = to; return <div key={to} style={{ width: w + "%", background: c, opacity: 0.35 }} />; })}
+        </div>
+        {range && <div style={{ position: "absolute", top: 8, height: 10, left: pct(range[0]) + "%", width: Math.max(1, pct(range[1]) - pct(range[0])) + "%", background: zone[2], borderRadius: 5, opacity: 0.7 }} />}
+        <div style={{ position: "absolute", left: `calc(${pct(value)}% - 7px)`, top: 4, width: 14, height: 18, borderRadius: 7, background: zone[2], border: "3px solid var(--surface)", boxShadow: "var(--shadow-1)" }} />
+      </div>
+      <div className="row" style={{ justifyContent: "space-between" }}>{zones.map(([, l]) => <span key={l} className="xs mu2" style={{ fontSize: 10 }}>{l}</span>)}</div>
+      <div className="xs mu2" style={{ fontSize: 10 }}>{min}{unit} … {max}{unit}</div>
+    </div>
+  );
+}
+
+function WhereYouStand({ r }: { r: VoiceRec }) {
+  const avgF0 = r.f0[0] ? (r.f0[0] + r.f0[1]) / 2 : 0;
+  const semis = r.f0[0] ? 12 * Math.log2(r.f0[1] / Math.max(1, r.f0[0])) : 0;
+  const pace = r.dur / r.exp;
+  return (
+    <div className="card flat mt12" style={{ padding: 12 }}>
+      <div className="xs mu" style={{ fontWeight: 700, marginBottom: 8 }}>WHERE YOU STAND</div>
+      {avgF0 > 0 && <Gauge label="Voice pitch (how low or high your voice is)" value={avgF0} min={60} max={350} unit=" Hz" show={Math.round(avgF0) + " Hz"} range={r.f0}
+        zones={[[120, "low voice", "var(--ai)"], [200, "mid voice", "var(--matcha)"], [280, "high voice", "var(--gold)"], [350, "very high", "var(--shu)"]]} />}
+      {avgF0 > 0 && <Gauge label="Melody (rise & fall inside the word)" value={semis} min={0} max={14} unit=" st" show={semis.toFixed(1) + " semitones"}
+        zones={[[2, "flat", "var(--shu)"], [9, "natural", "var(--matcha)"], [14, "very expressive", "var(--gold)"]]} />}
+      <Gauge label="Loudness" value={r.db} min={-50} max={0} unit=" dB" show={Math.round(r.db) + " dB"}
+        zones={[[-32, "too quiet", "var(--shu)"], [-26, "soft", "var(--gold)"], [-8, "good", "var(--matcha)"], [0, "very loud", "var(--gold)"]]} />
+      <Gauge label="Pace (your length ÷ natural length)" value={pace} min={0.3} max={2.5} unit="×" show={pace.toFixed(1) + "×"}
+        zones={[[0.7, "fast", "var(--gold)"], [1.4, "natural", "var(--matcha)"], [2.5, "slow", "var(--gold)"]]} />
+    </div>
+  );
+}
+
+function Explain() {
+  const s = useSettings();
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="card flat mt12" style={{ padding: 12 }}>
+      <button className="row" style={{ width: "100%" }} onClick={() => setOpen(!open)}>
+        <Icon name="bulb" size={16} color="var(--gold)" /><b className="sm grow" style={{ textAlign: "left" }}>What do Low / Mid / High mean?</b>{open ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+      </button>
+      {open && (
+        <div className="sm mt8" style={{ lineHeight: 1.6 }}>
+          <p style={{ margin: "0 0 8px" }}><b>Two different things are measured:</b></p>
+          <p style={{ margin: "0 0 8px" }}><b>1. Frequency balance (Low / Mid / High bands)</b> — how your sound energy is spread, like the bass, mid and treble on a speaker.
+            <br />• <b>Low</b> (80–500 Hz): the “body” of your voice and the base of every vowel.
+            <br />• <b>Mid</b> (500–2000 Hz): what makes あ sound different from お or う.
+            <br />• <b>High</b> (2000–6000 Hz): the hiss of s, sh, ts and the brightness of い and え.
+            <br />If your High is lower than the reference, your consonants are soft; if Low is much higher, the sound is muffled.</p>
+          <p style={{ margin: "0 0 8px" }}><b>2. Voice pitch (Hz)</b> — how fast your vocal cords vibrate: deep voices ≈ 85–155 Hz, higher voices ≈ 165–255 Hz. Everyone is different and that’s fine; what matters in Japanese is the <b>melody</b> — each beat is higher or lower than the one before (pitch accent). The melody chart labels each beat <b>H</b> / <b>M</b> / <b>L</b> within your own range.</p>
+          {s.showHindi && <p className="hi" style={{ margin: 0 }}>Low/Mid/High बैंड = आवाज़ का बेस, बीच और तीखापन (स्पीकर के bass/treble जैसा)। Pitch (Hz) = आवाज़ कितनी भारी या पतली है। जापानी में हर अक्षर (mora) ऊँचा या नीचा बोला जाता है — इसे pitch accent कहते हैं।</p>}
+        </div>
+      )}
     </div>
   );
 }

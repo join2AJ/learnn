@@ -317,3 +317,9 @@ export async function synthWord(ro: string, f0 = 140): Promise<AudioBuffer> {
 }
 /** Expected duration at a natural learner pace (~150 ms per mora). */
 export const expectedDuration = (ro: string) => Math.max(0.3, romajiSegments(ro).reduce((a, s) => a + s.dur, 0) * 1.15);
+
+/** Split romaji into morae (syllable beats), e.g. "dō itashimashite" → do o i ta shi ma shi te. */
+export function moraeOf(ro: string): string[] {
+  const s = ro.toLowerCase().replace(/ā/g, "aa").replace(/ī/g, "ii").replace(/ū/g, "uu").replace(/ē/g, "ee").replace(/ō/g, "oo").replace(/[^a-z]/g, "");
+  return s.match(/(ky|gy|sh|ch|ts|ny|hy|my|ry|by|py|[kgsztdnhbpmyrwfj])?[aeiou]|n(?![aeiouy])|([kstpcgdbhfmrjz])(?=\2)/g) || [];
+}

@@ -134,7 +134,7 @@ export type UiEvent =
   | { type: "toast"; text: string; tone?: "ok" | "info" | "warn" }
   | { type: "xp"; amount: number }
   | { type: "celebrate"; title: string; sub: string; jp?: string; icon?: string }
-  | { type: "voice"; text: string; ro?: string; en?: string }
+  | { type: "voice"; text: string; ro?: string; en?: string; reviewT?: number }
   | { type: "tour" };
 const ui = new Set<(e: UiEvent) => void>();
 export const onUi = (f: (e: UiEvent) => void) => { ui.add(f); return () => { ui.delete(f); }; };
