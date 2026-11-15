@@ -247,7 +247,7 @@ input[type=range] { width: 100%; accent-color: var(--shu); }
 /* ============ Charts ============ */
 .chart text { fill: var(--ink-3); font-size: 10px; font-family: var(--font); }
 .spectro { width: 100%; border-radius: 18px; background: #0c0e1c; display: block; image-rendering: pixelated; }
-.heat { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.heat { display: grid; grid-template-columns: repeat(14, 1fr); gap: 3px; }
 .heat i { aspect-ratio: 1; border-radius: 5px; background: var(--surface-3); display: block; }
 .stat { background: var(--surface); border-radius: 18px; padding: 14px; box-shadow: var(--shadow-1); }
 .stat .v { font-size: 24px; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
@@ -277,3 +277,7 @@ input[type=range] { width: 100%; accent-color: var(--shu); }
 .big-jp { font-family: var(--jp-serif); font-size: 72px; font-weight: 700; line-height: 1; letter-spacing: .02em; }
 @media (min-width: 430px) { .kcell b { font-size: 30px; } }
 @keyframes appear { to { opacity: 1; } }
+
+.jp-tap { font: inherit; color: inherit; font-family: var(--jp); text-decoration: underline dotted color-mix(in srgb, var(--shu) 70%, transparent); text-underline-offset: 3px; text-decoration-thickness: 1.5px; padding: 0 1px; border-radius: 4px; display: inline; text-align: inherit; }
+.jp-tap:active { background: var(--shu-soft); }
+.hint-tap { font-size: 11px; color: var(--ink-3); display: inline-flex; gap: 4px; align-items: center; }

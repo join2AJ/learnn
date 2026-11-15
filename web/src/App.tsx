@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { BookOpen, Compass, Dumbbell, Home as HomeIcon, User } from "lucide-react";
 import { go, sectionOf, useRoute } from "./core/router";
-import { onUi, toast, UiEvent, useProgress, useSettings } from "./core/store";
+import { onUi, setSettings, toast, UiEvent, useProgress, useSettings } from "./core/store";
 import { setSection, startTracker } from "./core/timeTracker";
 import { setNativeTheme, setWarn, speak } from "./core/native";
-import { Confetti, tap } from "./ui/kit";
+import { Confetti, Sheet, tap } from "./ui/kit";
+import VoiceCompare from "./ui/VoiceCompare";
+import Tour from "./screens/Tour";
 import { usePack } from "./pack";
 import { dueCount } from "./core/srs";
 import Home from "./screens/Home";
@@ -31,6 +33,8 @@ export default function App() {
   const [xp, setXp] = useState<{ n: number; k: number } | null>(null);
   const [cele, setCele] = useState<Extract<UiEvent, { type: "celebrate" }> | null>(null);
   const [confetti, setConfetti] = useState(0);
+  const [voice, setVoice] = useState<Extract<UiEvent, { type: "voice" }> | null>(null);
+  const [tour, setTour] = useState(false);
 
   useEffect(() => { startTracker(); setWarn((m) => toast(m, "warn")); }, []);
   useEffect(() => { setSection(sectionOf(route.parts)); window.scrollTo(0, 0); }, [route.path]);
@@ -50,6 +54,8 @@ export default function App() {
 
   useEffect(() => onUi((e) => {
     if (e.type === "toast") { setToast({ text: e.text, tone: e.tone }); window.setTimeout(() => setToast(null), 3200); }
+    else if (e.type === "voice") setVoice(e);
+    else if (e.type === "tour") setTour(true);
     else if (e.type === "xp") { setXp({ n: e.amount, k: Date.now() }); window.setTimeout(() => setXp(null), 1600); }
     else if (e.type === "celebrate") {
       setCele(e); setConfetti((c) => c + 1); tap(30);
@@ -57,7 +63,7 @@ export default function App() {
     }
   }), [settings.autoplay, p.ttsLang]);
 
-  if (!settings.onboarded) return <Onboarding />;
+  if (!settings.onboarded || !settings.profiled) return <Onboarding />;
 
   const top = route.parts[0] || "";
   const navTop = top === "lab" ? "practice" : top;
@@ -88,6 +94,8 @@ export default function App() {
       {toastMsg && <div className="toast" role="status">{toastMsg.tone === "warn" ? "⚠️" : toastMsg.tone === "ok" ? "✅" : "💡"} {toastMsg.text}</div>}
       {xp && <div className="xp-pop" key={xp.k}>+{xp.n} XP</div>}
       <Confetti run={confetti} />
+      <Sheet open={!!voice} onClose={() => setVoice(null)}>{voice && <VoiceCompare key={voice.text} text={voice.text} ro={voice.ro} en={voice.en} />}</Sheet>
+      {(tour || !settings.toured) && !cele && <Tour onDone={() => { setTour(false); if (!settings.toured) setSettings({ toured: true }); }} />}
       {cele && (<>
         <div className="scrim" style={{ zIndex: 89 }} onClick={() => setCele(null)} />
         <div className="modal" role="dialog">

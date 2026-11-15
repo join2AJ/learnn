@@ -6,7 +6,8 @@ import { award, recordAnswer } from "../../core/rewards";
 import { openExternal, speak } from "../../core/native";
 import type { Example, LessonBlock } from "../../core/types";
 import { usePack } from "../../pack";
-import { Bar, Header, Md, pick, Say, tap } from "../../ui/kit";
+import { Bar, Header, Jp, Md, pick, Say, tap } from "../../ui/kit";
+import { RecBtn } from "../../ui/VoiceCompare";
 
 export function GrammarList() {
   const pk = usePack();
@@ -29,7 +30,7 @@ export function GrammarList() {
             {pk.lessons.filter((l) => l.unit === u).map((l) => (
               <button key={l.id} className="li" onClick={() => go("/learn/grammar/" + l.id)}>
                 <span className={"ico " + (p.lessons[l.id] ? "soft-matcha" : "soft-ai")}>
-                  {p.lessons[l.id] ? <CheckCircle2 size={20} color="var(--matcha)" /> : <span className="jp" style={{ fontSize: l.jp.length > 3 ? 11 : 14, fontWeight: 700, color: "var(--ai)" }}>{l.jp.slice(0, 4)}</span>}
+                  {p.lessons[l.id] ? <CheckCircle2 size={20} color="var(--matcha)" /> : <span className="jp" style={{ fontSize: 16, fontWeight: 700, color: "var(--ai)" }}>{l.jp.replace(/[・と]/g, "").slice(0, 1)}</span>}
                 </span>
                 <span className="grow"><div className="t">{l.title}</div><div className="d">{l.summary}</div></span>
                 <span className="xs mu2 row gap4"><Clock size={12} />{l.minutes}m</span>
@@ -56,7 +57,7 @@ export function ExampleRow({ e }: { e: Example }) {
         {s.showHindi && e.hi && <div className="hi sm">{e.hi}</div>}
         {e.note && <div className="xs mu mt4">💡 {e.note}</div>}
       </div>
-      <div className="col gap6"><Say text={e.jp} size="s" /><Say text={e.jp} size="s" slow /></div>
+      <div className="col gap6"><Say text={e.jp} size="s" /><Say text={e.jp} size="s" slow /><RecBtn text={e.jp} ro={e.ro} en={e.en} /></div>
     </div>
   );
 }
@@ -65,19 +66,19 @@ function Block({ b }: { b: LessonBlock }) {
   const s = useSettings();
   switch (b.kind) {
     case "text": return <div className="card prose">{b.title && <b>{b.title}</b>}<p><Md text={b.text!} /></p></div>;
-    case "pattern": return <div className="card">{b.title && <div className="kicker">{b.title}</div>}<div className="pattern mt4">{b.text}</div></div>;
+    case "pattern": return <div className="card">{b.title && <div className="kicker">{b.title}</div>}<div className="pattern mt4"><Jp text={b.text!} /></div></div>;
     case "tip": return <div className="card soft-gold" style={{ boxShadow: "none" }}><div className="kicker">💡 Tip</div><div className="sm mt4" style={{ lineHeight: 1.6 }}><Md text={b.text!} /></div></div>;
     case "table": return (
       <div className="card">{b.title && <div style={{ fontWeight: 800, marginBottom: 8 }}>{b.title}</div>}
         <div className="tbl-wrap"><table className="tbl"><thead><tr>{b.head!.map((h, i) => <th key={i}>{h}</th>)}</tr></thead>
-          <tbody>{b.rows!.map((r, i) => <tr key={i}>{r.map((c, j) => <td key={j} className="jp">{c}</td>)}</tr>)}</tbody></table></div></div>);
+          <tbody>{b.rows!.map((r, i) => <tr key={i}>{r.map((c, j) => <td key={j}><Jp text={c} /></td>)}</tr>)}</tbody></table></div></div>);
     case "examples": return <div className="card"><div className="kicker">Examples · tap 🔊 to hear, 🐢 for slow</div>{b.examples!.map((e) => <ExampleRow key={e.jp} e={e} />)}</div>;
     case "compare": return (
       <div className="card">{<div style={{ fontWeight: 800, marginBottom: 8 }}>{b.title || "Compare"}</div>}
         <div className="cmp">
-          <div style={{ background: "var(--ai-soft)" }}><span className="flag">🇬🇧</span><span>{b.compare!.en}</span></div>
-          {s.showHindi && <div style={{ background: "var(--gold-soft)" }}><span className="flag">🇮🇳</span><span>{b.compare!.hi}</span></div>}
-          <div style={{ background: "var(--shu-soft)" }}><span className="flag">🇯🇵</span><span className="jp">{b.compare!.jp}</span></div>
+          <div style={{ background: "var(--ai-soft)" }}><span className="flag">🇬🇧</span><span><Jp text={b.compare!.en} /></span></div>
+          {s.showHindi && <div style={{ background: "var(--gold-soft)" }}><span className="flag">🇮🇳</span><span><Jp text={b.compare!.hi} /></span></div>}
+          <div style={{ background: "var(--shu-soft)" }}><span className="flag">🇯🇵</span><span><Jp text={b.compare!.jp} /></span></div>
         </div></div>);
   }
   return null;
@@ -128,7 +129,7 @@ export function LessonView({ id }: { id: string }) {
       <div className="section-title"><h2>Check yourself</h2><span className="mu">{finished ? score + "/" + l.quiz.length : (qi + 1) + "/" + l.quiz.length}</span></div>
       {!finished ? (
         <div className="card">
-          <div style={{ fontWeight: 700, fontSize: 16 }} className="jp">{q.q}</div>
+          <div style={{ fontWeight: 700, fontSize: 16 }}><Jp text={q.q} /></div>
           <div className={"opts mt12" + (q.options.some((o) => o.length > 14) ? " one" : "")}>
             {q.options.map((o, i) => (
               <button key={i} className={"opt" + (picked === null ? "" : i === q.answer ? " ok" : i === picked ? " bad" : " dim")} style={{ fontSize: 15 }} onClick={() => answer(i)}><span className="jp">{o}</span></button>

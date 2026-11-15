@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Check, Download, RotateCcw, Upload, Volume2 } from "lucide-react";
-import { exportAll, importAll, resetProgress, setSettings, toast, useSettings } from "../core/store";
+import { dayKey, emitUi, exportAll, importAll, resetProgress, setSettings, toast, useSettings } from "../core/store";
 import { appVersion, openExternal, openTtsSettings, speak, ttsStatus } from "../core/native";
 import { PACKS } from "../packs/registry";
 import { usePack } from "../pack";
@@ -57,6 +57,15 @@ export default function Settings() {
         </Row>
       </div>
 
+      <div className="section-title"><h2>Pledge & help</h2></div>
+      <div className="list">
+        <Row t={s.pledge ? "Pledge: " + s.pledge.min + " min/day for 30 days" : "No pledge yet"} d={s.pledge ? "Started " + s.pledge.start + " — renew to start a new 30 days at your current goal" : "Promise a daily time and earn streak badges"}>
+          <button className="btn sm" onClick={() => { setSettings({ pledge: { min: s.dailyGoalMin, start: dayKey(), days: 30 } }); toast("New 30-day pledge started", "ok"); }}>{s.pledge ? "Renew" : "Pledge"}</button>
+        </Row>
+        <Row t="Edit profile" d={[s.age, (s.reasons || []).join(", ")].filter(Boolean).join(" · ") || "Name, age, reasons"}><button className="btn sm" onClick={() => setSettings({ profiled: false })}>Edit</button></Row>
+        <Row t="App tour" d="How to use each tab"><button className="btn sm" onClick={() => emitUi({ type: "tour" })}>Show</button></Row>
+      </div>
+
       <div className="section-title"><h2>Backup</h2></div>
       <div className="card">
         <div className="sm mu">Progress is saved on this phone only. Copy the backup text somewhere safe (notes, email to yourself) and paste it back after reinstalling.</div>
@@ -71,7 +80,7 @@ export default function Settings() {
 
       <div className="section-title"><h2>About</h2></div>
       <div className="card sm" style={{ lineHeight: 1.6 }}>
-        <div><b>Nihongo Path</b> · v2.0 ({appVersion()})</div>
+        <div><b>Nihongo Path</b> · v2.1 ({appVersion()})</div>
         <div className="mu mt4">Built as a multi-language engine: each language is a content pack (scripts, words, grammar, culture, sounds). Japanese is the first pack.</div>
         <div className="mu mt8">Credits: stroke order from <a onClick={() => openExternal("https://kanjivg.tagaini.net")}>KanjiVG</a> (CC BY-SA 3.0, Ulrich Apel). Word ranks from Mindomax (OpenSubtitles + Tatoeba) and the wordfreq project. Example sentences were AI-written and reviewed; treat them as study material. Formant values are rounded literature averages.</div>
       </div>

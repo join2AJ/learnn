@@ -72,10 +72,19 @@ export function Sheet({ open, onClose, children }: { open: boolean; onClose: () 
   return createPortal(<><div className="scrim" onClick={onClose} /><div className="sheet" role="dialog"><div className="grab" />{children}</div></>, document.body);
 }
 
-/** **bold** markdown only — enough for lesson copy. */
+/** Renders text; every run of Japanese becomes tap-to-hear (dotted underline). */
+const JP_RUN = /([\u3040-\u30ff\u3400-\u9fff\uff66-\uff9f々〜ー][\u3040-\u30ff\u3400-\u9fff\uff66-\uff9f々〜ー、・（）()]*)/g;
+export function Jp({ text }: { text: string }) {
+  const parts = text.split(JP_RUN);
+  return <>{parts.map((p, i) => (i % 2 === 1
+    ? <button key={i} className="jp-tap" onClick={(e) => { e.stopPropagation(); tap(); speak(p.replace(/[（）()]/g, ""), { lang: pack().ttsLang, rate: getSettings().rate }); }}>{p}</button>
+    : <span key={i}>{p}</span>))}</>;
+}
+
+/** **bold** markdown only — enough for lesson copy. Japanese inside is tappable. */
 export function Md({ text }: { text: string }) {
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
-  return <>{parts.map((p, i) => (p.startsWith("**") ? <b key={i}>{p.slice(2, -2)}</b> : <span key={i}>{p}</span>))}</>;
+  return <>{parts.map((p, i) => (p.startsWith("**") ? <b key={i}><Jp text={p.slice(2, -2)} /></b> : <Jp key={i} text={p} />))}</>;
 }
 
 /** Celebration confetti on a canvas. */

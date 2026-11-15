@@ -5,6 +5,7 @@ import { updateProgress, useProgress, useSettings } from "../../core/store";
 import { award } from "../../core/rewards";
 import { usePack } from "../../pack";
 import { Header, Say, tap } from "../../ui/kit";
+import { RecBtn } from "../../ui/VoiceCompare";
 
 const TIERS: [string, number, number][] = [["All", 1, 1000], ["1–100", 1, 100], ["101–300", 101, 300], ["301–600", 301, 600], ["601–1000", 601, 1000]];
 const TYPE_COL: Record<string, string> = { verb: "var(--ai)", noun: "var(--matcha)", "i-adj": "var(--gold)", "na-adj": "var(--gold)", adverb: "var(--shu)", pron: "var(--plum)", num: "var(--ai)" };
@@ -87,7 +88,7 @@ export default function Words() {
                   {s.showRomaji && <span className="sm mu2">{w.ro}</span>}
                 </div>
               </div>
-              <Say text={w.r} />
+              <div className="row gap6"><Say text={w.r} /><RecBtn text={w.w} ro={w.ro} en={w.m} size="m" /></div>
             </div>
             <div style={{ fontWeight: 700, marginTop: 2 }}>{w.m}{s.showHindi && <span className="hi" style={{ fontWeight: 500 }}> · {w.h}</span>}</div>
             <div className="ex" style={{ paddingBottom: 4 }}>

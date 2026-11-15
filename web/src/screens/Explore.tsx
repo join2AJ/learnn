@@ -7,7 +7,7 @@ import { award } from "../core/rewards";
 import { openExternal } from "../core/native";
 import { checkTask, phaseProgress } from "../core/path";
 import { usePack } from "../pack";
-import { Bar, Header, Seg } from "../ui/kit";
+import { Bar, Header, Jp, Say, Seg } from "../ui/kit";
 
 export default function Explore({ route }: { route: Route }) {
   const [, sub, id] = route.parts;
@@ -76,13 +76,13 @@ function CultureView({ id }: { id: string }) {
   return (
     <div className="screen">
       <Header title={c.icon + " " + c.title} backTo="/explore" />
-      <div className={"card " + TONE[c.tone][0]} style={{ boxShadow: "none" }}><div className="sm" style={{ fontWeight: 600, lineHeight: 1.55 }}>{c.intro}</div></div>
+      <div className={"card " + TONE[c.tone][0]} style={{ boxShadow: "none" }}><div className="sm" style={{ fontWeight: 600, lineHeight: 1.55 }}>{c.intro}</div><div className="xs mu mt4">Tip: tap any <span className="jp-tap">日本語</span> to hear it.</div></div>
       {c.items.map((it, i) => (
         <div className="card" key={i} style={{ borderLeft: "4px solid " + TONE[c.tone][1] }}>
           <div style={{ fontWeight: 800, fontSize: 16 }}>{it.title}</div>
-          {it.jp && <div className="jp sm" style={{ color: TONE[c.tone][1], fontWeight: 600 }}>{it.jp}</div>}
-          <div className="sm mt4" style={{ lineHeight: 1.6 }}>{it.text}</div>
-          {it.india && s.showHindi && <div className="sm mt8 soft-gold" style={{ padding: "8px 10px", borderRadius: 12, lineHeight: 1.5 }}>🇮🇳 {it.india}</div>}
+          {it.jp && <div className="row gap6"><span className="jp sm" style={{ color: TONE[c.tone][1], fontWeight: 600 }}>{it.jp}</span><Say text={it.jp.replace(/[(（].*$/, "").trim()} size="s" /></div>}
+          <div className="sm mt4" style={{ lineHeight: 1.6 }}><Jp text={it.text} /></div>
+          {it.india && s.showHindi && <div className="sm mt8 soft-gold" style={{ padding: "8px 10px", borderRadius: 12, lineHeight: 1.5 }}>🇮🇳 <Jp text={it.india} /></div>}
         </div>
       ))}
       {next && <button className="btn primary block mt16" onClick={() => go("/explore/culture/" + next.id, true)}>Next: {next.icon} {next.title} <ArrowRight size={16} /></button>}

@@ -3,7 +3,8 @@ import { Settings as Cog } from "lucide-react";
 import type { Route } from "../core/router";
 import { go } from "../core/router";
 import { dayKey, emptyDay, useProgress, useSettings } from "../core/store";
-import { BADGES, HIRA46, KATA46, levelOf, masteredSet, totalMs, totalReviews } from "../core/rewards";
+import { BADGES, goalStreak, HIRA46, KATA46, levelOf, masteredSet, pledgeStatus, totalMs, totalReviews } from "../core/rewards";
+import { emitUi } from "../core/store";
 import { pendingMs } from "../core/timeTracker";
 import { usePack } from "../pack";
 import { Bar, fmtMin, Header, Ring } from "../ui/kit";
@@ -62,6 +63,13 @@ function Stats() {
         </div>
       </div>
 
+      {(() => { const ps = pledgeStatus(p); const gs = goalStreak(p); return ps ? (
+        <div className="card soft-gold mt12" style={{ boxShadow: "none" }}>
+          <div className="row"><span style={{ fontSize: 26 }}>🤝</span><div className="grow"><div style={{ fontWeight: 800 }}>Pledge: {ps.min} min a day</div><div className="xs mu">Day {ps.day} of {ps.days} · goal met {ps.kept} days · current run {gs.cur} · best {gs.best}</div></div></div>
+          <div className="mt8"><Bar pct={ps.kept / ps.days} color="var(--gold)" /></div>
+          <div className="xs mu mt4">Next badge: {gs.best < 3 ? "3" : gs.best < 7 ? "7" : gs.best < 21 ? "21" : "30"} days in a row</div>
+        </div>) : null; })()}
+
       <div className="grid2 mt12">
         <div className="stat"><div className="v">{fmtMin(total)}</div><div className="k">Total study time</div></div>
         <div className="stat"><div className="v">{p.known.length}</div><div className="k">Words known</div></div>
@@ -107,6 +115,8 @@ function Stats() {
         <div className="heat">{heat.map((ms, i) => <i key={i} title={Math.round(ms / 60000) + " min"} style={ms ? { background: "var(--matcha)", opacity: 0.25 + Math.min(1, ms / (s.dailyGoalMin * 60000)) * 0.75 } : undefined} />)}</div>
       </div>
 
+      <VoiceSection />
+
       <div className="section-title"><h2>Mastery</h2></div>
       <div className="card">
         {[["Hiragana", masteredSet(p, HIRA46) / 46, masteredSet(p, HIRA46) + "/46", "var(--shu)"], ["Katakana", masteredSet(p, KATA46) / 46, masteredSet(p, KATA46) + "/46", "var(--ai)"],
@@ -134,3 +144,53 @@ function Stats() {
   );
 }
 
+
+function VoiceSection() {
+  const p = useProgress();
+  const log = p.voiceLog || [];
+  if (!log.length) return (
+    <><div className="section-title"><h2>Your voice</h2></div>
+      <div className="card sm mu">Tap the green 🎙 next to any word to record yourself. Your low / mid / high balance, loudness and scores will be tracked here.</div></>
+  );
+  const recent = log.slice(-20);
+  const avg = (k: (r: typeof log[0]) => number) => recent.reduce((a, r) => a + k(r), 0) / recent.length;
+  const bands = [0, 1, 2].map((i) => avg((r) => r.bands[i]));
+  const ref = [0, 1, 2].map((i) => avg((r) => r.ref[i]));
+  const db = avg((r) => r.db), score = avg((r) => r.score);
+  const last = log.slice(-12);
+  return (
+    <>
+      <div className="section-title"><h2>Your voice</h2><span className="mu">{log.length} recordings</span></div>
+      <div className="card">
+        <div className="grid3">
+          <div className="stat" style={{ boxShadow: "none", background: "var(--surface-2)" }}><div className="v">{Math.round(score)}</div><div className="k">Avg score</div></div>
+          <div className="stat" style={{ boxShadow: "none", background: "var(--surface-2)" }}><div className="v">{Math.round(db)}</div><div className="k">Avg dB {db < -26 ? "· louder!" : "✓"}</div></div>
+          <div className="stat" style={{ boxShadow: "none", background: "var(--surface-2)" }}><div className="v">{Math.round(avg((r) => r.dur / r.exp) * 100)}%</div><div className="k">Pace vs natural</div></div>
+        </div>
+        <div className="xs mu mt12" style={{ fontWeight: 700 }}>FREQUENCY BALANCE (last {recent.length}) · you vs reference</div>
+        {["Low", "Mid", "High"].map((n, i) => (
+          <div key={n} className="row xs mt4"><b style={{ width: 34 }}>{n}</b>
+            <div className="grow" style={{ position: "relative", height: 14 }}>
+              <div style={{ position: "absolute", top: 0, height: 6, width: bands[i] * 100 + "%", background: "var(--matcha)", borderRadius: 3 }} />
+              <div style={{ position: "absolute", top: 8, height: 6, width: ref[i] * 100 + "%", background: "var(--ink-3)", opacity: .6, borderRadius: 3 }} />
+            </div>
+            <span style={{ width: 70, textAlign: "right" }}>{Math.round(bands[i] * 100)}% / {Math.round(ref[i] * 100)}%</span></div>
+        ))}
+        <div className="xs mu mt12" style={{ fontWeight: 700 }}>SCORE TREND</div>
+        <svg viewBox="0 0 300 60" width="100%" className="chart mt4">
+          <polyline fill="none" stroke="var(--shu)" strokeWidth="2.5" points={last.map((r, i) => (i / Math.max(1, last.length - 1)) * 290 + 5 + "," + (55 - (r.score / 100) * 50)).join(" ")} />
+          {last.map((r, i) => <circle key={i} cx={(i / Math.max(1, last.length - 1)) * 290 + 5} cy={55 - (r.score / 100) * 50} r="3" fill="var(--shu)" />)}
+        </svg>
+        <div className="mt8">
+          {log.slice(-5).reverse().map((r) => (
+            <button key={r.t} className="row" style={{ width: "100%", padding: "6px 0" }} onClick={() => emitUi({ type: "voice", text: r.w })}>
+              <span className="jp grow" style={{ textAlign: "left", fontWeight: 600 }}>{r.w}</span>
+              <span className="xs mu">{Math.round(r.db)} dB · {r.dur.toFixed(1)}s</span>
+              <span className="tag" style={{ background: r.score >= 70 ? "var(--matcha)" : r.score >= 50 ? "var(--gold)" : "var(--shu)", color: "#fff" }}>{r.score}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}

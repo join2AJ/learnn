@@ -9,6 +9,7 @@ import { usePack } from "../../pack";
 import { toHira } from "../../packs/ja/kana";
 import { Header, Say, Seg, Sheet, tap } from "../../ui/kit";
 import { StrokeView } from "../../ui/StrokeView";
+import { RecBtn } from "../../ui/VoiceCompare";
 
 export default function KanaChart({ id }: { id: string }) {
   const pk = usePack();
@@ -86,7 +87,7 @@ function CellDetail({ c, alphaId, mnemonic }: { c: LetterCell; alphaId: string; 
           {s.showHindi && c.hint && <div className="hi lg">{c.hint}</div>}
           {stat && <div className="xs mu mt4">Quiz: {stat.c} right · {stat.w} wrong {isMastered(stat) ? "· ✅ mastered" : ""}</div>}
         </div>
-        <Say text={c.ch} />
+        <div className="row gap6"><Say text={c.ch} /><RecBtn text={c.ch} ro={c.rom} size="m" /></div>
       </div>
       <div className="mt12"><StrokeView ch={c.ch} size={200} /></div>
       <div className="xs mu center mt8">{pk.strokes[c.ch]?.length || "?"} strokes · first stroke in red · tap ↻ to replay</div>
@@ -97,7 +98,7 @@ function CellDetail({ c, alphaId, mnemonic }: { c: LetterCell; alphaId: string; 
           {examples.map((w) => (
             <div key={w.n} className="ex">
               <div className="grow"><div className="j">{w.w} <span className="sm mu">{w.r !== w.w ? w.r : ""}</span></div><div className="e">{w.m}{s.showHindi && <span className="hi"> · {w.h}</span>}</div></div>
-              <Say text={w.r} size="s" />
+              <Say text={w.r} size="s" /><RecBtn text={w.w} ro={w.ro} en={w.m} />
             </div>
           ))}
         </div>

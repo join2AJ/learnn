@@ -4,7 +4,8 @@ import { go } from "../../core/router";
 import { updateProgress, useProgress, useSettings } from "../../core/store";
 import { openExternal } from "../../core/native";
 import { usePack } from "../../pack";
-import { Header, Say } from "../../ui/kit";
+import { Header, Jp, Say } from "../../ui/kit";
+import { RecBtn } from "../../ui/VoiceCompare";
 
 export default function Pronunciation() {
   const pk = usePack();
@@ -20,10 +21,10 @@ export default function Pronunciation() {
       {pk.pronunciation.map((t, i) => (
         <div className="card" key={t.id}>
           <div className="row"><span className="tag" style={{ background: "var(--shu)", color: "#fff" }}>{i + 1}</span><div style={{ fontWeight: 800, fontSize: 16 }}>{t.title}</div></div>
-          <div className="prose sm mt8">{t.text}</div>
+          <div className="prose sm mt8"><Jp text={t.text} /></div>
           <div className="cmp mt8">
-            <div style={{ background: "var(--ai-soft)" }}><span className="flag">🇬🇧</span><span>{t.en}</span></div>
-            {s.showHindi && <div style={{ background: "var(--gold-soft)" }}><span className="flag">🇮🇳</span><span>{t.hi}</span></div>}
+            <div style={{ background: "var(--ai-soft)" }}><span className="flag">🇬🇧</span><span><Jp text={t.en} /></span></div>
+            {s.showHindi && <div style={{ background: "var(--gold-soft)" }}><span className="flag">🇮🇳</span><span><Jp text={t.hi} /></span></div>}
           </div>
           <div className="mt8">
             {t.examples.map((e) => (
@@ -31,6 +32,7 @@ export default function Pronunciation() {
                 <div className="grow"><div className="j">{e.jp}</div><div className="r">{e.ro}</div><div className="e">{e.en}{s.showHindi && e.hi && <span className="hi"> · {e.hi}</span>}</div></div>
                 <Say text={e.jp} size="s" />
                 <Say text={e.jp} size="s" slow label="Play slowly" />
+                <RecBtn text={e.jp} ro={e.ro} en={e.en} />
               </div>
             ))}
           </div>

@@ -36,11 +36,11 @@ export function phaseProgress(pk: LanguagePack, p: Progress) {
 /** The single most useful next action for the learner. */
 export function nextStep(pk: LanguagePack, p: Progress): { title: string; sub: string; to: string; jp: string } {
   const hira = masteredSet(p, HIRA46), kata = masteredSet(p, KATA46);
-  if (!p.roadmap.scripts) return { title: "Meet the 3 scripts", sub: "2-minute overview: hiragana, katakana, kanji", to: "/learn/scripts", jp: "文字" };
-  if (hira < 46) return { title: "Hiragana · " + hira + "/46 mastered", sub: hira < 10 ? "Learn the first rows with sound + stroke order" : "Quiz yourself until every cell turns green", to: hira < 10 ? "/learn/kana/hira" : "/practice/quiz/kana?set=hira", jp: "ひらがな" };
-  if (kata < 46) return { title: "Katakana · " + kata + "/46 mastered", sub: "Same sounds, sharper shapes", to: kata < 10 ? "/learn/kana/kata" : "/practice/quiz/kana?set=kata", jp: "カタカナ" };
+  if (!p.roadmap.scripts) return { title: "Meet the 3 scripts", sub: "2-minute overview: hiragana, katakana, kanji", to: "/learn/scripts", jp: "字" };
+  if (hira < 46) return { title: "Hiragana · " + hira + "/46 mastered", sub: hira < 10 ? "Learn the first rows with sound + stroke order" : "Quiz yourself until every cell turns green", to: hira < 10 ? "/learn/kana/hira" : "/practice/quiz/kana?set=hira", jp: "あ" };
+  if (kata < 46) return { title: "Katakana · " + kata + "/46 mastered", sub: "Same sounds, sharper shapes", to: kata < 10 ? "/learn/kana/kata" : "/practice/quiz/kana?set=kata", jp: "ア" };
   const next = pk.lessons.find((l) => !p.lessons[l.id]);
-  if (next && (Object.keys(p.lessons).length < 5 || p.known.length >= Object.keys(p.lessons).length * 20)) return { title: next.title, sub: "Grammar · " + next.minutes + " min · " + next.unit, to: "/learn/grammar/" + next.id, jp: next.jp };
-  if (p.known.length < 1000) return { title: "Words " + (p.known.length + 1) + "–" + Math.min(1000, p.known.length + 20), sub: "Flashcards with spaced repetition", to: "/practice/cards", jp: "単語" };
-  return { title: "Keep reviewing", sub: "Spaced repetition keeps everything fresh", to: "/practice/cards", jp: "復習" };
+  if (next && (Object.keys(p.lessons).length < 5 || p.known.length >= Object.keys(p.lessons).length * 20)) return { title: next.title, sub: "Grammar · " + next.minutes + " min · " + next.unit, to: "/learn/grammar/" + next.id, jp: "文" };
+  if (p.known.length < 1000) return { title: "Words " + (p.known.length + 1) + "–" + Math.min(1000, p.known.length + 20), sub: "Flashcards with spaced repetition", to: "/practice/cards", jp: "語" };
+  return { title: "Keep reviewing", sub: "Spaced repetition keeps everything fresh", to: "/practice/cards", jp: "復" };
 }

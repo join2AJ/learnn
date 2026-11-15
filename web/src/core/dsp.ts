@@ -212,3 +212,108 @@ export function playBuffer(b: AudioBuffer) {
   src.buffer = b; src.connect(ctx.destination); src.start();
   return src;
 }
+
+/* ===================== word-level voice analysis ===================== */
+
+/** Cut leading/trailing silence (20 ms frames, relative threshold). */
+export function trimSilence(x: Float32Array, sr: number) {
+  const f = Math.floor(sr * 0.02), n = Math.floor(x.length / f);
+  const e = Array.from({ length: n }, (_, i) => { let s = 0; for (let j = 0; j < f; j++) s += x[i * f + j] ** 2; return Math.sqrt(s / f); });
+  const peak = Math.max(...e, 1e-6);
+  const thr = Math.max(0.006, peak * 0.08);
+  const a = e.findIndex((v) => v > thr);
+  if (a < 0) return null;
+  let b = n - 1; while (b > a && e[b] <= thr) b--;
+  return x.subarray(Math.max(0, (a - 2) * f), Math.min(x.length, (b + 3) * f));
+}
+
+/** Share of spectral energy in Low (80–500 Hz), Mid (500–2000), High (2000–6000) and loudness in dBFS. */
+export function bandProfile(x: Float32Array, sr: number): { bands: [number, number, number]; db: number } {
+  const size = 2048, hop = 1024, bins = size / 2, hz = sr / size;
+  const acc = [0, 0, 0];
+  let rms = 0;
+  for (let i = 0; i < x.length; i++) rms += x[i] * x[i];
+  rms = Math.sqrt(rms / Math.max(1, x.length));
+  const frames = stft(x, size, hop);
+  frames.forEach((fr) => {
+    for (let k = 1; k < bins; k++) {
+      const f = k * hz, p = Math.pow(10, fr[k] / 10);
+      if (f >= 80 && f < 500) acc[0] += p; else if (f < 2000 && f >= 500) acc[1] += p; else if (f < 6000 && f >= 2000) acc[2] += p;
+    }
+  });
+  // perceptual weighting: compare in log domain so fricatives aren't drowned by the low voice energy
+  const lg = acc.map((v) => Math.max(0, 10 * Math.log10(v + 1e-12) + 80));
+  const t = lg.reduce((a, b) => a + b, 0) || 1;
+  return { bands: [lg[0] / t, lg[1] / t, lg[2] / t], db: 20 * Math.log10(rms + 1e-9) };
+}
+
+/** Pitch track (10 ms hop), median filtered; returns [min,max] Hz of voiced frames plus contour. */
+export function pitchTrack(x: Float32Array, sr: number) {
+  const hop = Math.floor(sr / 100), size = Math.floor(sr * 0.04);
+  const ps: number[] = [];
+  for (let i = 0; i + size < x.length; i += hop) ps.push(pitch(x.subarray(i, i + size), sr));
+  const med = ps.map((_, i) => { const w = ps.slice(Math.max(0, i - 3), i + 4).filter((v) => v > 0).sort((a, b) => a - b); return ps[i] > 0 && w.length ? w[w.length >> 1] : 0; });
+  const v = med.filter((p) => p > 0).sort((a, b) => a - b);
+  const range: [number, number] = v.length ? [v[Math.floor(v.length * 0.1)], v[Math.floor(v.length * 0.9)]] : [0, 0];
+  return { contour: med, range };
+}
+
+const V: Record<string, [number, number, number]> = { a: [760, 1300, 2500], i: [300, 2250, 3000], u: [350, 1380, 2400], e: [480, 1950, 2600], o: [500, 850, 2500] };
+const NASAL: [number, number, number] = [280, 1500, 2500];
+type Seg = { dur: number; voice: number; f: [number, number, number]; noise: number; band?: [number, number] };
+
+/** Turn romaji into timed segments (one mora ≈ 130 ms). */
+export function romajiSegments(ro: string): Seg[] {
+  const s = ro.toLowerCase().replace(/ā/g, "aa").replace(/ī/g, "ii").replace(/ū/g, "uu").replace(/ē/g, "ee").replace(/ō/g, "ou").replace(/[^a-z' ]/g, " ");
+  const re = /(ky|gy|sh|ch|ts|ny|hy|my|ry|by|py|[kgsztdnhbpmyrwfj])?([aeiou])|(n)(?![aeiouy])|([kstpcgdbhfmrjz])(?=\4)|( +)/g;
+  const out: Seg[] = [];
+  const M = 0.13;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(s))) {
+    if (m[5]) { out.push({ dur: 0.06, voice: 0, f: V.a, noise: 0 }); continue; }
+    if (m[4]) { out.push({ dur: M, voice: 0, f: V.a, noise: 0 }); continue; } // small っ: one silent beat
+    if (m[3]) { out.push({ dur: M, voice: 0.55, f: NASAL, noise: 0 }); continue; } // ん
+    const c = m[1] || "", v = V[m[2]];
+    const glide = c.length === 2 && c[1] === "y" ? V.i : c === "w" ? V.u : c === "y" ? V.i : null;
+    let cd = 0.04;
+    if (/^(s|z)$/.test(c)) out.push({ dur: cd = 0.06, voice: c === "z" ? 0.25 : 0, f: v, noise: 0.9, band: [4500, 8000] });
+    else if (/^(sh|j|ch)$/.test(c)) { if (c === "ch") out.push({ dur: 0.03, voice: 0, f: v, noise: 0 }); out.push({ dur: cd = 0.06, voice: c === "j" ? 0.25 : 0, f: v, noise: 0.9, band: [2200, 5000] }); }
+    else if (c === "ts") { out.push({ dur: 0.03, voice: 0, f: v, noise: 0 }); out.push({ dur: cd = 0.05, voice: 0, f: v, noise: 0.9, band: [4000, 8000] }); }
+    else if (/^(h|f|hy)$/.test(c)) out.push({ dur: cd = 0.05, voice: 0, f: v, noise: 0.6, band: [600, 3500] });
+    else if (/^(k|g|t|d|p|b|ky|gy|by|py)$/.test(c)) { out.push({ dur: 0.045, voice: /[gdb]/.test(c) ? 0.15 : 0, f: v, noise: 0 }); out.push({ dur: cd = 0.015, voice: 0, f: v, noise: 1, band: c[0] === "k" || c[0] === "g" ? [1200, 3000] : c[0] === "t" || c[0] === "d" ? [3000, 6000] : [500, 1500] }); }
+    else if (/^(n|m|ny|my)$/.test(c)) out.push({ dur: cd = 0.05, voice: 0.6, f: NASAL, noise: 0 });
+    else if (/^(r|ry)$/.test(c)) out.push({ dur: cd = 0.02, voice: 0.5, f: [400, 1400, 2300], noise: 0 });
+    else cd = 0;
+    if (glide) out.push({ dur: 0.04, voice: 0.8, f: glide, noise: 0 });
+    out.push({ dur: Math.max(0.06, M - cd), voice: 1, f: v, noise: 0 });
+  }
+  return out;
+}
+
+/** Synthesize an approximate reference for a word from its romaji (source-filter model). */
+export async function synthWord(ro: string, f0 = 140): Promise<AudioBuffer> {
+  const segs = romajiSegments(ro);
+  const sr = 22050, dur = Math.max(0.3, segs.reduce((a, s) => a + s.dur, 0) + 0.15);
+  const ctx = new OfflineAudioContext(1, Math.floor(sr * dur), sr);
+  const osc = ctx.createOscillator(); osc.type = "sawtooth";
+  osc.frequency.setValueAtTime(f0 * 1.05, 0); osc.frequency.linearRampToValueAtTime(f0 * 0.85, dur);
+  const vg = ctx.createGain(); vg.gain.value = 0; vg.connect(ctx.destination);
+  const bps = [0, 1, 2].map((i) => { const b = ctx.createBiquadFilter(); b.type = "bandpass"; b.Q.value = 6 - i; const g = ctx.createGain(); g.gain.value = [3, 1.8, 0.8][i]; osc.connect(b); b.connect(g); g.connect(vg); return b; });
+  const nb = ctx.createBuffer(1, Math.floor(sr * dur), sr); const nd = nb.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+  const ns = ctx.createBufferSource(); ns.buffer = nb;
+  const nbp = ctx.createBiquadFilter(); nbp.type = "bandpass"; nbp.Q.value = 1.2;
+  const ng = ctx.createGain(); ng.gain.value = 0; ns.connect(nbp); nbp.connect(ng); ng.connect(ctx.destination);
+  let t = 0.05;
+  for (const s of segs) {
+    vg.gain.setTargetAtTime(s.voice * 0.9, t, 0.008);
+    ng.gain.setTargetAtTime(s.noise * 1.6, t, 0.005);
+    s.f.forEach((F, i) => bps[i].frequency.setTargetAtTime(F, t, 0.015));
+    if (s.band) { const c = Math.sqrt(s.band[0] * s.band[1]); nbp.frequency.setValueAtTime(c, t); nbp.Q.setValueAtTime(c / (s.band[1] - s.band[0]), t); }
+    t += s.dur;
+  }
+  vg.gain.setTargetAtTime(0, t, 0.02); ng.gain.setTargetAtTime(0, t, 0.01);
+  osc.start(); ns.start();
+  return ctx.startRendering();
+}
+/** Expected duration at a natural learner pace (~150 ms per mora). */
+export const expectedDuration = (ro: string) => Math.max(0.3, romajiSegments(ro).reduce((a, s) => a + s.dur, 0) * 1.15);

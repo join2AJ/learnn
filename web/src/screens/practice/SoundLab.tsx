@@ -1,53 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Mic, MicOff, Play, Square, Volume2 } from "lucide-react";
-import { updateProgress, useSettings } from "../../core/store";
+import { useSettings } from "../../core/store";
 import { award } from "../../core/rewards";
-import { ensureMic, speak } from "../../core/native";
-import { audioCtx, formants, paintColumn, pitch, playBuffer, renderSpectrogram, synthesize } from "../../core/dsp";
+import { speak } from "../../core/native";
+import { formants, paintColumn, pitch, playBuffer, renderSpectrogram, synthesize } from "../../core/dsp";
+import { closeMic, Mic as MicH, openMic, record, toBuffer } from "../../core/mic";
 import type { SoundRef, VowelRef } from "../../core/types";
 import { usePack } from "../../pack";
 import { Header, Seg, tap } from "../../ui/kit";
 import { toast } from "../../core/store";
-
-/* ---------------- microphone helpers ---------------- */
-interface Mic { ctx: AudioContext; stream: MediaStream; src: MediaStreamAudioSourceNode; an: AnalyserNode; }
-async function openMic(): Promise<Mic | null> {
-  if (!(await ensureMic())) { toast("Microphone permission is needed for the Sound Lab.", "warn"); return null; }
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } as MediaTrackConstraints });
-    const ctx = audioCtx();
-    const src = ctx.createMediaStreamSource(stream);
-    const an = ctx.createAnalyser(); an.fftSize = 2048; an.smoothingTimeConstant = 0.2;
-    src.connect(an);
-    updateProgress((x) => { x.labSessions++; });
-    return { ctx, stream, src, an };
-  } catch (e) {
-    toast("Could not open the microphone: " + (e as Error).message, "warn");
-    return null;
-  }
-}
-const closeMic = (m: Mic | null) => { if (!m) return; m.src.disconnect(); m.stream.getTracks().forEach((t) => t.stop()); };
-
-/** Record `sec` seconds of mono audio from a mic. */
-function record(m: Mic, sec: number): Promise<{ data: Float32Array; sr: number }> {
-  return new Promise((res) => {
-    const sp = m.ctx.createScriptProcessor(2048, 1, 1);
-    const chunks: Float32Array[] = [];
-    const total = Math.floor(m.ctx.sampleRate * sec);
-    let n = 0;
-    const mute = m.ctx.createGain(); mute.gain.value = 0;
-    sp.onaudioprocess = (e) => {
-      const d = e.inputBuffer.getChannelData(0); chunks.push(new Float32Array(d)); n += d.length;
-      if (n >= total) {
-        sp.disconnect(); m.src.disconnect(sp); mute.disconnect();
-        const out = new Float32Array(n); let o = 0; chunks.forEach((c) => { out.set(c, o); o += c.length; });
-        res({ data: out, sr: m.ctx.sampleRate });
-      }
-    };
-    m.src.connect(sp); sp.connect(mute); mute.connect(m.ctx.destination);
-  });
-}
-const toBuffer = (d: Float32Array, sr: number) => { const b = audioCtx().createBuffer(1, d.length, sr); b.getChannelData(0).set(d); return b; };
 
 /* ---------------- vowel chart ---------------- */
 const F2MAX = 2700, F2MIN = 600, F1MIN = 200, F1MAX = 950;
@@ -104,7 +65,7 @@ function FreqAxis({ maxHz, h }: { maxHz: number; h: number }) {
 function Live() {
   const pk = usePack();
   const cv = useRef<HTMLCanvasElement>(null);
-  const mic = useRef<Mic | null>(null);
+  const mic = useRef<MicH | null>(null);
   const [on, setOn] = useState(false);
   const [read, setRead] = useState<{ f0: number; f1: number; f2: number; near: string } | null>(null);
   const [trail, setTrail] = useState<[number, number][]>([]);

@@ -13,10 +13,17 @@ export interface Settings {
   newPerDay: number;
   haptics: boolean;
   autoplay: boolean;
+  profiled: boolean;
+  toured: boolean;
+  age: string;
+  reasons: string[];
+  pledge: { min: number; start: string; days: number } | null;
 }
 
 export interface SrsCard { due: number; ivl: number; ease: number; reps: number; lapses: number; last: number; }
-export interface DayStat { ms: number; sec: Record<string, number>; xp: number; reviews: number; correct: number; wrong: number; learned: number; }
+/** Summary of one voice recording (audio itself is not stored). */
+export interface VoiceRec { t: number; w: string; bands: [number, number, number]; ref: [number, number, number]; db: number; dur: number; exp: number; f0: [number, number]; score: number; }
+export interface DayStat { ms: number; sec: Record<string, number>; xp: number; reviews: number; correct: number; wrong: number; learned: number; spoke?: number; }
 
 export interface Progress {
   xp: number;
@@ -34,17 +41,18 @@ export interface Progress {
   goalHit: Record<string, boolean>;
   roadmap: Record<string, boolean>;
   culturesRead: Record<string, boolean>;
+  voiceLog: VoiceRec[];
   started: number;
 }
 
 const defSettings: Settings = {
   lang: "ja", name: "", onboarded: false, showHindi: true, showRomaji: true, rate: 0.9,
-  theme: "auto", dailyGoalMin: 20, newPerDay: 15, haptics: true, autoplay: true,
+  theme: "auto", dailyGoalMin: 20, newPerDay: 15, haptics: true, autoplay: true, profiled: false, toured: false, age: "", reasons: [], pledge: null,
 };
 const defProgress = (): Progress => ({
   xp: 0, known: [], kana: {}, lessons: {}, srs: {}, badges: {}, quiz: { correct: 0, wrong: 0, best: 0 },
   speak: { ok: 0, tries: 0 }, writes: 0, labSessions: 0, days: {}, streak: { count: 0, best: 0, last: "" },
-  goalHit: {}, roadmap: {}, culturesRead: {}, started: Date.now(),
+  goalHit: {}, roadmap: {}, culturesRead: {}, voiceLog: [], started: Date.now(),
 });
 
 /* ---------- persistence ---------- */
@@ -125,7 +133,9 @@ export function bumpDay(p: Progress, f: (d: DayStat) => void) {
 export type UiEvent =
   | { type: "toast"; text: string; tone?: "ok" | "info" | "warn" }
   | { type: "xp"; amount: number }
-  | { type: "celebrate"; title: string; sub: string; jp?: string; icon?: string };
+  | { type: "celebrate"; title: string; sub: string; jp?: string; icon?: string }
+  | { type: "voice"; text: string; ro?: string; en?: string }
+  | { type: "tour" };
 const ui = new Set<(e: UiEvent) => void>();
 export const onUi = (f: (e: UiEvent) => void) => { ui.add(f); return () => { ui.delete(f); }; };
 export const emitUi = (e: UiEvent) => ui.forEach((f) => f(e));

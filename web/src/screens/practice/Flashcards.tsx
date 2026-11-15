@@ -8,6 +8,7 @@ import { speak } from "../../core/native";
 import type { LetterCell } from "../../core/types";
 import { usePack } from "../../pack";
 import { Bar, Header, pick, Say, Seg, tap } from "../../ui/kit";
+import { RecBtn } from "../../ui/VoiceCompare";
 
 type Card = { id: string; front: string; reading?: string; romaji?: string; meaning: string; hindi?: string; s?: string; sr?: string; st?: string; speakText: string; kind: "word" | "kana" };
 
@@ -108,7 +109,7 @@ export default function Flashcards({ deck }: { deck: string }) {
               <div style={{ fontWeight: 800, fontSize: 34 }}>{card.romaji}</div>
               {s.showHindi && card.hindi && <div className="hi" style={{ fontSize: 24 }}>{card.hindi}</div>}
             </>)}
-            <div style={{ position: "absolute", top: 12, right: 12 }}><Say text={card.speakText} /></div>
+            <div className="row gap6" style={{ position: "absolute", top: 12, right: 12 }}><Say text={card.speakText} /><RecBtn text={card.front} ro={card.romaji} en={card.meaning} size="m" /></div>
           </div>
         </div>
       </div>

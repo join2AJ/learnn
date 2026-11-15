@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { AudioLines, Mic, SkipForward, ThumbsUp } from "lucide-react";
 import { go } from "../../core/router";
-import { updateProgress, useProgress, useSettings } from "../../core/store";
+import { bumpDay, updateProgress, useProgress, useSettings } from "../../core/store";
 import { award } from "../../core/rewards";
 import { listen, speak, speechSupported, stopListening } from "../../core/native";
 import { usePack } from "../../pack";
 import { toHira } from "../../packs/ja/kana";
 import { Header, pick, Say, Seg, shuffle, tap } from "../../ui/kit";
+import { RecBtn } from "../../ui/VoiceCompare";
 
 const norm = (s: string) => toHira(s).replace(/[\s、。！？!?,.・「」『』〜~]/g, "").toLowerCase();
 function lev(a: string, b: string) {
@@ -56,7 +57,7 @@ export default function Speak() {
         const sc = matchScore(e.texts, item.alt);
         setScore(sc); setState("done");
         const ok = sc >= 0.75;
-        updateProgress((x) => { x.speak = { ok: x.speak.ok + (ok ? 1 : 0), tries: x.speak.tries + 1 }; });
+        updateProgress((x) => { x.speak = { ok: x.speak.ok + (ok ? 1 : 0), tries: x.speak.tries + 1 }; bumpDay(x, (d) => { d.spoke = (d.spoke || 0) + 1; }); });
         if (ok) { award(8); speak(pick(pk.praise).jp, { lang: pk.ttsLang }); }
       } else if (e.type === "error") { setErr(String(e.error || "Didn’t catch that")); setState("idle"); }
       else if (e.type === "end") setState((st) => (st === "listening" ? "idle" : st));
@@ -75,7 +76,8 @@ export default function Speak() {
         {s.showRomaji && <div className="mu">{item.ro}</div>}
         <div style={{ fontWeight: 700, marginTop: 4 }}>{item.en}</div>
         {s.showHindi && item.hi && <div className="hi">{item.hi}</div>}
-        <div className="row mt12" style={{ justifyContent: "center" }}><Say text={item.jp} /><Say text={item.jp} slow /></div>
+        <div className="row mt12" style={{ justifyContent: "center" }}><Say text={item.jp} /><Say text={item.jp} slow /><RecBtn text={item.jp} ro={item.ro} en={item.en} size="m" /></div>
+        <div className="xs mu mt8">🎙 green button = record & see your voice’s spectrum vs the reference</div>
       </div>
 
       <div className="center mt24">

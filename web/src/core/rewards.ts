@@ -34,6 +34,12 @@ export const BADGES: Badge[] = [
   { id: "culture", icon: "⛩️", title: "Culture curious", desc: "Read 5 culture sections", test: (p) => Object.keys(p.culturesRead).length >= 5 },
   { id: "hour", icon: "⏱️", title: "Hour of power", desc: "Study 60 minutes total", test: (p) => totalMs(p) >= 3600_000 },
   { id: "perfect", icon: "💯", title: "Perfect round", desc: "10/10 in a quiz", test: (p) => p.quiz.best >= 10 },
+  { id: "pledge", icon: "🤝", title: "Pledge made", desc: "Promised your daily study time", test: () => !!getSettings().pledge },
+  { id: "keep3", icon: "🎯", title: "Promise kept ×3", desc: "Daily goal met 3 days in a row", test: (p) => goalStreak(p).best >= 3 },
+  { id: "keep7", icon: "🏅", title: "Promise kept ×7", desc: "Daily goal met 7 days in a row", test: (p) => goalStreak(p).best >= 7 },
+  { id: "keep21", icon: "🥈", title: "Habit formed", desc: "Daily goal met 21 days in a row", test: (p) => goalStreak(p).best >= 21 },
+  { id: "keep30", icon: "🏆", title: "Pledge fulfilled", desc: "30 days of keeping your promise", test: (p) => goalStreak(p).best >= 30 },
+  { id: "voice10", icon: "🎙️", title: "Voice explorer", desc: "Record and compare 10 words", test: (p) => (p.voiceLog || []).length >= 10 },
 ];
 
 const HIRA46 = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん";
@@ -46,6 +52,28 @@ export const totalReviews = (p: Progress) => Object.values(p.days).reduce((a, d)
 export { HIRA46, KATA46 };
 
 /** Award XP, update streak, and fire level-up / badge celebrations. */
+/** Consecutive days with the daily goal met: current run (ending today or yesterday) and best run. */
+export function goalStreak(p: Progress) {
+  const days = Object.keys(p.goalHit).filter((k) => p.goalHit[k]).sort();
+  let best = 0, run = 0, prev = "";
+  for (const k of days) {
+    const d = new Date(k + "T12:00:00"); d.setDate(d.getDate() - 1);
+    run = prev === dayKey(d) ? run + 1 : 1; best = Math.max(best, run); prev = k;
+  }
+  const y = new Date(); y.setDate(y.getDate() - 1);
+  const cur = prev === dayKey() || prev === dayKey(y) ? run : 0;
+  return { cur, best };
+}
+/** Days since the pledge started (1-based) and how many of them met the goal. */
+export function pledgeStatus(p: Progress) {
+  const pl = getSettings().pledge;
+  if (!pl) return null;
+  const start = new Date(pl.start + "T12:00:00");
+  const day = Math.min(pl.days, Math.floor((Date.now() - start.getTime()) / 86_400_000) + 1);
+  const kept = Object.keys(p.goalHit).filter((k) => p.goalHit[k] && k >= pl.start).length;
+  return { ...pl, day: Math.max(1, day), kept };
+}
+
 export function award(xp: number, f?: (p: Progress) => void) {
   const before = getProgress();
   const lvBefore = levelOf(before.xp).level;

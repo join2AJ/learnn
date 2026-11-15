@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { go } from "../../core/router";
 import { updateProgress, useProgress } from "../../core/store";
 import { usePack } from "../../pack";
-import { Header, Md, Say } from "../../ui/kit";
+import { Header, Jp, Md, Say } from "../../ui/kit";
 
 export default function Scripts() {
   const pk = usePack();
@@ -54,7 +54,7 @@ export default function Scripts() {
       <div className="tbl-wrap" style={{ background: "var(--surface)" }}>
         <table className="tbl">
           <thead><tr>{pk.compareTable.head.map((h) => <th key={h}>{h}</th>)}</tr></thead>
-          <tbody>{pk.compareTable.rows.map((r) => <tr key={r[0]}>{r.map((c, i) => <td key={i} className={i === 3 ? "jp" : ""}>{c}</td>)}</tr>)}</tbody>
+          <tbody>{pk.compareTable.rows.map((r) => <tr key={r[0]}>{r.map((c, i) => <td key={i}><Jp text={c} /></td>)}</tr>)}</tbody>
         </table>
       </div>
 
