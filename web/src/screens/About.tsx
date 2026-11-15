@@ -25,9 +25,7 @@ const TIMELINES = ["As soon as possible", "Within 1 month", "1 – 3 months", "F
 const STAGES = ["Just an idea", "Have a design / sketch", "Have an existing app to improve"];
 
 export default function About() {
-  const pk = usePack();
   const st = useSettings();
-  const stats = useMemo(() => contentStats(pk), [pk]);
   const [cat, setCat] = useState("");
   const [sub, setSub] = useState("");
   const [feat, setFeat] = useState<string[]>([]);
@@ -73,19 +71,7 @@ export default function About() {
     <div className="screen">
       <Header title="About" sub={"Nihongo Path · version " + APP_VERSION} backTo="/me" />
 
-      <div className="card hero tint-shu">
-        <div className="watermark">道</div>
-        <div className="kicker">About the app</div>
-        <div style={{ fontWeight: 800, fontSize: 19, margin: "2px 0 6px" }}>Nihongo Path · 日本語の道</div>
-        <div className="sm" style={{ lineHeight: 1.6 }}>A free, offline, beginner-first way to learn Japanese - with English and Hindi side by side. {stats.words.toLocaleString()} words in spoken-frequency order, {(stats.sentences + stats.sentenceBank).toLocaleString()} example sentences, all kana with stroke order, grammar, verbs, culture, a map of Japan, and a voice lab that shows your pronunciation.</div>
-        <div className="xs mt8" style={{ opacity: 0.85 }}>No ads · no account · your data stays on your phone.</div>
-      </div>
-
-      <div className="card mt12">
-        <div className="kicker">From the developer</div>
-        <div style={{ fontWeight: 800, fontSize: 17, marginTop: 2 }}>{ABOUT_ME.title}</div>
-        {ABOUT_ME.paragraphs.map((t, i) => <p key={i} className="sm" style={{ lineHeight: 1.65, margin: "8px 0 0" }}>{t}</p>)}
-      </div>
+      <AboutBlock />
 
       <div className="card mt16 soft-ai" style={{ boxShadow: "none" }}>
         <div className="row"><Smartphone size={24} color="var(--ai)" /><div className="grow"><div style={{ fontWeight: 800, fontSize: 17 }}>Want your own Android app?</div><div className="sm">I build apps like this one. Tell me what you need - it takes 2 minutes.</div></div></div>
@@ -139,4 +125,26 @@ function Step({ n, title, hint, children }: { n: number; title: string; hint?: s
       {children}
     </div>
   );
+}
+
+/** App description + developer story (shown on About and Support). */
+export function AboutBlock() {
+  const pk = usePack();
+  const stats = useMemo(() => contentStats(pk), [pk]);
+  return (<>
+      <div className="card hero tint-shu">
+      <div className="watermark">道</div>
+      <div className="kicker">About the app</div>
+      <div style={{ fontWeight: 800, fontSize: 19, margin: "2px 0 6px" }}>Nihongo Path · 日本語の道</div>
+      <div className="sm" style={{ lineHeight: 1.6 }}>A free, offline, beginner-first way to learn Japanese - with English and Hindi side by side. {stats.words.toLocaleString()} words in spoken-frequency order, {(stats.sentences + stats.sentenceBank).toLocaleString()} example sentences, all kana with stroke order, grammar, verbs, culture, a map of Japan, and a voice lab that shows your pronunciation.</div>
+      <div className="xs mt8" style={{ opacity: 0.85 }}>No ads · no account · your data stays on your phone.</div>
+    </div>
+
+    <div className="card mt12">
+      <div className="kicker">From the developer</div>
+      <div style={{ fontWeight: 800, fontSize: 17, marginTop: 2 }}>{ABOUT_ME.title}</div>
+      {ABOUT_ME.paragraphs.map((t, i) => <p key={i} className="sm" style={{ lineHeight: 1.65, margin: "8px 0 0" }}>{t}</p>)}
+    </div>
+
+  </>);
 }

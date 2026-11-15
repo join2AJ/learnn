@@ -171,7 +171,6 @@ export default function JapanMap() {
         <div className="section-title"><h2>Big cities</h2></div>
         <div className="grid2">{CITIES.map((c) => <button key={c.name} className="tile" style={{ minHeight: 80 }} onClick={() => { tap(); setCity(c); speak(c.ja, { lang: pk.ttsLang }); }}><span className="row gap6"><MapPin size={16} color="var(--shu)" /><span className="jp" style={{ fontWeight: 800, fontSize: 18 }}>{c.ja}</span></span><span className="t">{c.name}</span><span className="d">{c.pop}</span></button>)}</div>
         <button className="btn primary block mt16" onClick={startQuiz}><Target size={17} /> Play “Find the prefecture”</button>
-        <div className="xs mu mt12">Map outlines: 地球地図日本 (Global Map Japan), Geospatial Information Authority of Japan (GSI). Photos: Wikimedia Commons contributors (credited on each place).</div>
       </>)}
 
       <SightSheet s={sight} onClose={() => setSight(null)} />

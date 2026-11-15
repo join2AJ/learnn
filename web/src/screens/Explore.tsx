@@ -225,7 +225,6 @@ function Famous() {
       <div className="chips">{kinds.map((k) => <button key={k} className={"chip" + (kind === k ? " on" : "")} onClick={() => setKind(k)}>{k}</button>)}</div>
       <div className="mt8"><SightGrid list={kind === "All" ? SIGHTS : SIGHTS.filter((x) => x.kind === kind)} /></div>
       <button className="btn white block mt16" onClick={() => go("/explore/map")}><Map size={16} /> See them on the map</button>
-      <div className="xs mu mt12">Photos from Wikimedia Commons under Creative Commons licences - the author and licence are shown on each place.</div>
     </div>
   );
 }

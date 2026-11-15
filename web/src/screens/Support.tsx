@@ -4,6 +4,7 @@ import { openExternal } from "../core/native";
 import { toast } from "../core/store";
 import { Header } from "../ui/kit";
 import { childMode } from "../core/child";
+import { AboutBlock } from "./About";
 
 /** Optional, voluntary support - the app stays free with no locked features. */
 export default function Support() {
@@ -37,6 +38,8 @@ export default function Support() {
         </div>
       )}
       {!hasSupport() && <div className="card flat mt12 sm mu">Support options will appear here soon.</div>}
+      <div className="section-title"><h2>About the app</h2></div>
+      <AboutBlock />
       <div className="section-title"><h2>Free ways to help</h2></div>
       <div className="list">
         <button className="li" onClick={share}><span className="ico soft-matcha"><Share2 size={19} color="var(--matcha)" /></span><span className="grow"><div className="t">Share with a friend</div><div className="d">The best support is another learner</div></span></button>

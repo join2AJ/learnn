@@ -6,9 +6,9 @@ import { PACKS } from "../packs/registry";
 import { speak, vibrate } from "../core/native";
 import { Switch, tap } from "../ui/kit";
 import PolicyReader from "./PolicyReader";
+import Intro from "./Intro";
 import { ParentConsent } from "./Privacy";
 import { MINOR_AGES } from "../core/child";
-import { StrokeView } from "../ui/StrokeView";
 import { Icon } from "../ui/icons";
 import { GoalEditor } from "../ui/Goal";
 
@@ -38,24 +38,7 @@ export default function Onboarding() {
     {sub && <p className="mu" style={{ marginTop: 0 }}>{sub}</p>}
   </>);
 
-  if (step === 0) return (
-    <div className="onb tint-shu" style={{ position: "relative", overflow: "hidden", justifyContent: "space-between" }}>
-      <div className="serif" style={{ position: "absolute", top: "6vh", right: -24, fontSize: 250, opacity: .1, lineHeight: 1, fontWeight: 700 }}>道</div>
-      <div style={{ paddingTop: "8vh" }}>
-        <div className="kicker">Welcome · ようこそ · स्वागत है</div>
-        <div className="kana-cycle mt16" aria-hidden="true">{["あ", "ア", "日", "語"].map((k, i) => <span key={k} style={{ animationDelay: i * 2 + "s" }}>{k}</span>)}</div>
-      </div>
-      <div>
-        <h1 style={{ fontSize: 34, margin: "0 0 6px", letterSpacing: "-.02em", lineHeight: 1.1 }}>Nihongo Path</h1>
-        <p style={{ fontSize: 17, margin: "0 0 8px", opacity: .92, lineHeight: 1.45 }}>Learn Japanese from your very first あ to real conversations - explained in English and हिन्दी.</p>
-        <p style={{ fontSize: 15, margin: "0 0 22px", opacity: .85 }}>Let us show you around in 30 seconds.</p>
-        <button className="btn white lg block" onClick={() => { next(); speak("ようこそ", { lang: "ja-JP" }); }}>Let’s begin <ArrowRight size={18} /></button>
-        <div className="xs center mt8" style={{ opacity: .8 }}>Takes about one minute to set up</div>
-      </div>
-    </div>
-  );
-
-  if (step === 1) return <Showcase onDone={next} />;
+  if (step === 0 || step === 1) return <Intro onDone={() => { setParentView(false); setStep(2); }} />;
 
   if (step === 2) return (
     <div className="onb" style={{ justifyContent: "flex-start", paddingTop: 32 }}>
@@ -241,59 +224,3 @@ function Pledge({ name, mins, reasons, back }: { name: string; mins: number; rea
 }
 
 /** "What is Nihongo Path" - five slides with live mini demos, shown before setup. */
-function Showcase({ onDone }: { onDone: () => void }) {
-  const [i, setI] = useState(0);
-  const Kana = () => (
-    <div className="row" style={{ gap: 6, justifyContent: "center" }}>
-      {[["あ", "a", "अ"], ["か", "ka", "क"], ["さ", "sa", "स"], ["た", "ta", "त"]].map(([k, r, h]) => (
-        <div key={k} className="kcell" style={{ width: 60 }}><b>{k}</b><span className="r">{r}</span><span className="h">{h}</span></div>
-      ))}
-    </div>
-  );
-  const Spectro = () => (
-    <div className="row" style={{ gap: 10, justifyContent: "center", alignItems: "stretch" }}>
-      <div style={{ width: 130, height: 110, borderRadius: 14, background: "linear-gradient(0deg,#0c0e1c 0%,#2e3478 30%,#aa285a 55%,#ec5c32 70%,#fac450 80%,#0c0e1c 100%)", position: "relative", overflow: "hidden" }}>
-        {[18, 46, 74, 102].map((x) => <i key={x} style={{ position: "absolute", left: x, top: 0, bottom: 0, width: 10, background: "rgba(12,14,28,.55)" }} />)}
-      </div>
-      <svg viewBox="0 0 110 110" width="110" height="110" style={{ background: "var(--surface)", borderRadius: 14 }}>
-        {[["い", 22, 22], ["え", 36, 50], ["あ", 60, 92], ["お", 92, 52], ["う", 70, 26]].map(([l, x, y]) => <g key={l as string}><circle cx={x as number} cy={y as number} r="10" fill="var(--shu)" /><text x={x as number} y={(y as number) + 4} textAnchor="middle" style={{ fill: "#fff", fontSize: 10, fontWeight: 800 }}>{l}</text></g>)}
-        <circle cx="64" cy="80" r="7" fill="var(--matcha)" stroke="#fff" strokeWidth="2" />
-      </svg>
-    </div>
-  );
-  const Cards = () => (
-    <div className="row" style={{ gap: 10, justifyContent: "center" }}>
-      <div className="card" style={{ width: 120, textAlign: "center", margin: 0, padding: 12 }}><div className="jp" style={{ fontSize: 30, fontWeight: 700 }}>食べる</div><div className="xs mu">to eat · खाना</div><div className="row mt4" style={{ justifyContent: "center", gap: 2 }}>{[1, 2, 3, 4, 5].map((n) => <i key={n} style={{ width: 4, height: 4 + n * 2, borderRadius: 2, background: n <= 4 ? "var(--gold)" : "var(--line-2)", display: "block" }} />)}</div></div>
-      <div className="col" style={{ gap: 6 }}>{[["food", "Food"], ["train", "Travel"], ["users", "Family"]].map(([ic, t]) => <span key={t} className="chip" style={{ height: 30 }}><Icon name={ic} size={14} /> {t}</span>)}</div>
-    </div>
-  );
-  const Rewards = () => (
-    <div className="row" style={{ gap: 10, justifyContent: "center" }}>
-      {["flame", "medal", "trophy", "handshake"].map((ic) => <div key={ic} style={{ width: 54, height: 54, borderRadius: 27, display: "grid", placeItems: "center", background: "var(--gold-soft)", color: "var(--gold)", boxShadow: "inset 0 0 0 2px color-mix(in srgb, var(--gold) 40%, transparent)" }}><Icon name={ic} size={24} /></div>)}
-    </div>
-  );
-  const slides: { k: string; title: string; text: string; demo: React.ReactNode }[] = [
-    { k: "Learn", title: "Learn Japanese from zero", text: "The 3 scripts with sound, Hindi hints and memory tricks, 25 short grammar lessons and the 2,000 most-spoken words - all explained in English and हिन्दी.", demo: <Kana /> },
-    { k: "Speak", title: "Speak - and see your voice", text: "Every word is spoken aloud. Record yourself: the app checks the words, draws your spectrogram and shows where your vowels land on a mouth map.", demo: <Spectro /> },
-    { k: "Write", title: "Write with real stroke order", text: "Watch each character being drawn, trace it with your finger, and get an accuracy score for shape, stroke count and order.", demo: <div style={{ display: "grid", placeItems: "center" }}><StrokeView ch="あ" size={120} speed={0.5} showNumbers={false} /></div> },
-    { k: "Remember", title: "Remember with smart review", text: "Flashcards come back just before you’d forget. Study by topic (food, travel, family…) or JLPT level, with quizzes, a sentence bank and a frequency meter.", demo: <Cards /> },
-    { k: "Stay", title: "Stay motivated - and understand Japan", text: "XP, streaks, 30+ badges, a daily pledge and a personal goal - plus culture notes on what Japanese people love, dislike and expect.", demo: <Rewards /> },
-  ];
-  const sl = slides[i];
-  const last = i === slides.length - 1;
-  return (
-    <div className="onb" style={{ justifyContent: "flex-start", paddingTop: 32 }}>
-      <div className="row"><div className="kicker grow">What is Nihongo Path · {i + 1}/{slides.length}</div><button className="sm mu" onClick={onDone}>Skip</button></div>
-      <div className="row mt8" style={{ gap: 6 }}>{slides.map((x, k) => <button key={x.k} onClick={() => setI(k)} aria-label={x.k} style={{ flex: 1, height: 5, borderRadius: 3, background: k <= i ? "var(--shu)" : "var(--line-2)" }} />)}</div>
-      <div key={i} className="card mt24" style={{ padding: "22px 16px", minHeight: 170, display: "grid", placeItems: "center", animation: "screenIn .35s both" }}>{sl.demo}</div>
-      <div className="kicker mt24" style={{ color: "var(--shu)" }}>{sl.k}</div>
-      <h1 style={{ fontSize: 27, margin: "4px 0 8px", letterSpacing: "-.02em", lineHeight: 1.2 }}>{sl.title}</h1>
-      <p className="mu" style={{ fontSize: 16, lineHeight: 1.55, margin: 0 }}>{sl.text}</p>
-      <div style={{ flex: 1 }} />
-      <div className="row mt24">
-        {i > 0 && <button className="btn lg" onClick={() => setI(i - 1)}><ArrowLeft size={18} /></button>}
-        <button className="btn primary lg grow" onClick={() => { tap(); if (last) onDone(); else setI(i + 1); }}>{last ? "See your journey" : "Next"} <ArrowRight size={18} /></button>
-      </div>
-    </div>
-  );
-}

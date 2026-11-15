@@ -62,7 +62,7 @@ export function SightSheet({ s, onClose }: { s: Sight | null; onClose: () => voi
           <div className="row sm top gap6 mt8"><Lightbulb size={16} color="var(--gold)" /><span><b>Tip:</b> {s.tip}</span></div>
           {pref && <div className="row sm top gap6 mt8"><MapPin size={16} color="var(--shu)" /><span><b>Prefecture:</b> <span className="jp">{pref.ja}</span> {pref.en}</span></div>}
         </div>
-        {ph && <button className="xs mu mt8 row gap6" style={{ background: "none", border: 0, padding: 0, color: "var(--ink-3)", textAlign: "left" }} onClick={() => openExternal(ph.source)}><Camera size={12} /> Photo: {ph.author} · {ph.license} · Wikimedia Commons</button>}
+        {ph && <button className="mt8 row gap6" style={{ background: "none", border: 0, padding: 0, color: "var(--ink-3)", textAlign: "left", fontSize: 10, opacity: .7 }} onClick={() => openExternal(ph.source)}><Camera size={10} /> {ph.author} · {ph.license}</button>}
       </div>
     )}</Sheet>
   );

@@ -100,7 +100,7 @@ export default function Settings() {
       <div className="section-title"><h2>About</h2></div>
       <div className="card sm" style={{ lineHeight: 1.6 }}>
         <div><b>Nihongo Path</b> · v{APP_VERSION} ({appVersion()})</div>
-        <button className="mu mt8 xs" style={{ background: "none", border: 0, padding: 0, textDecoration: "underline", color: "var(--ink-3)" }} onClick={() => go("/me/licenses")}>Open-source licences</button>
+        <button className="mu mt8 xs" style={{ background: "none", border: 0, padding: 0, textDecoration: "underline", color: "var(--ink-3)" }} onClick={() => go("/me/licenses")}>Licences</button>
       </div>
     </div>
   );

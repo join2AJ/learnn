@@ -1,6 +1,11 @@
 /** Shown once after each update ("What's new"). Newest first. */
-export const APP_VERSION = "3.4";
+export const APP_VERSION = "3.5";
 export const CHANGELOG: { v: string; date: string; items: [string, string][] }[] = [
+  { v: "3.5", date: "17 Nov 2026", items: [
+    ["sparkles", "Brand-new intro: swipe through real screens of the app, hear Japanese on every slide, then set up in a minute."],
+    ["heart", "Support page now tells the story of the app and why it was made."],
+    ["sliders", "Cleaner screens: credits trimmed to one small Licences page."],
+  ] },
   { v: "3.4", date: "17 Nov 2026", items: [
     ["sliders", "Tidier Settings: credits moved to a separate Open-source licences page."],
   ] },
