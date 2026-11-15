@@ -9,6 +9,7 @@ import type { LetterCell } from "../../core/types";
 import { usePack } from "../../pack";
 import { Header, pick, Say, Seg, tap } from "../../ui/kit";
 import { StrokeView } from "../../ui/StrokeView";
+import { childMode } from "../../core/child";
 
 type Pt = [number, number];
 const G = 64; // scoring grid
@@ -95,7 +96,7 @@ export default function Write({ initial, set }: { initial: string | null; set: s
     const orderR = paths.length ? order / paths.length : 1;
     const score = Math.round(Math.min(1, shape * (countOk ? 1 : 0.85) * (0.85 + 0.15 * orderR)) * 100);
     setResult({ score, count: strokes.length, shape: Math.round(shape * 100), ink: Math.round(precision * 100), cover: Math.round(recall * 100), order, dir });
-    saveWrite({ t: Date.now(), ch: cell.ch, set: alpha, strokes: strokes.map((st) => st.filter((_, j) => j % 2 === 0 || j === st.length - 1).flatMap(([x, y]) => [Math.round(x * 2) / 2, Math.round(y * 2) / 2])),
+    if (!childMode()) saveWrite({ t: Date.now(), ch: cell.ch, set: alpha, strokes: strokes.map((st) => st.filter((_, j) => j % 2 === 0 || j === st.length - 1).flatMap(([x, y]) => [Math.round(x * 2) / 2, Math.round(y * 2) / 2])),
       score, shape: Math.round(shape * 100), ink: Math.round(precision * 100), cover: Math.round(recall * 100), count: strokes.length, expected: paths.length, order, dir });
     updateProgress((x) => {
       x.writes++;

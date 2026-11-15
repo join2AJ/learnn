@@ -42,14 +42,15 @@ export default function Words() {
   const [tier, setTier] = useState(0);
   const [type, setType] = useState("All");
   const [hideKnown, setHideKnown] = useState(false);
+  const [jlpt, setJlpt] = useState(0);
   const [limit, setLimit] = useState(30);
   const types = useMemo(() => ["All", ...Array.from(new Set(pk.words.map((w) => w.t)))], [pk]);
   const list = useMemo(() => {
     const t = q.trim().toLowerCase();
     const [, a, b] = TIERS[tier];
-    return pk.words.filter((w) => (w.rank ?? w.n) >= a && (w.rank ?? w.n) <= b && (type === "All" || w.t === type) && (!hideKnown || !known.has(w.n)) &&
+    return pk.words.filter((w) => (w.rank ?? w.n) >= a && (w.rank ?? w.n) <= b && (!jlpt || w.jlpt === jlpt) && (type === "All" || w.t === type) && (!hideKnown || !known.has(w.n)) &&
       (!t || [w.w, w.r, w.ro, w.m, w.h, w.s, w.st].some((x) => (x || "").toLowerCase().includes(t))));
-  }, [q, tier, type, hideKnown, known, pk]);
+  }, [q, tier, type, hideKnown, known, pk, jlpt]);
 
   const toggle = (n: number) => {
     tap();
@@ -74,6 +75,9 @@ export default function Words() {
         <button className={"chip" + (hideKnown ? " on" : "")} onClick={() => setHideKnown(!hideKnown)}>Hide known</button>
       </div>
       <div className="chips mt4">
+        {[0, 5, 4, 3, 2, 1].map((n) => <button key={"j" + n} className={"chip" + (jlpt === n ? " on" : "")} onClick={() => { setJlpt(n); setLimit(30); }}>{n ? "JLPT N" + n : "All levels"}</button>)}
+      </div>
+      <div className="chips mt4">
         {types.map((t) => <button key={t} className={"chip" + (type === t ? " shu on" : "")} onClick={() => { setType(t); setLimit(30); }}>{t}</button>)}
       </div>
       <div className="row mt8"><span className="sm mu">{list.length} words</span><button className="btn sm primary right" onClick={() => go("/practice/cards")}>Study as flashcards</button></div>
@@ -84,7 +88,7 @@ export default function Words() {
           <div key={w.n} className="card" style={k ? { boxShadow: "inset 0 0 0 1.5px color-mix(in srgb, var(--matcha) 50%, transparent), var(--shadow-1)" } : undefined}>
             <div className="row top">
               <div className="grow">
-                <div className="row gap6 wrap"><span className="xs mu2">#{w.rank ?? w.n}</span><FreqMeter w={w} compact /><span className="tag" style={{ background: TYPE_COL[w.t] || "var(--ink-3)", color: "#fff" }}>{w.t}</span></div>
+                <div className="row gap6 wrap"><span className="xs mu2">#{w.rank ?? w.n}</span><FreqMeter w={w} compact /><span className="tag" style={{ background: TYPE_COL[w.t] || "var(--ink-3)", color: "#fff" }}>{w.t}</span>{w.jlpt && <span className="tag" style={{ boxShadow: "inset 0 0 0 1.5px var(--ai)", background: "transparent", color: "var(--ai)" }}>N{w.jlpt}</span>}</div>
                 <div className="row" style={{ alignItems: "baseline", gap: 8 }}>
                   <span className="jp" style={{ fontSize: 30, fontWeight: 600 }}>{w.w}</span>
                   {w.r !== w.w && <span className="jp mu">{w.r}</span>}

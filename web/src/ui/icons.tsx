@@ -4,7 +4,7 @@ import {
   Flower2, Gamepad2, Gauge, GraduationCap, Hand, Handshake, Heart, HeartHandshake, Hourglass, Landmark, Languages, Layers, Library, LifeBuoy,
   Lightbulb, Medal, Megaphone, MessagesSquare, Mic, Music, NotebookPen, PartyPopper, PenLine, Plane, Repeat, Rocket, ShieldCheck, ShoppingBag,
   SlidersHorizontal, Smile, Sparkles, Sprout, Star, Target, Timer, TrainFront, TriangleAlert, Trophy, Turtle, Users, UtensilsCrossed, Volume1,
-  Volume2, Zap, Crown,
+  Volume2, Zap, Crown, MonitorPlay, Lock,
 } from "lucide-react";
 
 /** One icon family for the whole app. Content files refer to icons by these keys. */
@@ -16,7 +16,7 @@ export const ICONS: Record<string, LucideIcon> = {
   bulb: Lightbulb, turtle: Turtle, volume: Volume2, volumeLow: Volume1, gauge: Gauge, music: Music, rocket: Rocket, star: Star, party: PartyPopper,
   smile: Smile, food: UtensilsCrossed, train: TrainFront, shop: ShoppingBag, help: LifeBuoy, hand: Hand, compass: Compass, repeat: Repeat,
   flag: Flag, shield: ShieldCheck, heartHand: HeartHandshake, activity: Activity, zap: Zap, target: Target, languages: Languages,
-  hourglass: Hourglass, mic: Mic, sliders: SlidersHorizontal, crown: Crown,
+  hourglass: Hourglass, mic: Mic, sliders: SlidersHorizontal, crown: Crown, media: MonitorPlay, lock: Lock,
 };
 
 export function Icon({ name, size = 20, color, stroke = 2.2 }: { name: string; size?: number; color?: string; stroke?: number }) {

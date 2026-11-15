@@ -1,20 +1,22 @@
 import { useMemo, useState } from "react";
-import { Heart, Settings as Cog } from "lucide-react";
+import { Heart, Lock, Settings as Cog } from "lucide-react";
 import type { Route } from "../core/router";
 import { go } from "../core/router";
 import { dayKey, emptyDay, useProgress, useSettings } from "../core/store";
-import { BADGES, goalStreak, HIRA46, KATA46, levelOf, masteredSet, pledgeStatus, totalMs, totalReviews } from "../core/rewards";
+import { BADGE_HOW, BADGES, goalStreak, HIRA46, KATA46, levelOf, masteredSet, pledgeStatus, totalMs, totalReviews } from "../core/rewards";
 import { emitUi } from "../core/store";
 import { pendingMs } from "../core/timeTracker";
 import { usePack } from "../pack";
-import { Bar, fmtMin, Header, Ring, Seg } from "../ui/kit";
+import { Bar, fmtMin, Header, Ring, Seg, Sheet } from "../ui/kit";
 import Settings from "./Settings";
 import Recordings from "./Recordings";
 import MyWriting from "./MyWriting";
 import Privacy from "./Privacy";
 import Backup from "./Backup";
 import Support from "./Support";
+import PolicyText from "./PolicyText";
 import { Icon, IconTile } from "../ui/icons";
+import { childMode } from "../core/child";
 
 const SEC_COL: Record<string, string> = {
   Alphabet: "#e0452b", Writing: "#d29a2e", Pronunciation: "#7b4fb0", Grammar: "#2f4b8a", Vocabulary: "#3f8a4f", Phrases: "#e47aa0",
@@ -29,10 +31,12 @@ export default function Me({ route }: { route: Route }) {
   if (route.parts[1] === "privacy") return <Privacy />;
   if (route.parts[1] === "backup") return <Backup />;
   if (route.parts[1] === "support") return <Support />;
+  if (route.parts[1] === "policy") return <div className="screen"><Header title="Privacy policy" backTo="/me/privacy" /><div className="card"><PolicyText /></div></div>;
   return <Stats />;
 }
 
 function Stats() {
+  const [badge, setBadge] = useState<string | null>(null);
   const pk = usePack();
   const s = useSettings();
   const p = useProgress();
@@ -145,17 +149,21 @@ function Stats() {
         <div className="row sm mt8 mu"><span className="grow">Speaking: {p.speak.ok}/{p.speak.tries} correct</span><span>Writing: {p.writes} characters</span></div>
       </div>
 
-      <button className="card tap mt16 soft-sakura" style={{ boxShadow: "none" }} onClick={() => go("/me/support")}>
+      {!childMode() && <button className="card tap mt16 soft-sakura" style={{ boxShadow: "none" }} onClick={() => go("/me/support")}>
         <div className="row"><Heart size={22} color="var(--sakura)" /><div className="grow"><div style={{ fontWeight: 800 }}>Support Nihongo Path</div><div className="xs mu">Free forever - help keep it that way</div></div></div>
-      </button>
+      </button>}
 
       <div className="section-title"><h2>Badges</h2><span className="mu">{Object.keys(p.badges).length}/{BADGES.length}</span></div>
+      <Sheet open={!!badge} onClose={() => setBadge(null)}>{badge && <BadgeDetail id={badge} onGo={(to) => { setBadge(null); go(to); }} />}</Sheet>
+      <div className="xs mu" style={{ margin: "-4px 2px 10px" }}>Tap a badge to see how to earn it.</div>
       <div className="grid3">
-        {BADGES.map((b) => (
-          <div key={b.id} className={"badge-tile" + (p.badges[b.id] ? "" : " locked")}>
-            <div className="b"><Icon name={b.icon} size={24} color="var(--gold)" /></div><div className="t">{b.title}</div><div className="xs mu" style={{ lineHeight: 1.25 }}>{b.desc}</div>
-          </div>
-        ))}
+        {BADGES.map((b) => { const got = !!p.badges[b.id]; const pr = BADGE_HOW[b.id]?.prog(p) || [0, 1]; return (
+          <button key={b.id} className={"badge-tile" + (got ? "" : " locked")} onClick={() => setBadge(b.id)}>
+            <div className="b" style={{ position: "relative" }}><Icon name={b.icon} size={24} color={got ? "var(--gold)" : "var(--ink-2)"} />{!got && <span style={{ position: "absolute", right: -2, bottom: -2, width: 20, height: 20, borderRadius: 10, background: "var(--surface-3)", display: "grid", placeItems: "center" }}><Lock size={11} /></span>}</div>
+            <div className="t">{b.title}</div>
+            {got ? <div className="xs" style={{ color: "var(--gold)", fontWeight: 700 }}>Earned</div>
+              : <><div className="bar thin" style={{ width: "80%" }}><i style={{ width: (pr[0] / pr[1]) * 100 + "%", background: "var(--gold)" }} /></div><div className="xs mu" style={{ fontWeight: 700 }}>{pr[0]} / {pr[1]}</div></>}
+          </button>); })}
       </div>
     </div>
   );
@@ -266,5 +274,30 @@ function PracticeLog() {
         )}
       </div>
     </>
+  );
+}
+
+function BadgeDetail({ id, onGo }: { id: string; onGo: (to: string) => void }) {
+  const p = useProgress();
+  const b = BADGES.find((x) => x.id === id)!;
+  const how = BADGE_HOW[id];
+  const got = p.badges[id];
+  const [cur, tot] = how?.prog(p) || [0, 1];
+  return (
+    <div className="center">
+      <div style={{ width: 96, height: 96, borderRadius: 48, margin: "6px auto 10px", display: "grid", placeItems: "center", background: got ? "linear-gradient(135deg, var(--gold-soft), var(--sakura-soft))" : "var(--surface-2)", boxShadow: got ? "inset 0 0 0 3px color-mix(in srgb, var(--gold) 50%, transparent)" : "inset 0 0 0 2px var(--line-2)" }}>
+        <Icon name={b.icon} size={44} color={got ? "var(--gold)" : "var(--ink-2)"} />
+      </div>
+      <h2 style={{ margin: "0 0 4px" }}>{b.title}</h2>
+      <div className="mu">{b.desc}</div>
+      {got ? <div className="tag mt12" style={{ background: "var(--gold)", color: "#fff", height: 28 }}>Earned {new Date(got).toLocaleDateString()}</div> : (
+        <div className="card flat mt16" style={{ textAlign: "left" }}>
+          <div className="row sm"><b className="grow">Progress</b><b>{cur} / {tot}</b></div>
+          <div className="bar mt8"><i style={{ width: (cur / tot) * 100 + "%", background: "var(--gold)" }} /></div>
+          <div className="sm mt12" style={{ lineHeight: 1.55 }}><b>How to earn it:</b> {how?.how}</div>
+        </div>
+      )}
+      {!got && how && <button className="btn primary block mt16" onClick={() => onGo(how.to)}>Go earn it →</button>}
+    </div>
   );
 }

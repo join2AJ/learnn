@@ -1,6 +1,7 @@
 import { bandProfile, expectedDuration, pitchTrack, synthWord, trimSilence } from "./dsp";
 import { saveRec } from "./recStore";
 import { bumpDay, updateProgress, VoiceRec } from "./store";
+import { childMode } from "./child";
 
 const refCache = new Map<string, [number, number, number]>();
 async function refBandsFor(roma: string) {
@@ -22,6 +23,6 @@ export async function analyzeAndSave(text: string, roma: string, data: Float32Ar
   const score = Math.round(Math.max(0, Math.min(1, (1 - bandDiff * 1.6) * 0.55 + loud * 0.25 + pace * 0.2)) * 100);
   const rec: VoiceRec = { t: Date.now(), w: text, bands, ref, db, dur, exp, f0: range, score, ...extra };
   updateProgress((p) => { p.voiceLog = [...(p.voiceLog || []), rec].slice(-300); bumpDay(p, (d) => { d.spoke = (d.spoke || 0) + 1; }); });
-  await saveRec(rec.t, text, cut, sr, contour);
+  if (!childMode()) await saveRec(rec.t, text, cut, sr, contour);
   return rec;
 }

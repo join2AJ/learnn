@@ -23,6 +23,8 @@ export interface Word {
   z?: number;         // Zipf frequency (wordfreq)
   pm?: number;        // uses per million words in everyday sentences (Tatoeba)
   rank?: number;      // position when ordered by how often it is spoken (1 = most)
+  jlpt?: number;      // JLPT level 5 (N5, easiest) … 1 (N1)
+  tp?: string[];      // topic ids
 }
 
 export interface CoreGrammar {

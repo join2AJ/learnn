@@ -10,4 +10,13 @@ export const SUPPORT = {
   githubSponsors: "",   // e.g. "https://github.com/sponsors/yourname"
   shareUrl: "",         // where friends can download the app (website / Play Store link)
 };
+
+/** Privacy contact (required by the DPDP Act: grievance officer). Fill in before publishing. */
+export const CONTACT = {
+  developer: "Nihongo Path",
+  grievanceOfficer: "",  // name of the person who handles privacy requests
+  email: "",             // e.g. "privacy@yourdomain.com"
+  policyUrl: "",         // public URL of the privacy policy (needed for Google Play)
+  policyUpdated: "16 November 2026",
+};
 export const hasSupport = () => !!(SUPPORT.upiId || SUPPORT.buyMeACoffee || SUPPORT.kofi || SUPPORT.githubSponsors);

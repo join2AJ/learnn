@@ -135,6 +135,8 @@ Maturity tiers: 1 Partial · 2 Risk-informed · 3 Repeatable · 4 Adaptive.
 | Retention | Erase when the purpose ends or consent is withdrawn (§8(7)) | Art. 5(1)(e) | Data stays until the learner deletes it or uninstalls | Optional "delete recordings older than N months" setting |
 | Analytics / crash reports (future) | Needs consent; no tracking of children | Consent (ePrivacy) | None today ✅ | If added: opt-in, anonymous, off for under-18 |
 
+**Done in 3.0:** in-app privacy policy (`docs/PRIVACY.md`), consent checkbox at setup and a one-time notice for existing users, grievance-contact fields (`web/src/support.ts` → `CONTACT`, still to be filled in), parent-consent form and child mode for under-18s (recordings and drawings not saved, support links hidden).
+
 **Bottom line:** the on-device design already gives you a strong position under both laws. The remaining gaps are paperwork and children's handling: a public privacy policy with a grievance contact, a consent line, and a parent-consent step (or reduced features) for learners under 18.
 
 ---

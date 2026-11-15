@@ -1,4 +1,4 @@
-import { ArrowRight, AudioLines, BookA, Brain, Languages, MessageCircle, Repeat, Sparkle, Speech } from "lucide-react";
+import { Layers, ArrowRight, AudioLines, BookA, Brain, Languages, MessageCircle, Repeat, Sparkle, Speech } from "lucide-react";
 import type { Route } from "../core/router";
 import { go } from "../core/router";
 import { useProgress } from "../core/store";
@@ -13,6 +13,7 @@ import Verbs from "./learn/Verbs";
 import Words from "./learn/Words";
 import Phrases from "./learn/Phrases";
 import Sentences from "./learn/Sentences";
+import Topics from "./learn/Topics";
 
 export default function Learn({ route }: { route: Route }) {
   const [, sub, id] = route.parts;
@@ -26,6 +27,7 @@ export default function Learn({ route }: { route: Route }) {
     case "words": return <Words />;
     case "phrases": return <Phrases />;
     case "sentences": return <Sentences />;
+    case "topics": return <Topics id={id} />;
   }
   return <LearnHub />;
 }
@@ -66,6 +68,7 @@ function LearnHub() {
       <div className="list">
         <Item to="/learn/words" tint="soft-gold" icon={<BookA size={19} color="var(--gold)" />} title="2,000 core words" desc={p.known.length + " known · most spoken first, with Hindi + sentences"} pct={p.known.length / 2000} />
         <Item to="/learn/phrases" tint="soft-sakura" icon={<MessageCircle size={19} color="var(--sakura)" />} title="Survival phrases" desc="Greetings, food, travel, shopping - tap to hear" />
+        <Item to="/learn/topics" tint="soft-matcha" icon={<Layers size={19} color="var(--matcha)" />} title="Topic packs & JLPT levels" desc="Food, family, travel, N5–N1… study by theme" />
         <Item to="/learn/sentences" tint="soft-ai" icon={<MessageCircle size={19} color="var(--ai)" />} title="Sentence bank" desc="3,200 real sentences, simplest & most common first" />
       </div>
     </div>

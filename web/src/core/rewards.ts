@@ -12,6 +12,8 @@ export function levelOf(xp: number) {
 }
 
 export interface Badge { id: string; icon: string; title: string; desc: string; test: (p: Progress) => boolean; }
+/** Progress toward each badge [current, target] and where to go to earn it. */
+export interface BadgeHow { prog: (p: Progress) => [number, number]; to: string; how: string }
 export const BADGES: Badge[] = [
   { id: "first", icon: "sprout", title: "First step", desc: "Earn your first XP", test: (p) => p.xp > 0 },
   { id: "kana10", icon: "あ", title: "Kana sprout", desc: "Answer 10 kana right", test: (p) => sumKana(p) >= 10 },
@@ -133,3 +135,38 @@ export function recordAnswer(ok: boolean) {
     if (ok) p.quiz.correct++; else p.quiz.wrong++;
   });
 }
+
+const kanaRight = (p: Progress) => Object.values(p.kana).reduce((a, b) => a + b.c, 0);
+export const BADGE_HOW: Record<string, BadgeHow> = {
+  first: { prog: (p) => [Math.min(1, p.xp), 1], to: "/learn/scripts", how: "Do anything - read a lesson, answer a quiz or review a card." },
+  kana10: { prog: (p) => [Math.min(10, kanaRight(p)), 10], to: "/practice/quiz/kana?set=hira", how: "Answer kana correctly in the Kana sprint quiz." },
+  kana100: { prog: (p) => [Math.min(100, kanaRight(p)), 100], to: "/practice/quiz/kana?set=hira", how: "Keep doing Kana sprints until 100 correct answers." },
+  hira: { prog: (p) => [masteredSet(p, HIRA46), 46], to: "/practice/quiz/kana?set=hira", how: "A kana is mastered after 3+ correct answers (and twice as many right as wrong)." },
+  kata: { prog: (p) => [masteredSet(p, KATA46), 46], to: "/practice/quiz/kana?set=kata", how: "Master all 46 basic katakana in quizzes." },
+  w50: { prog: (p) => [Math.min(50, p.known.length), 50], to: "/practice/cards", how: "Mark words as known or rate them Good twice in flashcards." },
+  w100: { prog: (p) => [Math.min(100, p.known.length), 100], to: "/practice/cards", how: "Know the 100 most-spoken words." },
+  w300: { prog: (p) => [Math.min(300, p.known.length), 300], to: "/practice/cards", how: "Know 300 words." },
+  w1000: { prog: (p) => [Math.min(1000, p.known.length), 1000], to: "/practice/cards", how: "Know 1,000 words." },
+  w2000: { prog: (p) => [Math.min(2000, p.known.length), 2000], to: "/practice/cards", how: "Know all 2,000 core words." },
+  lesson1: { prog: (p) => [Math.min(1, Object.keys(p.lessons).length), 1], to: "/learn/grammar", how: "Finish any grammar lesson (read it and answer its 3 questions)." },
+  lesson10: { prog: (p) => [Math.min(10, Object.keys(p.lessons).length), 10], to: "/learn/grammar", how: "Finish 10 grammar lessons." },
+  streak3: { prog: (p) => [Math.min(3, p.streak.best), 3], to: "/", how: "Study on 3 days in a row." },
+  streak7: { prog: (p) => [Math.min(7, p.streak.best), 7], to: "/", how: "Study on 7 days in a row." },
+  streak30: { prog: (p) => [Math.min(30, p.streak.best), 30], to: "/", how: "Study on 30 days in a row." },
+  review100: { prog: (p) => [Math.min(100, totalReviews(p)), 100], to: "/practice/cards", how: "Review 100 flashcards." },
+  speak10: { prog: (p) => [Math.min(10, p.speak.ok), 10], to: "/practice/speak", how: "Say 10 words or phrases correctly in Speak aloud." },
+  write10: { prog: (p) => [Math.min(10, p.writes), 10], to: "/practice/write", how: "Check 10 drawings in Writing practice." },
+  lab: { prog: (p) => [Math.min(1, p.labSessions), 1], to: "/lab", how: "Open the Sound Lab and start the microphone." },
+  culture: { prog: (p) => [Math.min(5, Object.keys(p.culturesRead).length), 5], to: "/explore", how: "Read 5 culture sections in Explore." },
+  hour: { prog: (p) => [Math.min(60, Math.floor(totalMs(p) / 60000)), 60], to: "/learn", how: "Study 60 minutes in total." },
+  perfect: { prog: (p) => [Math.min(10, p.quiz.best), 10], to: "/practice", how: "Get 10 out of 10 in any quiz." },
+  pledge: { prog: () => [getSettings().pledge ? 1 : 0, 1], to: "/me/settings", how: "Make a daily-study pledge (Settings → Pledge)." },
+  keep3: { prog: (p) => [Math.min(3, goalStreak(p).best), 3], to: "/", how: "Meet your daily minutes goal 3 days in a row." },
+  keep7: { prog: (p) => [Math.min(7, goalStreak(p).best), 7], to: "/", how: "Meet your daily goal 7 days in a row." },
+  keep21: { prog: (p) => [Math.min(21, goalStreak(p).best), 21], to: "/", how: "Meet your daily goal 21 days in a row." },
+  keep30: { prog: (p) => [Math.min(30, goalStreak(p).best), 30], to: "/", how: "Meet your daily goal 30 days in a row." },
+  write50: { prog: (p) => [Math.min(50, p.writes), 50], to: "/practice/write", how: "Check 50 drawings." },
+  writeAce: { prog: (p) => [Math.min(10, Object.values(p.writeLog || {}).filter((v) => v.best >= 90).length), 10], to: "/practice/write", how: "Score 90%+ on 10 different characters." },
+  writeHira: { prog: (p) => [Array.from(HIRA46).filter((c) => (p.writeLog?.[c]?.best || 0) >= 70).length, 46], to: "/practice/write?set=hira", how: "Write each of the 46 basic hiragana at 70% or better." },
+  voice10: { prog: (p) => [Math.min(10, (p.voiceLog || []).length), 10], to: "/learn/words", how: "Tap the green mic next to words and record 10 times." },
+};

@@ -3,6 +3,7 @@ import { SUPPORT, hasSupport } from "../support";
 import { openExternal } from "../core/native";
 import { toast } from "../core/store";
 import { Header } from "../ui/kit";
+import { childMode } from "../core/child";
 
 /** Optional, voluntary support - the app stays free with no locked features. */
 export default function Support() {
@@ -12,6 +13,7 @@ export default function Support() {
     openExternal("https://wa.me/?text=" + encodeURIComponent(text));
   };
   const upi = (amt: number) => openExternal(`upi://pay?pa=${encodeURIComponent(SUPPORT.upiId)}&pn=${encodeURIComponent(SUPPORT.upiName || "Nihongo Path")}&am=${amt}&cu=INR&tn=${encodeURIComponent("Support Nihongo Path")}`);
+  if (childMode()) return <div className="screen"><Header title="Support" backTo="/me" /><div className="card sm">Support options are not shown in child mode. Thank you for learning with us!</div></div>;
   return (
     <div className="screen">
       <Header title="Support Nihongo Path" sub="Free forever - support is optional" backTo="/me" />

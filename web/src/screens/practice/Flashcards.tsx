@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { RotateCcw } from "lucide-react";
 import { go } from "../../core/router";
-import { getProgress, today, useProgress, useSettings } from "../../core/store";
+import { getProgress, setSettings, today, useProgress, useSettings } from "../../core/store";
 import { award, isMastered } from "../../core/rewards";
 import { buildQueue, grade, previewLabel } from "../../core/srs";
 import { speak } from "../../core/native";
@@ -13,6 +13,7 @@ import { FreqMeter } from "../../core/freq";
 import type { Word } from "../../core/types";
 import { Icon } from "../../ui/icons";
 import { HlJp, HlRo } from "../../ui/Highlight";
+import { TOPICS } from "../../packs/ja/topics";
 
 const DECKS = [
   { id: "words", top: "Words", sub: "शब्द", name: "Words (2,000 core)", en: "the most-spoken Japanese words, most frequent first, with meaning and an example sentence.", hi: "सबसे ज़्यादा बोले जाने वाले 2,000 जापानी शब्द - अर्थ और वाक्य के साथ।" },
@@ -28,9 +29,14 @@ export default function Flashcards({ deck }: { deck: string }) {
   const s = useSettings();
   const p = useProgress();
 
+  const isWords = deck === "words" || deck.startsWith("topic:") || deck.startsWith("jlpt:");
+  const topic = deck.startsWith("topic:") ? TOPICS.find((t) => t.id === deck.slice(6)) : undefined;
+  const jl = deck.startsWith("jlpt:") ? +deck.slice(5) : 0;
+  const inDeck = (w: Word) => (topic ? (w.tp || []).includes(topic.id) : jl ? w.jlpt === jl : true);
+  const reverse = s.cardsReverse && isWords;
   const cards = useMemo(() => {
     const m = new Map<string, Card>();
-    if (deck === "words") pk.words.forEach((w) => m.set("w:" + w.n, { word: w, id: "w:" + w.n, front: w.w, reading: w.r, romaji: w.ro, meaning: w.m, hindi: w.h, s: w.s, sr: w.sr, st: w.st, speakText: w.r, kind: "word" }));
+    if (isWords) pk.words.filter(inDeck).forEach((w) => m.set("w:" + w.n, { word: w, id: "w:" + w.n, front: w.w, reading: w.r, romaji: w.ro, meaning: w.m, hindi: w.h, s: w.s, sr: w.sr, st: w.st, speakText: w.r, kind: "word" }));
     else {
       const a = pk.alphabets.find((x) => x.id === deck);
       a?.groups.forEach((g) => g.rows.forEach((r) => (r.cells.filter(Boolean) as LetterCell[]).forEach((c) =>
@@ -41,7 +47,7 @@ export default function Flashcards({ deck }: { deck: string }) {
 
   const [session] = useState(() => {
     const learnedToday = today(getProgress()).learned;
-    const newLimit = Math.max(deck === "words" ? 5 : 10, (deck === "words" ? s.newPerDay : 20) - learnedToday);
+    const newLimit = topic || jl ? 20 : Math.max(deck === "words" ? 5 : 10, (deck === "words" ? s.newPerDay : 20) - learnedToday);
     return buildQueue(Array.from(cards.keys()), newLimit, getProgress());
   });
   const [queue, setQueue] = useState<string[]>(session.queue);
@@ -66,9 +72,16 @@ export default function Flashcards({ deck }: { deck: string }) {
 
   const deckSel = (
     <>
-      <Seg value={deck} options={DECKS.map((d) => [d.id, <span style={{ display: "flex", flexDirection: "column", lineHeight: 1.15 }}><span className={d.id === "words" ? "" : "jp"}>{d.top}</span><span style={{ fontSize: 10, fontWeight: 600, opacity: .75 }}>{d.sub}</span></span>] as [string, React.ReactNode])}
+      <Seg value={isWords ? "words" : deck} options={DECKS.map((d) => [d.id, <span style={{ display: "flex", flexDirection: "column", lineHeight: 1.15 }}><span className={d.id === "words" ? "" : "jp"}>{d.top}</span><span style={{ fontSize: 10, fontWeight: 600, opacity: .75 }}>{d.sub}</span></span>] as [string, React.ReactNode])}
         onChange={(v) => go("/practice/cards?deck=" + v, true)} />
-      {(() => { const d = DECKS.find((x) => x.id === deck)!; return (
+      {isWords && (
+        <div className="row mt8 gap6">
+          {(topic || jl > 0) && <span className="tag" style={{ background: "var(--shu)", color: "#fff", height: 28 }}>{topic ? topic.name : "JLPT N" + jl}</span>}
+          <span className="grow" />
+          <button className={"chip" + (s.cardsReverse ? " on" : "")} onClick={() => setSettings({ cardsReverse: !s.cardsReverse })}>{s.cardsReverse ? "English first ✓" : "English first"}</button>
+        </div>
+      )}
+      {(() => { const d = DECKS.find((x) => x.id === (isWords ? "words" : deck))!; return (
         <div className="card flat mt8" style={{ padding: "10px 12px", background: "transparent" }}>
           <div className="sm"><b>{d.name}</b> - {d.en}</div>
           {s.showHindi && <div className="sm hi">{d.hi}</div>}
@@ -108,8 +121,14 @@ export default function Flashcards({ deck }: { deck: string }) {
           <div className="face">
             <span className="tag" style={{ position: "absolute", top: 14, left: 14, background: isNew ? "var(--gold)" : "var(--surface-2)", color: isNew ? "#fff" : undefined }}>{isNew ? "NEW" : "REVIEW"}</span>
             {card.kind === "kana" && isMastered(p.kana[card.front]) && <span className="tag" style={{ position: "absolute", top: 14, right: 14 }}>mastered</span>}
-            <div className="huge" style={{ fontSize: card.front.length > 4 ? 44 : card.kind === "kana" ? 96 : 64 }}>{card.front}</div>
-            <div className="sm mu2 mt16">Tap to reveal</div>
+            {reverse && card.kind === "word" ? (<>
+              <div style={{ fontSize: 28, fontWeight: 800, lineHeight: 1.25 }}>{card.meaning}</div>
+              {s.showHindi && card.hindi && <div className="hi lg mt4">{card.hindi}</div>}
+              <div className="sm mu2 mt16">Say it in Japanese, then tap to check</div>
+            </>) : (<>
+              <div className="huge" style={{ fontSize: card.front.length > 4 ? 44 : card.kind === "kana" ? 96 : 64 }}>{card.front}</div>
+              <div className="sm mu2 mt16">Tap to reveal</div>
+            </>)}
           </div>
           <div className="face back">
             {card.kind === "word" ? (<>

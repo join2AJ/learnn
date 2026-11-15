@@ -11,6 +11,7 @@ import { Bar, Jp, Ring, Say, tap } from "../ui/kit";
 import { RecBtn } from "../ui/VoiceCompare";
 import { Icon, IconTile, LangPill } from "../ui/icons";
 import { HlJp, HlRo } from "../ui/Highlight";
+import { GoalCard } from "../ui/Goal";
 
 const hash = (s: string) => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
 
@@ -64,6 +65,7 @@ export default function Home() {
       </div>
 
       <TodayPlan />
+      <GoalCard />
 
       {/* Quick actions */}
       <div className="grid2 mt16">

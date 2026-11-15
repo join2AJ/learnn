@@ -9,6 +9,7 @@ import { deleteMedia } from "../core/privacy";
 import { contentStats } from "../core/contentStats";
 import { APP_VERSION } from "../changelog";
 import { Header, Seg, Switch, tap } from "../ui/kit";
+import { GoalEditor } from "../ui/Goal";
 
 export default function Settings() {
   const s = useSettings();
@@ -39,6 +40,9 @@ export default function Settings() {
         <div className="li" style={{ display: "block" }}><div className="t">Daily goal · {s.dailyGoalMin} min</div><input type="range" min={5} max={120} step={5} value={s.dailyGoalMin} onChange={(e) => setSettings({ dailyGoalMin: +e.target.value })} className="mt8" /></div>
         <div className="li" style={{ display: "block" }}><div className="t">New words per day · {s.newPerDay}</div><input type="range" min={5} max={40} step={5} value={s.newPerDay} onChange={(e) => setSettings({ newPerDay: +e.target.value })} className="mt8" /></div>
       </div>
+
+      <div className="section-title"><h2>Personal goal</h2></div>
+      <div className="card"><GoalEditor /></div>
 
       <div className="section-title"><h2>Display</h2></div>
       <div className="list">

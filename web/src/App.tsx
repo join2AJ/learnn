@@ -19,6 +19,7 @@ import Explore from "./screens/Explore";
 import Me from "./screens/Me";
 import Onboarding from "./screens/Onboarding";
 import { Icon, IconTile } from "./ui/icons";
+import PrivacyNotice from "./screens/PrivacyNotice";
 
 const TABS = [
   { id: "", label: "Home", Icon: HomeIcon },
@@ -114,8 +115,9 @@ export default function App() {
       {xp && <div className="xp-pop" key={xp.k}>+{xp.n} XP</div>}
       <Confetti run={confetti} />
       <Sheet open={!!voice} onClose={() => setVoice(null)}>{voice && <VoiceCompare key={voice.text + (voice.reviewT || "")} text={voice.text} ro={voice.ro} en={voice.en} reviewT={voice.reviewT} />}</Sheet>
-      {(news || (settings.toured && settings.seenVersion !== APP_VERSION)) && !cele && !tour && <WhatsNew since={news ? "" : settings.seenVersion} onDone={() => { setNews(false); setSettings({ seenVersion: APP_VERSION }); }} />}
-      {(tour || !settings.toured) && !cele && <Tour onDone={() => { setTour(false); if (!settings.toured) setSettings({ toured: true, seenVersion: APP_VERSION }); }} />}
+      {!settings.privacyOk && <PrivacyNotice />}
+      {settings.privacyOk && (news || (settings.toured && settings.seenVersion !== APP_VERSION)) && !cele && !tour && <WhatsNew since={news ? "" : settings.seenVersion} onDone={() => { setNews(false); setSettings({ seenVersion: APP_VERSION }); }} />}
+      {settings.privacyOk && (tour || !settings.toured) && !cele && <Tour onDone={() => { setTour(false); if (!settings.toured) setSettings({ toured: true, seenVersion: APP_VERSION }); }} />}
       {cele && (<>
         <div className="scrim" style={{ zIndex: 89 }} onClick={() => setCele(null)} />
         <div className="modal" role="dialog">

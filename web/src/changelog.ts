@@ -1,6 +1,14 @@
 /** Shown once after each update ("What's new"). Newest first. */
-export const APP_VERSION = "2.9";
+export const APP_VERSION = "3.0";
 export const CHANGELOG: { v: string; date: string; items: [string, string][] }[] = [
+  { v: "3.0", date: "16 Nov 2026", items: [
+    ["layers", "Topic packs (food, travel, family… 15 themes) and JLPT N5–N1 packs - browse and study each as flashcards."],
+    ["flag", "Personal goal: e.g. 600 words by February for your trip, with the words per day you need."],
+    ["repeat", "Flashcards: “English first” mode - see the meaning, say the Japanese. JLPT tags and filter on words."],
+    ["award", "Badges you can explore: progress on every badge and how to earn it."],
+    ["shield", "Privacy policy, grievance contact, consent, and parent consent / child mode for learners under 18."],
+    ["compass", "New intro: see what the app does before setting up."],
+  ] },
   { v: "2.9", date: "16 Nov 2026", items: [
     ["layers", "Backup & restore: save a backup file to Downloads/NihongoPath (survives uninstall), restore from a file, optionally include recordings and drawings."],
     ["timer", "Automatic backup every day or every week at a time you choose, with a reminder notification."],
