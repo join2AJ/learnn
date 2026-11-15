@@ -15,6 +15,7 @@ export interface Settings {
   autoplay: boolean;
   profiled: boolean;
   toured: boolean;
+  newIntro?: boolean;
   age: string;
   reasons: string[];
   pledge: { min: number; start: string; days: number } | null;

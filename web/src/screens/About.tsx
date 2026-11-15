@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowRight, Check, Copy, Mail, MessageCircle, Send, Share2, Smartphone } from "lucide-react";
+import { ArrowRight, BookHeart, Check, ChevronDown, Copy, Heart, Mail, MessageCircle, Send, Share2, Smartphone } from "lucide-react";
 import { go } from "../core/router";
 import { SupportBlock } from "./Support";
 import { ABOUT_ME, BUILD_CONTACT } from "../support";
@@ -71,7 +71,7 @@ export function BuildApp() {
 
   return (
     <div className="screen">
-      <Header title="Build an app like this" sub="Tell me what you need - about 2 minutes" backTo="/me/about" />
+      <Header title="Build an app like this" sub="Tell us what you need - we will build it for you" backTo="/me/about" />
       <div className="card" style={{ padding: "4px 16px" }}>
       <Step n={1} title="What kind of app?">
         <div className="chips" style={{ flexWrap: "wrap" }}>{Object.keys(APP_CATEGORIES).map((c) => <button key={c} className={"chip" + (cat === c ? " on" : "")} onClick={() => { tap(); setCat(c); setSub(APP_CATEGORIES[c].length === 1 ? APP_CATEGORIES[c][0] : ""); }}>{c}</button>)}</div>
@@ -128,42 +128,50 @@ function Step({ n, title, hint, children }: { n: number; title: string; hint?: s
 export function AboutBlock() {
   const pk = usePack();
   const stats = useMemo(() => contentStats(pk), [pk]);
-  return (<>
-      <div className="card hero tint-shu" style={{ marginTop: 0 }}>
-      <div className="watermark">道</div>
-      <div className="kicker">About the app</div>
-      <div style={{ fontWeight: 800, fontSize: 19, margin: "2px 0 6px" }}>Nihongo Path · 日本語の道</div>
+  return (
+    <div className="card" style={{ marginTop: 0 }}>
+      <div className="row" style={{ gap: 12, marginBottom: 8 }}>
+        <span className="jp" style={{ width: 46, height: 46, borderRadius: 14, display: "grid", placeItems: "center", background: "var(--shu)", color: "#fff", fontSize: 26, fontWeight: 800, flex: "none" }}>道</span>
+        <div><div style={{ fontWeight: 800, fontSize: 18 }}>Nihongo Path</div><div className="jp xs mu">日本語の道</div></div>
+      </div>
       <div className="sm" style={{ lineHeight: 1.6 }}>A free, offline, beginner-first way to learn Japanese - with English and Hindi side by side. {stats.words.toLocaleString()} words in spoken-frequency order, {(stats.sentences + stats.sentenceBank).toLocaleString()} example sentences, all kana with stroke order, grammar, verbs, culture, a map of Japan, and a voice lab that shows your pronunciation.</div>
-      <div className="xs mt8" style={{ opacity: 0.85 }}>No ads · no account · your data stays on your phone.</div>
+      <div className="xs mu mt8">No ads · no account · your data stays on your phone.</div>
     </div>
+  );
+}
 
-    <div className="card mt12">
-      <div className="kicker">Our story</div>
-      <div style={{ fontWeight: 800, fontSize: 17, marginTop: 2 }}>{ABOUT_ME.title}</div>
-      {ABOUT_ME.paragraphs.map((t, i) => <p key={i} className="sm" style={{ lineHeight: 1.65, margin: "8px 0 0" }}>{t}</p>)}
+/** Collapsible section: closed until tapped. */
+function Fold({ id, open, onToggle, icon, title, sub, tone, children }: { id: string; open: boolean; onToggle: () => void; icon: React.ReactNode; title: string; sub: string; tone?: string; children: React.ReactNode }) {
+  return (
+    <div id={id} className={"card mt12 " + (tone || "")} style={{ padding: 0, overflow: "hidden", ...(tone ? { boxShadow: "none" } : {}) }}>
+      <button className="row" style={{ width: "100%", padding: 16, background: "none", border: 0, color: "inherit", textAlign: "left", gap: 12 }} aria-expanded={open} onClick={() => { tap(); onToggle(); }}>
+        <span style={{ width: 40, height: 40, borderRadius: 12, display: "grid", placeItems: "center", flex: "none", background: tone ? "rgba(255,255,255,.2)" : "var(--surface-2)" }}>{icon}</span>
+        <span className="grow"><div style={{ fontWeight: 800, fontSize: 16 }}>{title}</div><div className="xs" style={{ opacity: 0.8 }}>{sub}</div></span>
+        <ChevronDown size={20} style={{ transition: "transform .25s", transform: open ? "rotate(180deg)" : "none", flex: "none" }} />
+      </button>
+      {open && <div style={{ padding: "0 16px 16px", animation: "screenIn .3s both" }}>{children}</div>}
     </div>
-
-  </>);
+  );
 }
 
 export default function About() {
+  const start = /open=(\w+)/.exec(location.hash)?.[1] || "";
+  const [open, setOpen] = useState<string>(start);
+  const toggle = (k: string) => setOpen(open === k ? "" : k);
   return (
     <div className="screen">
       <Header title="About us" sub={"Nihongo Path · version " + APP_VERSION} backTo="/me" />
       <AboutBlock />
-      <div id="support" className="section-title"><h2>Support us</h2></div>
-      <SupportBlock />
-      <div className="section-title"><h2>Build an app like this</h2></div>
-      <div className="card">
-        <div className="row top" style={{ gap: 12 }}>
-          <span className="ico" style={{ background: "var(--surface-2)", width: 40, height: 40, borderRadius: 12, display: "grid", placeItems: "center", flex: "none" }}><Smartphone size={20} /></span>
-          <div className="grow">
-            <div style={{ fontWeight: 800 }}>Want your own Android app?</div>
-            <div className="sm mu mt4" style={{ lineHeight: 1.5 }}>For a shop, school, clinic, community or idea - tell me the type of app, features and budget, and I’ll get back to you.</div>
-          </div>
-        </div>
-        <button className="btn block mt12" onClick={() => go("/me/build")}>Request an app <ArrowRight size={16} /></button>
-      </div>
+      <Fold id="story" open={open === "story"} onToggle={() => toggle("story")} icon={<BookHeart size={20} />} title="Our story" sub={ABOUT_ME.title}>
+        {ABOUT_ME.paragraphs.map((t, i) => <p key={i} className="sm" style={{ lineHeight: 1.65, margin: i ? "10px 0 0" : 0 }}>{t}</p>)}
+      </Fold>
+      <Fold id="support" open={open === "support"} onToggle={() => toggle("support")} icon={<Heart size={20} color="#fff" />} title="Support us" sub="Donate or share - keep it free for every learner" tone="tint-sakura">
+        <SupportBlock />
+      </Fold>
+      <Fold id="build" open={open === "build"} onToggle={() => toggle("build")} icon={<Smartphone size={20} color="#fff" />} title="Build an app like this" sub="We will build your Android app for you" tone="tint-ai">
+        <div className="sm" style={{ lineHeight: 1.55 }}>For a shop, school, clinic, community or your own idea - choose the type of app, the features you want and your budget, and we will build it for you.</div>
+        <button className="btn white block mt12" onClick={() => go("/me/build")}>Request your app <ArrowRight size={16} /></button>
+      </Fold>
     </div>
   );
 }

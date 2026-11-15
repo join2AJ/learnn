@@ -331,3 +331,7 @@ input[type=range] { width: 100%; accent-color: var(--shu); }
 @media (prefers-reduced-motion: reduce) { .intro *, .intro { animation: none !important; } }
 @media (max-height: 720px) { .intro-phones { height: 34vh; } .intro-text h1 { font-size: 21px; } .intro-text p { font-size: 13.5px; } .intro-chips { margin-top: 10px; } .intro-say { margin-top: 8px; } .intro-logo { width: 90px; height: 90px; } .intro-logo span { font-size: 56px; } }
 .intro-stage { overflow: visible; padding-top: 12px; }
+.tint-sakura { background: linear-gradient(135deg, #b8336a 0%, #e5689b 100%); color: #fff; }
+.tint-sakura .mu, .tint-sakura .kicker { color: rgba(255, 255, 255, .82); }
+.tint-sakura .card, .tint-ai .card { background: rgba(255, 255, 255, .14); box-shadow: none; color: #fff; }
+.intro-tour { z-index: 99; }

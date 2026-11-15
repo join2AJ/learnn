@@ -1,6 +1,6 @@
 import { Coffee, Github, Heart, IndianRupee, Share2 } from "lucide-react";
-import { SUPPORT, hasSupport } from "../support";
-import { openExternal } from "../core/native";
+import { BUILD_CONTACT, SUPPORT, hasSupport } from "../support";
+import { openExternal, shareText } from "../core/native";
 import { toast } from "../core/store";
 import { useEffect } from "react";
 import { go } from "../core/router";
@@ -14,34 +14,28 @@ export function SupportBlock() {
     openExternal("https://wa.me/?text=" + encodeURIComponent(text));
   };
   const upi = (amt: number) => openExternal(`upi://pay?pa=${encodeURIComponent(SUPPORT.upiId)}&pn=${encodeURIComponent(SUPPORT.upiName || "Nihongo Path")}&am=${amt}&cu=INR&tn=${encodeURIComponent("Support Nihongo Path")}`);
-  if (childMode()) return <div className="card sm">Thank you for learning with us!</div>;
+  const askDonate = () => {
+    const msg = "Hi! I'd like to donate to support Nihongo Path. Please send me how I can contribute.";
+    if (BUILD_CONTACT.whatsapp) openExternal(`https://wa.me/${BUILD_CONTACT.whatsapp}?text=${encodeURIComponent(msg)}`);
+    else if (BUILD_CONTACT.email) openExternal(`mailto:${BUILD_CONTACT.email}?subject=${encodeURIComponent("Donation for Nihongo Path")}&body=${encodeURIComponent(msg)}`);
+    else if (!shareText("Donation for Nihongo Path", msg)) toast("Donations open very soon - thank you!", "ok");
+  };
+  if (childMode()) return <div className="sm">Thank you for learning with us!</div>;
   return (
     <>
-      <div className="card">
-        <div className="row top" style={{ gap: 12 }}>
-          <Heart size={22} color="var(--sakura)" style={{ flex: "none", marginTop: 2 }} />
-          <div className="sm" style={{ lineHeight: 1.55 }}>No ads, no tracking, nothing locked. If the app helps you, a small contribution pays for new languages, more words and better voice tools.</div>
-        </div>
-      </div>
+      <div className="sm" style={{ lineHeight: 1.55 }}>No ads, no tracking, nothing locked. If the app helps you, a small contribution pays for new languages, more words and better voice tools.</div>
       {SUPPORT.upiId && (
         <div className="card mt12">
-          <div className="row"><IndianRupee size={20} color="var(--matcha)" /><b className="grow">UPI (India)</b></div>
-          <div className="grid3 mt12">{[49, 99, 199].map((a) => <button key={a} className="btn" onClick={() => upi(a)}>₹{a}</button>)}</div>
-          <button className="btn ghost block mt8" onClick={() => { navigator.clipboard?.writeText(SUPPORT.upiId); toast("UPI ID copied", "ok"); }}>Copy UPI ID: {SUPPORT.upiId}</button>
+          <div className="row"><IndianRupee size={20} /><b className="grow">UPI (India)</b></div>
+          <div className="grid3 mt12">{[49, 99, 199].map((a) => <button key={a} className="btn white" onClick={() => upi(a)}>₹{a}</button>)}</div>
+          <button className="btn ghost block mt8" style={{ color: "#fff" }} onClick={() => { navigator.clipboard?.writeText(SUPPORT.upiId); toast("UPI ID copied", "ok"); }}>Copy UPI ID: {SUPPORT.upiId}</button>
         </div>
       )}
-      {(SUPPORT.buyMeACoffee || SUPPORT.kofi) && (
-        <div className="list mt12">
-          {SUPPORT.buyMeACoffee && <button className="li" onClick={() => openExternal(SUPPORT.buyMeACoffee)}><span className="ico soft-gold"><Coffee size={19} color="var(--gold)" /></span><span className="grow"><div className="t">Buy me a coffee</div><div className="d">Cards & international payments</div></span></button>}
-          {SUPPORT.kofi && <button className="li" onClick={() => openExternal(SUPPORT.kofi)}><span className="ico soft-sakura"><Coffee size={19} color="var(--sakura)" /></span><span className="grow"><div className="t">Ko-fi</div><div className="d">One-time or monthly</div></span></button>}
-          {SUPPORT.githubSponsors && <button className="li" onClick={() => openExternal(SUPPORT.githubSponsors)}><span className="ico soft-ai"><Github size={19} color="var(--ai)" /></span><span className="grow"><div className="t">GitHub Sponsors</div><div className="d">For developers</div></span></button>}
-        </div>
-      )}
-      {!hasSupport() && <div className="card flat mt12 sm mu">Ways to contribute are coming soon.</div>}
-      <div className="section-title"><h2>Free ways to help</h2></div>
-      <div className="list">
-        <button className="li" onClick={share}><span className="ico soft-matcha"><Share2 size={19} color="var(--matcha)" /></span><span className="grow"><div className="t">Share with a friend</div><div className="d">The best support is another learner</div></span></button>
-      </div>
+      {SUPPORT.buyMeACoffee && <button className="btn white block mt12" onClick={() => openExternal(SUPPORT.buyMeACoffee)}><Coffee size={17} /> Buy me a coffee</button>}
+      {SUPPORT.kofi && <button className="btn white block mt8" onClick={() => openExternal(SUPPORT.kofi)}><Coffee size={17} /> Ko-fi</button>}
+      {SUPPORT.githubSponsors && <button className="btn white block mt8" onClick={() => openExternal(SUPPORT.githubSponsors)}><Github size={17} /> GitHub Sponsors</button>}
+      {!hasSupport() && <button className="btn white block mt12" onClick={askDonate}><Heart size={17} /> I want to donate</button>}
+      <button className="btn block mt8" style={{ background: "rgba(255,255,255,.18)", color: "#fff" }} onClick={share}><Share2 size={17} /> Share with a friend</button>
     </>
   );
 }

@@ -154,8 +154,8 @@ function Stats() {
         <div className="row sm mt8 mu"><span className="grow">Speaking: {p.speak.ok}/{p.speak.tries} correct</span><span>Writing: {p.writes} characters</span></div>
       </div>
 
-      <button className="card tap mt16" onClick={() => go("/me/about")}>
-        <div className="row"><Heart size={22} color="var(--sakura)" /><div className="grow"><div style={{ fontWeight: 800 }}>About us</div><div className="xs mu">Our story · support us · build an app like this</div></div><ChevronRight size={18} /></div>
+      <button className="card tap mt16 tint-sakura" style={{ boxShadow: "0 10px 26px rgba(184,51,106,.3)" }} onClick={() => go("/me/about?open=support")}>
+        <div className="row"><span style={{ width: 42, height: 42, borderRadius: 13, display: "grid", placeItems: "center", background: "rgba(255,255,255,.2)", flex: "none" }}><Heart size={22} color="#fff" fill="#fff" /></span><div className="grow"><div style={{ fontWeight: 800, fontSize: 16 }}>Support the app · About us</div><div className="xs" style={{ opacity: .9 }}>Donate or share · our story · build an app like this</div></div><ChevronRight size={18} /></div>
       </button>
 
       <div className="section-title"><h2>Badges</h2><span className="mu">{Object.keys(p.badges).length}/{BADGES.length}</span></div>

@@ -16,7 +16,7 @@ const SLIDES: Slide[] = [
 ];
 
 /** First-run intro: swipe through real screens of the app, each slide says a Japanese word aloud. */
-export default function Intro({ onDone }: { onDone: () => void }) {
+export default function Intro({ onDone, tour }: { onDone: () => void; tour?: boolean }) {
   const [i, setI] = useState(0);
   const [dir, setDir] = useState(1);
   const x0 = useRef<number | null>(null);
@@ -27,7 +27,7 @@ export default function Intro({ onDone }: { onDone: () => void }) {
   const goTo = (n: number) => { if (n < 0 || n >= SLIDES.length) return; tap(); setDir(n > i ? 1 : -1); setI(n); };
 
   return (
-    <div className="intro" style={{ background: `radial-gradient(120% 70% at 80% 0%, ${sl.bg[0]}, ${sl.bg[1]} 70%)` }}
+    <div className={"intro" + (tour ? " intro-tour" : "")} style={{ background: `radial-gradient(120% 70% at 80% 0%, ${sl.bg[0]}, ${sl.bg[1]} 70%)` }}
       onPointerDown={(e) => { x0.current = e.clientX; }}
       onPointerUp={(e) => { if (x0.current == null) return; const dx = e.clientX - x0.current; x0.current = null; if (Math.abs(dx) > 50) goTo(i + (dx < 0 ? 1 : -1)); }}>
       <div className="intro-petals" aria-hidden="true">{Array.from({ length: 9 }, (_, k) => <i key={k} style={{ left: (k * 11 + 5) % 100 + "%", animationDelay: k * 1.3 + "s", animationDuration: 9 + (k % 4) * 2 + "s" }} />)}</div>
@@ -63,7 +63,7 @@ export default function Intro({ onDone }: { onDone: () => void }) {
 
       <div className="intro-nav">
         {i > 0 && <button className="intro-back" aria-label="Back" onClick={() => goTo(i - 1)}><ArrowLeft size={20} /></button>}
-        <button className="intro-next" onClick={() => (last ? (tap(), onDone()) : goTo(i + 1))}>{last ? "Set up in 1 minute" : i === 0 ? "Show me the app" : "Next"} <ArrowRight size={18} /></button>
+        <button className="intro-next" onClick={() => (last ? (tap(), onDone()) : goTo(i + 1))}>{last ? (tour ? "Start learning" : "Set up in 1 minute") : i === 0 ? "Show me the app" : "Next"} <ArrowRight size={18} /></button>
       </div>
     </div>
   );

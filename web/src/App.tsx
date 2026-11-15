@@ -116,8 +116,8 @@ export default function App() {
       <Confetti run={confetti} />
       <Sheet open={!!voice} onClose={() => setVoice(null)}>{voice && <VoiceCompare key={voice.text + (voice.reviewT || "")} text={voice.text} ro={voice.ro} en={voice.en} reviewT={voice.reviewT} />}</Sheet>
       {!settings.privacyOk && <PrivacyNotice />}
-      {settings.privacyOk && (news || (settings.toured && settings.seenVersion !== APP_VERSION)) && !cele && !tour && <WhatsNew since={news ? "" : settings.seenVersion} onDone={() => { setNews(false); setSettings({ seenVersion: APP_VERSION }); }} />}
-      {settings.privacyOk && (tour || !settings.toured) && !cele && <Tour onDone={() => { setTour(false); if (!settings.toured) setSettings({ toured: true, seenVersion: APP_VERSION }); }} />}
+      {settings.privacyOk && (news || (settings.toured && settings.newIntro && settings.seenVersion !== APP_VERSION)) && !cele && !tour && <WhatsNew since={news ? "" : settings.seenVersion} onDone={() => { setNews(false); setSettings({ seenVersion: APP_VERSION }); }} />}
+      {settings.privacyOk && (tour || !settings.toured || !settings.newIntro) && !cele && <Tour onDone={() => { setTour(false); setSettings({ toured: true, newIntro: true, ...(settings.toured ? {} : { seenVersion: APP_VERSION }) }); }} />}
       {cele && (<>
         <div className="scrim" style={{ zIndex: 89 }} onClick={() => setCele(null)} />
         <div className="modal" role="dialog">

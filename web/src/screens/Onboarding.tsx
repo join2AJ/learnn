@@ -38,7 +38,7 @@ export default function Onboarding() {
     {sub && <p className="mu" style={{ marginTop: 0 }}>{sub}</p>}
   </>);
 
-  if (step === 0 || step === 1) return <Intro onDone={() => { setParentView(false); setStep(2); }} />;
+  if (step === 0 || step === 1) return <Intro onDone={() => { setSettings({ newIntro: true, toured: true }); setParentView(false); setStep(2); }} />;
 
   if (step === 2) return (
     <div className="onb" style={{ justifyContent: "flex-start", paddingTop: 32 }}>
