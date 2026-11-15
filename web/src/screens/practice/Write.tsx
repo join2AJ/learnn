@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Eraser, Eye, EyeOff, Undo2 } from "lucide-react";
-import { updateProgress, useSettings } from "../../core/store";
+import { toast, updateProgress, useProgress, useSettings } from "../../core/store";
 import { award } from "../../core/rewards";
 import { speak } from "../../core/native";
 import type { LetterCell } from "../../core/types";
@@ -39,6 +39,7 @@ export default function Write({ initial, set }: { initial: string | null; set: s
   const cur = useRef<Pt[] | null>(null);
   const [guide, setGuide] = useState(true);
   const [result, setResult] = useState<{ score: number; count: number } | null>(null);
+  const log = useProgress().writeLog?.[cell.ch];
 
   useEffect(() => { setStrokes([]); setResult(null); }, [cell.ch]);
 
@@ -60,11 +61,15 @@ export default function Write({ initial, set }: { initial: string | null; set: s
   useEffect(() => redraw(strokes), [strokes]); // eslint-disable-line
 
   const pos = (e: React.PointerEvent): Pt => { const r = cv.current!.getBoundingClientRect(); return [((e.clientX - r.left) / r.width) * 109, ((e.clientY - r.top) / r.height) * 109]; };
-  const down = (e: React.PointerEvent) => { (e.target as Element).setPointerCapture(e.pointerId); cur.current = [pos(e)]; setResult(null); };
+  const down = (e: React.PointerEvent) => {
+    if (result) { toast("Already checked — tap Clear to write it again.", "info"); return; }
+    (e.target as Element).setPointerCapture(e.pointerId); cur.current = [pos(e)];
+  };
   const move = (e: React.PointerEvent) => { if (!cur.current) return; cur.current.push(pos(e)); redraw([...strokes, cur.current]); };
   const up = () => { if (!cur.current) return; const st = cur.current; cur.current = null; if (st.length > 1 || strokes.length === 0) setStrokes([...strokes, st]); };
 
   const check = () => {
+    if (result || !strokes.length) return; // one check per drawing
     tap(14);
     const tmpl = raster((ctx) => { ctx.lineWidth = 9; paths.forEach((d) => ctx.stroke(new Path2D(d))); });
     const tmplWide = raster((ctx) => { ctx.lineWidth = 20; paths.forEach((d) => ctx.stroke(new Path2D(d))); });
@@ -77,7 +82,11 @@ export default function Write({ initial, set }: { initial: string | null; set: s
     const countOk = strokes.length === paths.length;
     const score = Math.round(Math.min(1, shape * (countOk ? 1 : 0.85)) * 100);
     setResult({ score, count: strokes.length });
-    updateProgress((x) => { x.writes++; });
+    updateProgress((x) => {
+      x.writes++;
+      const prev = x.writeLog?.[cell.ch];
+      x.writeLog = { ...(x.writeLog || {}), [cell.ch]: { n: (prev?.n || 0) + 1, best: Math.max(prev?.best || 0, score), last: score, t: Date.now(), scores: [...(prev?.scores || []), score].slice(-20) } };
+    });
     if (score >= 70) { award(score >= 85 ? 6 : 4); speak(pick(pk.praise).jp, { lang: pk.ttsLang }); }
   };
 
@@ -111,10 +120,12 @@ export default function Write({ initial, set }: { initial: string | null; set: s
       </div>
       <div className="row mt12" style={{ justifyContent: "center" }}>
         <button className="btn sm" onClick={() => setGuide(!guide)}>{guide ? <EyeOff size={15} /> : <Eye size={15} />} {guide ? "Hide guide" : "Show guide"}</button>
-        <button className="btn sm" onClick={() => { setStrokes(strokes.slice(0, -1)); setResult(null); }} disabled={!strokes.length}><Undo2 size={15} /> Undo</button>
+        <button className="btn sm" onClick={() => setStrokes(strokes.slice(0, -1))} disabled={!strokes.length || !!result}><Undo2 size={15} /> Undo</button>
         <button className="btn sm" onClick={() => { setStrokes([]); setResult(null); }}><Eraser size={15} /> Clear</button>
       </div>
-      <button className="btn primary lg block mt12" disabled={!strokes.length} onClick={check}>Check my writing</button>
+      {result ? <button className="btn lg block mt12" onClick={() => { tap(); setStrokes([]); setResult(null); }}><Eraser size={17} /> Clear & write again</button>
+        : <button className="btn primary lg block mt12" disabled={!strokes.length} onClick={check}>Check my writing</button>}
+      {log && <div className="xs mu center mt8">This character: tried {log.n}× · best {log.best}% · last {log.last}%{log.scores.length > 1 ? " · history " + log.scores.slice(-6).join(" → ") : ""}</div>}
       {result && (
         <div className={"feedback " + (result.score >= 70 ? "ok" : "bad")}>
           <div className="row"><div style={{ fontSize: 32, fontWeight: 800 }}>{result.score}%</div>

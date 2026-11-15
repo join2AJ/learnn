@@ -35,6 +35,7 @@ export interface Progress {
   quiz: { correct: number; wrong: number; best: number };
   speak: { ok: number; tries: number };
   writes: number;
+  writeLog: Record<string, { n: number; best: number; last: number; t: number; scores: number[] }>;
   labSessions: number;
   days: Record<string, DayStat>;
   streak: { count: number; best: number; last: string };
@@ -51,7 +52,7 @@ const defSettings: Settings = {
 };
 const defProgress = (): Progress => ({
   xp: 0, known: [], kana: {}, lessons: {}, srs: {}, badges: {}, quiz: { correct: 0, wrong: 0, best: 0 },
-  speak: { ok: 0, tries: 0 }, writes: 0, labSessions: 0, days: {}, streak: { count: 0, best: 0, last: "" },
+  speak: { ok: 0, tries: 0 }, writes: 0, writeLog: {}, labSessions: 0, days: {}, streak: { count: 0, best: 0, last: "" },
   goalHit: {}, roadmap: {}, culturesRead: {}, voiceLog: [], started: Date.now(),
 });
 

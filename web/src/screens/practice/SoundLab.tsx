@@ -15,17 +15,19 @@ import { LangPill } from "../../ui/icons";
 const F2MAX = 2700, F2MIN = 600, F1MIN = 200, F1MAX = 950;
 const COL: Record<string, string> = { target: "var(--shu)", en: "var(--ai)", hi: "var(--gold)" };
 function VowelChart({ refs, show, live, trail, scale = 1, onTap, height = 260 }: { refs: VowelRef[]; show: Record<string, boolean>; live?: [number, number] | null; trail?: [number, number][]; scale?: number; onTap?: (v: VowelRef) => void; height?: number }) {
-  const W = 340, H = height, pl = 30, pr = 10, pt = 14, pb = 24;
+  const W = 340, H = height, pl = 40, pr = 10, pt = 14, pb = 30;
   const x = (f2: number) => pl + ((F2MAX - f2) / (F2MAX - F2MIN)) * (W - pl - pr);
   const y = (f1: number) => pt + ((f1 - F1MIN) / (F1MAX - F1MIN)) * (H - pt - pb);
   const target = refs.filter((r) => r.lang === "target");
   const poly = ["i", "e", "a", "o", "ɯ"].map((ipa) => target.find((t) => t.ipa === ipa)).filter(Boolean) as VowelRef[];
   return (
     <svg viewBox={`0 0 ${W} ${H}`} width="100%" className="chart" style={{ background: "var(--surface)", borderRadius: 18 }}>
-      {[500, 1000, 1500, 2000, 2500].map((f) => <g key={f}><line x1={x(f)} x2={x(f)} y1={pt} y2={H - pb} stroke="var(--line)" /><text x={x(f) - 10} y={H - 8}>{f}</text></g>)}
-      {[300, 500, 700, 900].map((f) => <g key={f}><line x1={pl} x2={W - pr} y1={y(f)} y2={y(f)} stroke="var(--line)" /><text x={2} y={y(f) + 3}>{f}</text></g>)}
-      <text x={W - 92} y={pt + 8} style={{ fontWeight: 700 }}>← front · back →</text>
-      <text x={pl + 4} y={H - pb - 4} style={{ fontWeight: 700 }}>open ↓</text>
+      {[1000, 1500, 2000, 2500].map((f) => <g key={f}><line x1={x(f)} x2={x(f)} y1={pt} y2={H - pb} stroke="var(--line)" /><text x={x(f)} y={H - 12} textAnchor="middle">{f}</text></g>)}
+      <text x={(W + pl) / 2} y={H - 1} textAnchor="middle" style={{ fontWeight: 700, fontSize: 9 }}>F2 Hz — tongue position: front (い) ← → back (お)</text>
+      <text x={9} y={(H - pb + pt) / 2} textAnchor="middle" transform={`rotate(-90 9 ${(H - pb + pt) / 2})`} style={{ fontWeight: 700, fontSize: 9 }}>F1 Hz — mouth opening ↓</text>
+      {[300, 500, 700, 900].map((f) => <g key={f}><line x1={pl} x2={W - pr} y1={y(f)} y2={y(f)} stroke="var(--line)" /><text x={pl - 3} y={y(f) + 3} textAnchor="end">{f}</text></g>)}
+      <text x={W - pr - 2} y={pt + 9} textAnchor="end" style={{ fontWeight: 700 }}>closed mouth</text>
+      <text x={W - pr - 2} y={H - pb - 4} textAnchor="end" style={{ fontWeight: 700 }}>open mouth</text>
       {show.target && <polygon points={poly.map((v) => x(v.f2 * scale) + "," + y(v.f1 * scale)).join(" ")} fill="var(--shu-soft)" stroke="var(--shu)" strokeOpacity=".4" />}
       {refs.filter((r) => show[r.lang]).map((r, i) => (
         <g key={i} onClick={() => onTap?.(r)} style={{ cursor: "pointer" }}>
@@ -137,6 +139,7 @@ function Live() {
           {read?.near && <span className="tag jp" style={{ background: "var(--matcha)", color: "#fff", height: 30, fontSize: 15 }}>≈ {read.near}</span>}</div>
         <div className="mt8"><VowelChart refs={pk.vowels} show={{ target: true, en: false, hi: false }} live={read && read.f1 ? [read.f1, read.f2] : null} trail={trail} scale={scale} onTap={(v) => speak(v.example || v.label, { lang: pk.ttsLang })} /></div>
         <div className="mt8"><Seg value={String(scale)} options={[["1", "Lower voice"], ["1.15", "Higher voice"]]} onChange={(v) => setScale(+v)} /></div>
+        <FormantHelp />
         <div className="xs mu mt8" style={{ lineHeight: 1.5 }}>Targets are average adult values; higher voices have formants ~15% higher, so switch the scale. Estimates come from LPC analysis on your phone — use quiet surroundings.</div>
       </div>
     </div>
@@ -174,6 +177,7 @@ function Vowels() {
           <li>English speakers: avoid gliding “ay”/“oh” — Japanese <span className="jp">え</span> and <span className="jp">お</span> are pure, steady points.</li>
         </ul>
       </div>
+      <div className="card"><FormantHelp open /></div>
       <div className="xs mu" style={{ lineHeight: 1.5 }}>Approximate adult-male averages: English from Hillenbrand et al. (1995); Japanese and Hindi from published acoustic studies, rounded.</div>
     </div>
   );
@@ -332,6 +336,28 @@ function Pitch() {
         </div>
       )}
       <div className="xs mu" style={{ lineHeight: 1.5 }}>Patterns are Tokyo standard Japanese. Look up any word’s pitch in the OJAD dictionary (Explore → Resources).</div>
+    </div>
+  );
+}
+
+/** Explains the numbers on the vowel chart axes. */
+function FormantHelp({ open: start = false }: { open?: boolean }) {
+  const s = useSettings();
+  const [open, setOpen] = useState(start);
+  return (
+    <div className="mt8" style={{ background: "var(--surface-2)", borderRadius: 14, padding: "10px 12px" }}>
+      <button className="row" style={{ width: "100%" }} onClick={() => setOpen(!open)}>
+        <b className="sm grow" style={{ textAlign: "left" }}>What are 300 … 900 and 1000 … 2500?</b><span className="xs mu">{open ? "hide" : "show"}</span>
+      </button>
+      {open && (
+        <div className="sm mt8" style={{ lineHeight: 1.6 }}>
+          <p style={{ margin: "0 0 6px" }}>They are frequencies in <b>Hz</b> (vibrations per second). When you say a vowel, your mouth and throat act like a tube that makes two strong resonances, called <b>formants</b>:</p>
+          <p style={{ margin: "0 0 6px" }}>• <b>F1 (up–down axis, 300 → 900 Hz)</b> shows <b>how open your mouth is</b>. Closed vowels い and う ≈ 300 Hz (top). Wide-open あ ≈ 750–900 Hz (bottom).</p>
+          <p style={{ margin: "0 0 6px" }}>• <b>F2 (left–right axis, 2500 → 1000 Hz)</b> shows <b>where your tongue is</b>. Tongue forward, like い ≈ 2300 Hz (left). Tongue pulled back, like お ≈ 850 Hz (right).</p>
+          <p style={{ margin: "0 0 6px" }}>So the chart is a map of your mouth: <b>left = front of the mouth, right = back, top = closed, bottom = open</b>. When you speak, the green dot shows where your vowel lands; try to move it onto the red Japanese targets.</p>
+          {s.showHindi && <p className="hi" style={{ margin: 0 }}>ये संख्याएँ Hz (आवृत्ति) हैं। ऊपर-नीचे (F1) = मुँह कितना खुला है: इ/उ बंद (300), आ खुला (800+)। बाएँ-दाएँ (F2) = जीभ आगे या पीछे: इ आगे (2300), ओ पीछे (850)।</p>}
+        </div>
+      )}
     </div>
   );
 }

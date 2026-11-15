@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Settings as Cog } from "lucide-react";
 import type { Route } from "../core/router";
 import { go } from "../core/router";
@@ -7,7 +7,7 @@ import { BADGES, goalStreak, HIRA46, KATA46, levelOf, masteredSet, pledgeStatus,
 import { emitUi } from "../core/store";
 import { pendingMs } from "../core/timeTracker";
 import { usePack } from "../pack";
-import { Bar, fmtMin, Header, Ring } from "../ui/kit";
+import { Bar, fmtMin, Header, Ring, Seg } from "../ui/kit";
 import Settings from "./Settings";
 import Recordings from "./Recordings";
 import { Icon, IconTile } from "../ui/icons";
@@ -119,6 +119,7 @@ function Stats() {
       </div>
 
       <VoiceSection />
+      <PracticeLog />
 
       <div className="section-title"><h2>Mastery</h2></div>
       <div className="card">
@@ -193,6 +194,63 @@ function VoiceSection() {
             </button>
           ))}
         </div>
+      </div>
+    </>
+  );
+}
+
+const sc = (v: number) => (v >= 70 ? "var(--matcha)" : v >= 50 ? "var(--gold)" : "var(--shu)");
+
+/** Everything the learner has written or recorded: what, how many tries, best and last score. */
+function PracticeLog() {
+  const pk = usePack();
+  const p = useProgress();
+  const [tab, setTab] = useState<"write" | "voice">("write");
+  const [all, setAll] = useState(false);
+  const wl = Object.entries(p.writeLog || {}).sort((a, b) => b[1].t - a[1].t);
+  const vm = new Map<string, { n: number; best: number; last: number; t: number; lastT: number }>();
+  (p.voiceLog || []).forEach((r) => { const v = vm.get(r.w) || { n: 0, best: 0, last: 0, t: 0, lastT: 0 }; vm.set(r.w, { n: v.n + 1, best: Math.max(v.best, r.score), last: r.score, t: r.t, lastT: r.t }); });
+  const vl = [...vm.entries()].sort((a, b) => b[1].t - a[1].t);
+  const wTries = wl.reduce((a, [, v]) => a + v.n, 0);
+  const vTries = (p.voiceLog || []).length;
+  const rows = tab === "write" ? wl : vl;
+  const shown = all ? rows : rows.slice(0, 8);
+  return (
+    <>
+      <div className="section-title"><h2>Practice log</h2><span className="mu">{wl.length} characters · {vl.length} words</span></div>
+      <div className="card">
+        <Seg value={tab} options={[["write", "Writing (" + wTries + ")"], ["voice", "Speaking (" + vTries + ")"]]} onChange={(v) => { setTab(v); setAll(false); }} />
+        {tab === "write" && wl.length > 0 && (
+          <div className="mt12" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(44px, 1fr))", gap: 6 }}>
+            {wl.map(([ch, v]) => (
+              <button key={ch} onClick={() => go("/practice/write?ch=" + encodeURIComponent(ch))} title={v.n + " tries, best " + v.best + "%"}
+                style={{ aspectRatio: "1", borderRadius: 12, background: "var(--surface-2)", boxShadow: "inset 0 -3px 0 " + sc(v.best), display: "grid", placeItems: "center", position: "relative" }}>
+                <span className="jp" style={{ fontSize: 20, fontWeight: 600 }}>{ch}</span>
+                <span style={{ position: "absolute", top: 2, right: 4, fontSize: 9, fontWeight: 800, color: "var(--ink-3)" }}>{v.n}×</span>
+              </button>
+            ))}
+          </div>
+        )}
+        {rows.length === 0 ? (
+          <div className="sm mu mt12">{tab === "write" ? "Nothing written yet — open Practice → Write and check a character." : "Nothing recorded yet — tap the green mic next to any word."}</div>
+        ) : (
+          <div className="mt12">
+            <div className="row xs mu2" style={{ fontWeight: 700, padding: "0 0 4px" }}><span className="grow">{tab === "write" ? "CHARACTER" : "WORD"}</span><span style={{ width: 46, textAlign: "center" }}>TRIES</span><span style={{ width: 46, textAlign: "center" }}>BEST</span><span style={{ width: 46, textAlign: "center" }}>LAST</span></div>
+            {shown.map(([k, v]) => (
+              <button key={k} className="row" style={{ width: "100%", padding: "7px 0", borderTop: "1px solid var(--line)" }}
+                onClick={() => { if (tab === "write") go("/practice/write?ch=" + encodeURIComponent(k)); else { const w = pk.words.find((x) => x.w === k); emitUi({ type: "voice", text: k, ro: w?.ro, en: w?.m, reviewT: (v as { lastT: number }).lastT }); } }}>
+                <span className="grow" style={{ textAlign: "left", minWidth: 0 }}>
+                  <span className="jp" style={{ fontWeight: 700 }}>{k}</span>
+                  <span className="xs mu"> · {new Date(v.t).toLocaleDateString(undefined, { day: "numeric", month: "short" })}</span>
+                </span>
+                <span style={{ width: 46, textAlign: "center", fontWeight: 700 }}>{v.n}</span>
+                <span style={{ width: 46, textAlign: "center", fontWeight: 800, color: sc(v.best) }}>{v.best}</span>
+                <span style={{ width: 46, textAlign: "center", fontWeight: 700, color: sc(v.last) }}>{v.last}</span>
+              </button>
+            ))}
+            {rows.length > 8 && <button className="btn sm block mt8" onClick={() => setAll(!all)}>{all ? "Show less" : "Show all " + rows.length}</button>}
+          </div>
+        )}
       </div>
     </>
   );

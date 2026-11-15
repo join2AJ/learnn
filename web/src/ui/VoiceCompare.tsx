@@ -92,7 +92,7 @@ export default function VoiceCompare({ text, ro, en, reviewT }: { text: string; 
     const score = Math.round(Math.max(0, Math.min(1, (1 - bandDiff * 1.6) * 0.55 + loud * 0.25 + pace * 0.2)) * 100);
     const rec: VoiceRec = { t: Date.now(), w: text, bands, ref: refBands, db, dur, exp, f0: range, score };
     updateProgress((p) => { p.voiceLog = [...(p.voiceLog || []), rec].slice(-300); bumpDay(p, (d) => { d.spoke = (d.spoke || 0) + 1; }); });
-    saveRec(rec.t, text, cut, sr, contour);
+    saveRec(rec.t, text, cut, sr, contour).then((ok) => { if (!ok) toast("Couldn’t save the sound of this recording on the phone (storage full?). The analysis is saved.", "warn"); });
     award(3); checkBadges();
     setRes({ ...rec, mine: toBuffer(cut, sr), contour });
     setState("done");

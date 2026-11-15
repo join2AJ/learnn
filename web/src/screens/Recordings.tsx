@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Pause, Play, Search, Trash2 } from "lucide-react";
-import { emitUi, updateProgress, useProgress, VoiceRec } from "../core/store";
+import { emitUi, toast, updateProgress, useProgress, VoiceRec } from "../core/store";
 import { deleteRec, decode, getRec, savedKeys } from "../core/recStore";
 import { audioCtx } from "../core/dsp";
 import { usePack } from "../pack";
@@ -33,7 +33,13 @@ export default function Recordings() {
     tap();
     try { current?.stop(); } catch { /* already stopped */ }
     if (playing === r.t) { setPlaying(null); return; }
-    const st = await getRec(r.t); if (!st) return;
+    const st = await getRec(r.t);
+    if (!st) {
+      toast("No sound was saved for this one — it was recorded before v2.4. Opening it so you can record it again.", "info");
+      const w = pk.words.find((x) => x.w === r.w);
+      emitUi({ type: "voice", text: r.w, ro: w?.ro, en: w?.m, reviewT: r.t });
+      return;
+    }
     const x = decode(st); const ctx = audioCtx();
     const b = ctx.createBuffer(1, x.length, st.sr); b.getChannelData(0).set(x);
     const src = ctx.createBufferSource(); src.buffer = b; src.connect(ctx.destination); src.start();
@@ -105,12 +111,12 @@ export default function Recordings() {
                 {head && <div className="kicker" style={{ margin: "16px 4px 8px" }}>{head}</div>}
                 <div className="card" style={{ padding: 12, marginTop: 8 }}>
                   <div className="row">
-                    <button className="say" style={{ background: has ? "var(--matcha-soft)" : "var(--surface-2)", color: has ? "var(--matcha)" : "var(--ink-3)" }} disabled={!has} aria-label="Play recording" onClick={() => play(r)}>
+                    <button className="say" style={{ background: has ? "var(--matcha-soft)" : "var(--surface-2)", color: has ? "var(--matcha)" : "var(--ink-3)" }} aria-label="Play recording" onClick={() => play(r)}>
                       {playing === r.t ? <Pause size={17} /> : <Play size={17} />}
                     </button>
                     <button className="grow" style={{ textAlign: "left", minWidth: 0 }} onClick={() => emitUi({ type: "voice", text: r.w, ro: w?.ro, en: w?.m, reviewT: r.t })}>
                       <div className="jp" style={{ fontWeight: 700, fontSize: 17, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.w}</div>
-                      <div className="xs mu">{d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · {Math.round(r.db)} dB · {r.dur.toFixed(1)}s · {r.f0[0] ? Math.round(r.f0[0]) + "–" + Math.round(r.f0[1]) + " Hz" : "no pitch"}{has ? "" : " · no audio"}</div>
+                      <div className="xs mu">{d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · {Math.round(r.db)} dB · {r.dur.toFixed(1)}s · {r.f0[0] ? Math.round(r.f0[0]) + "–" + Math.round(r.f0[1]) + " Hz" : "no pitch"}{has ? "" : " · no sound saved (before v2.4)"}</div>
                       <div className="row mt4" style={{ gap: 3 }}>
                         {r.bands.map((b, i) => <div key={i} title={["Low", "Mid", "High"][i]} style={{ height: 5, width: b * 120, borderRadius: 3, background: ["var(--ai)", "var(--gold)", "var(--shu)"][i], opacity: 0.8 }} />)}
                       </div>

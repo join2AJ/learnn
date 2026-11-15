@@ -40,13 +40,32 @@ export function decode(r: StoredRec): Float32Array {
   return out;
 }
 
-export async function saveRec(t: number, w: string, x: Float32Array, sr: number, contour: number[]) {
-  try { await tx("readwrite", (s) => s.put({ t, w, sr: SR, pcm: encode(x, sr), contour } as StoredRec)); } catch { /* storage unavailable */ }
+/* Fallback when IndexedDB is unavailable: localStorage, base64 at 8 kHz. */
+const LK = (t: number) => "np2:rec:" + t;
+function b64(buf: ArrayBuffer) { let s = ""; const u = new Uint8Array(buf); for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode(...u.subarray(i, i + 0x8000)); return btoa(s); }
+function unb64(s: string) { const b = atob(s); const u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u.buffer; }
+function lsSave(t: number, w: string, x: Float32Array, sr: number, contour: number[]) {
+  const pcm = encode(x, sr), half = new Int16Array(pcm).filter((_, i) => i % 2 === 0);
+  try { localStorage.setItem(LK(t), JSON.stringify({ t, w, sr: SR / 2, pcm: b64(half.buffer), contour })); return true; } catch { return false; }
+}
+function lsGet(t: number): StoredRec | undefined {
+  try { const v = localStorage.getItem(LK(t)); if (!v) return undefined; const o = JSON.parse(v); return { ...o, pcm: unb64(o.pcm) }; } catch { return undefined; }
+}
+
+/** Saves the audio; returns true when it is stored somewhere. */
+export async function saveRec(t: number, w: string, x: Float32Array, sr: number, contour: number[]): Promise<boolean> {
+  try { await tx("readwrite", (s) => s.put({ t, w, sr: SR, pcm: encode(x, sr), contour } as StoredRec)); return true; }
+  catch { return lsSave(t, w, x, sr, contour); }
 }
 export async function getRec(t: number): Promise<StoredRec | undefined> {
-  try { return await tx("readonly", (s) => s.get(t) as IDBRequest<StoredRec | undefined>); } catch { return undefined; }
+  let r: StoredRec | undefined;
+  try { r = await tx("readonly", (s) => s.get(t) as IDBRequest<StoredRec | undefined>); } catch { /* fall through */ }
+  return r || lsGet(t);
 }
-export async function deleteRec(t: number) { try { await tx("readwrite", (s) => s.delete(t)); } catch { /* ignore */ } }
+export async function deleteRec(t: number) { try { await tx("readwrite", (s) => s.delete(t)); } catch { /* ignore */ } try { localStorage.removeItem(LK(t)); } catch { /* ignore */ } }
 export async function savedKeys(): Promise<Set<number>> {
-  try { return new Set((await tx("readonly", (s) => s.getAllKeys())) as number[]); } catch { return new Set(); }
+  const out = new Set<number>();
+  try { ((await tx("readonly", (s) => s.getAllKeys())) as number[]).forEach((k) => out.add(k)); } catch { /* ignore */ }
+  try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i) || ""; if (k.startsWith("np2:rec:")) out.add(+k.slice(8)); } } catch { /* ignore */ }
+  return out;
 }
