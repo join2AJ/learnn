@@ -12,6 +12,7 @@ import Settings from "./Settings";
 import Recordings from "./Recordings";
 import MyWriting from "./MyWriting";
 import Privacy from "./Privacy";
+import Backup from "./Backup";
 import Support from "./Support";
 import { Icon, IconTile } from "../ui/icons";
 
@@ -26,6 +27,7 @@ export default function Me({ route }: { route: Route }) {
   if (route.parts[1] === "recordings") return <Recordings />;
   if (route.parts[1] === "writing") return <MyWriting />;
   if (route.parts[1] === "privacy") return <Privacy />;
+  if (route.parts[1] === "backup") return <Backup />;
   if (route.parts[1] === "support") return <Support />;
   return <Stats />;
 }

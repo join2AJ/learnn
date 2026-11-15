@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Check, Download, RotateCcw, Upload, Volume2 } from "lucide-react";
-import { dayKey, emitUi, exportAll, importAll, resetProgress, setSettings, toast, useSettings } from "../core/store";
+import { Check, Download, RotateCcw, Volume2 } from "lucide-react";
+import { dayKey, emitUi, resetProgress, setSettings, toast, useSettings } from "../core/store";
 import { appVersion, openExternal, openTtsSettings, speak, ttsStatus } from "../core/native";
 import { PACKS } from "../packs/registry";
 import { usePack } from "../pack";
@@ -14,7 +14,6 @@ export default function Settings() {
   const s = useSettings();
   const pk = usePack();
   const [confirm, setConfirm] = useState(false);
-  const [backup, setBackup] = useState("");
   const tts = ttsStatus();
   const Row = ({ t, d, children }: { t: string; d?: string; children: React.ReactNode }) => (
     <div className="li"><span className="grow"><div className="t">{t}</div>{d && <div className="d">{d}</div>}</span>{children}</div>
@@ -74,15 +73,12 @@ export default function Settings() {
       </div>
 
       <div className="section-title"><h2>Backup</h2></div>
-      <div className="card">
-        <div className="sm mu">Progress is saved on this phone only. Copy the backup text somewhere safe (notes, email to yourself) and paste it back after reinstalling.</div>
-        <div className="row mt12">
-          <button className="btn sm grow" onClick={async () => { const t = exportAll(); setBackup(t); try { await navigator.clipboard.writeText(t); toast("Backup copied to clipboard", "ok"); } catch { toast("Select and copy the text below"); } }}><Download size={15} /> Export</button>
-          <button className="btn sm grow" onClick={() => { try { importAll(backup); toast("Progress restored", "ok"); } catch { toast("That backup text is not valid", "warn"); } }} disabled={!backup.trim()}><Upload size={15} /> Import</button>
-        </div>
-        <textarea value={backup} onChange={(e) => setBackup(e.target.value)} placeholder="Backup text appears here, or paste one to import" style={{ width: "100%", minHeight: 70, marginTop: 10, borderRadius: 12, border: 0, boxShadow: "inset 0 0 0 1px var(--line)", background: "var(--surface-2)", padding: 10, fontSize: 11, fontFamily: "monospace" }} />
-        {!confirm ? <button className="btn ghost block mt12" style={{ color: "var(--shu)" }} onClick={() => setConfirm(true)}><RotateCcw size={15} /> Reset all progress</button>
-          : <div className="row mt12"><button className="btn grow" onClick={() => setConfirm(false)}>Cancel</button><button className="btn primary grow" onClick={async () => { await deleteMedia(); resetProgress(); setConfirm(false); toast("Progress, recordings and drawings reset"); }}>Yes, reset</button></div>}
+      <button className="card tap" onClick={() => go("/me/backup")}>
+        <div className="row"><Download size={22} color="var(--ai)" /><div className="grow"><div style={{ fontWeight: 800 }}>Backup & restore</div><div className="xs mu">{s.backup.last ? "Last: " + new Date(s.backup.last).toLocaleString() : "No backup yet"} · auto: {s.backup.auto}</div></div></div>
+      </button>
+      <div className="card mt12">
+        {!confirm ? <button className="btn ghost block" style={{ color: "var(--shu)" }} onClick={() => setConfirm(true)}><RotateCcw size={15} /> Reset all progress</button>
+          : <div className="col"><div className="sm" style={{ color: "var(--shu)", fontWeight: 700 }}>Reset progress, recordings and drawings? Settings stay.</div><div className="row"><button className="btn grow" onClick={() => setConfirm(false)}>Cancel</button><button className="btn primary grow" onClick={async () => { await deleteMedia(); resetProgress(); setConfirm(false); toast("Progress, recordings and drawings reset"); }}>Yes, reset</button></div></div>}
       </div>
 
       <div className="section-title"><h2>What’s inside</h2><span className="mu">{pk.name} pack</span></div>

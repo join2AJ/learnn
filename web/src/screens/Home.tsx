@@ -10,6 +10,7 @@ import { usePack } from "../pack";
 import { Bar, Jp, Ring, Say, tap } from "../ui/kit";
 import { RecBtn } from "../ui/VoiceCompare";
 import { Icon, IconTile, LangPill } from "../ui/icons";
+import { HlJp, HlRo } from "../ui/Highlight";
 
 const hash = (s: string) => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
 
@@ -100,11 +101,11 @@ export default function Home() {
         <div className="divider" />
         <div className="row top">
           <div className="grow">
-            <div className="jp" style={{ fontSize: 17 }}>{wotd.s}</div>
-            {s.showRomaji && <div className="xs mu2">{wotd.sr}</div>}
+            <div className="jp" style={{ fontSize: 17 }}><HlJp text={wotd.s} word={wotd} /></div>
+            {s.showRomaji && <div className="xs mu2"><HlRo text={wotd.sr} word={wotd} /></div>}
             <div className="sm mu">{wotd.st}</div>
           </div>
-          <Say text={wotd.s} size="s" />
+          <div className="row gap6"><Say text={wotd.s} size="s" /><RecBtn text={wotd.s} ro={wotd.sr} en={wotd.st} /></div>
         </div>
       </div>
 

@@ -1,6 +1,12 @@
 /** Shown once after each update ("What's new"). Newest first. */
-export const APP_VERSION = "2.8";
+export const APP_VERSION = "2.9";
 export const CHANGELOG: { v: string; date: string; items: [string, string][] }[] = [
+  { v: "2.9", date: "16 Nov 2026", items: [
+    ["layers", "Backup & restore: save a backup file to Downloads/NihongoPath (survives uninstall), restore from a file, optionally include recordings and drawings."],
+    ["timer", "Automatic backup every day or every week at a time you choose, with a reminder notification."],
+    ["mic", "Word of the day: record button on the example sentence too."],
+    ["shield", "Privacy screen: “Back up first” link and tidier delete buttons."],
+  ] },
   { v: "2.8", date: "16 Nov 2026", items: [
     ["book", "2,000 words (was 1,000) with Hindi - all ordered by how often they are spoken, with a “how common” meter (e.g. heard about 1 in 23 words)."],
     ["chat", "Sentence bank: 3,200 real sentences, simplest first, filter by top-100 / 300 / 600 / 1,000 / 2,000 words."],

@@ -17,6 +17,10 @@ interface NativeApi {
   appVersion(): string;
   setTheme?(dark: boolean): void;
   recordAndRecognize?(lang: string, ms: number, id: string): void;
+  saveBackup?(name: string, content: string): string;
+  scheduleBackup?(hour: number, minute: number, weekday: number): void;
+  cancelBackup?(): void;
+  takeAction?(): string;
 }
 
 declare global {
@@ -25,6 +29,7 @@ declare global {
     __nativeTts?: (e: { type: string; id: string }) => void;
     __nativeSpeech?: (e: { type: string; texts?: string[]; error?: string }) => void;
     __nativePerm?: (granted: boolean) => void;
+    __nativeAction?: () => void;
     __nativeCapture?: (e: { id: string; type: string; pcm?: string; texts?: string[]; error?: string }) => void;
     webkitSpeechRecognition?: any;
     SpeechRecognition?: any;
@@ -195,3 +200,17 @@ export function captureNative(lang: string, ms: number): Promise<Capture> {
   });
 }
 export const asrUnsupported = (c: Capture) => c.texts === null && (!c.asrError || UNSUPPORTED.has(c.asrError));
+
+/* ---------------- backups ---------------- */
+export const nativeBackup = () => !!N()?.saveBackup;
+export function saveBackupFile(name: string, content: string): string {
+  const n = N();
+  if (n?.saveBackup) return n.saveBackup(name, content);
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([content], { type: "application/json" })); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  return "Downloads/" + name;
+}
+export const scheduleBackupReminder = (h: number, m: number, weekday: number) => N()?.scheduleBackup?.(h, m, weekday);
+export const cancelBackupReminder = () => N()?.cancelBackup?.();
+export const takeNativeAction = () => { try { return N()?.takeAction?.() || ""; } catch { return ""; } };

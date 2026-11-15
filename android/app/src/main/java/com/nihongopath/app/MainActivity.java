@@ -12,6 +12,13 @@ import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.util.Base64;
+import android.content.ContentValues;
+import android.provider.MediaStore;
+import android.os.Environment;
+import android.webkit.ValueCallback;
+import java.io.File;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
@@ -61,6 +68,9 @@ public class MainActivity extends Activity {
     private PermissionRequest pendingWebPermission = null;
     private String[] pendingCapture = null; // lang, ms, id
     private SpeechRecognizer captureRecognizer;
+    private String pendingAction = null;
+    private ValueCallback<Uri[]> fileCallback = null;
+    private static final int REQ_FILE = 20, REQ_NOTIF = 21;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +124,14 @@ public class MainActivity extends Activity {
         });
         web.setWebChromeClient(new WebChromeClient() {
             @Override
+            public boolean onShowFileChooser(WebView v, ValueCallback<Uri[]> cb, FileChooserParams params) {
+                if (fileCallback != null) fileCallback.onReceiveValue(null);
+                fileCallback = cb;
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*");
+                try { startActivityForResult(i, REQ_FILE); } catch (Exception e) { fileCallback = null; return false; }
+                return true;
+            }
+            @Override
             public void onPermissionRequest(final PermissionRequest request) {
                 runOnUiThread(() -> {
                     boolean wantsAudio = false;
@@ -126,6 +144,7 @@ public class MainActivity extends Activity {
         });
         web.addJavascriptInterface(new Bridge(), "Native");
         setContentView(web);
+        pendingAction = getIntent() != null ? getIntent().getStringExtra("action") : null;
         if (savedInstanceState != null) web.restoreState(savedInstanceState);
         else web.loadUrl(START);
     }
@@ -164,6 +183,39 @@ public class MainActivity extends Activity {
         @JavascriptInterface public void stopListening() { runOnUiThread(() -> { if (recognizer != null) recognizer.stopListening(); }); }
         /** Record ms of audio once; send the PCM to JS and (Android 13+) feed the same audio to speech recognition. */
         @JavascriptInterface public void recordAndRecognize(String lang, int ms, String id) { runOnUiThread(() -> startCapture(lang, ms, id)); }
+        /** Save text to Downloads/NihongoPath (survives uninstall). Returns where it was saved or "error:…". */
+        @JavascriptInterface
+        public String saveBackup(String name, String content) {
+            try {
+                byte[] data = content.getBytes(StandardCharsets.UTF_8);
+                if (Build.VERSION.SDK_INT >= 29) {
+                    ContentValues v = new ContentValues();
+                    v.put(MediaStore.Downloads.DISPLAY_NAME, name);
+                    v.put(MediaStore.Downloads.MIME_TYPE, "application/json");
+                    v.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/NihongoPath");
+                    Uri uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, v);
+                    if (uri == null) return "error:could not create file";
+                    try (OutputStream o = getContentResolver().openOutputStream(uri)) { o.write(data); }
+                    return "Downloads/NihongoPath/" + name;
+                } else {
+                    File dir = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "NihongoPath");
+                    dir.mkdirs();
+                    File f = new File(dir, name);
+                    try (java.io.FileOutputStream o = new java.io.FileOutputStream(f)) { o.write(data); }
+                    return f.getAbsolutePath();
+                }
+            } catch (Exception e) { return "error:" + e.getMessage(); }
+        }
+        /** Daily (weekday = -1) or weekly (1 = Sunday … 7 = Saturday) backup reminder at hour:minute. */
+        @JavascriptInterface
+        public void scheduleBackup(int hour, int minute, int weekday) {
+            BackupReminder.schedule(MainActivity.this, hour, minute, weekday);
+            if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission("android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED)
+                runOnUiThread(() -> requestPermissions(new String[]{"android.permission.POST_NOTIFICATIONS"}, REQ_NOTIF));
+        }
+        @JavascriptInterface public void cancelBackup() { BackupReminder.cancel(MainActivity.this); }
+        /** One-shot action from a notification tap (e.g. "backup"). */
+        @JavascriptInterface public String takeAction() { String a = pendingAction; pendingAction = null; return a == null ? "" : a; }
         @JavascriptInterface public boolean hasMic() { return hasMicPermission(); }
         @JavascriptInterface public void requestMic() { runOnUiThread(() -> askMic(REQ_MIC_JS)); }
         @JavascriptInterface
@@ -353,6 +405,22 @@ public class MainActivity extends Activity {
         catch (ActivityNotFoundException ignored) { }
     }
     private void js(final String code) { runOnUiThread(() -> { if (web != null) web.evaluateJavascript(code, null); }); }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        String a = intent.getStringExtra("action");
+        if (a != null) { pendingAction = a; js("window.__nativeAction&&window.__nativeAction()"); }
+    }
+    @Override
+    protected void onActivityResult(int req, int res, Intent data) {
+        super.onActivityResult(req, res, data);
+        if (req == REQ_FILE && fileCallback != null) {
+            Uri u = (res == RESULT_OK && data != null) ? data.getData() : null;
+            fileCallback.onReceiveValue(u == null ? null : new Uri[]{u});
+            fileCallback = null;
+        }
+    }
 
     @Override
     public void onBackPressed() {

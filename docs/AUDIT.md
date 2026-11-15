@@ -14,7 +14,7 @@ The real risks are in **release and key management, personal data of minors, thi
 
 | Priority | Finding | Fix effort |
 |---|---|---|
-| 🔴 High | The APK signing key and its password are committed to the repository | 1 hour + one-time re-install for current users |
+| 🔴 High (risk accepted) | The APK signing key and its password are committed to the repository. The owner chose to keep it for now so updates install over existing versions. Revisit before publishing on Play (use Play App Signing with a new upload key) | 1 hour + one-time re-install |
 | 🔴 High | Age is collected, including "Under 13" / "13–17", and voice recordings are stored - children's data rules (India DPDP Act 2023, COPPA, GDPR-K) | Fixed partly in 2.8; finish with a privacy policy |
 | 🟠 Medium | No published privacy policy / licence notice - required for the Play Store and for CC BY-SA data (KanjiVG, JMdict, wordfreq) | 2–3 hours |
 | ✅ Fixed in 2.8 | Voice recordings were included in Android cloud backup | done |
@@ -112,6 +112,30 @@ Maturity tiers: 1 Partial · 2 Risk-informed · 3 Repeatable · 4 Adaptive.
 | Handwriting strokes + scores | IndexedDB `np-writing` | No (excluded from cloud backup) | Same | Same |
 | Speech for recognition | Google speech service on the phone | **Yes - may be processed by Google** | Google's policy | Not under app control - disclose |
 | Exported backup text | Wherever the learner pastes it | Learner's choice | Learner's choice | Learner |
+
+---
+
+## 6a. India DPDP Act 2023 and EU GDPR
+
+**Who is the "data fiduciary" / "controller"?** You, as the app's publisher, decide *why* and *how* the app processes personal data (name, age range, goals, voice, handwriting). That holds even though the data never reaches you. Because everything stays on the device and you never receive it, most heavy obligations (breach reporting, Data Protection Officer, transfers) are light or not triggered. Transparency, consent, children's rules and the right to erasure still apply to how the app is designed.
+
+| Requirement | DPDP Act 2023 (+ DPDP Rules) | GDPR | Status in 2.9 | To do |
+|---|---|---|---|---|
+| Lawful basis | Consent or "legitimate uses" (§4, §6–7) | Art. 6 - consent or legitimate interest | Learner chooses to enter data; nothing is sent to the developer | Short consent line on the profile step: "Stored only on this phone - you can delete it any time" |
+| Notice | Itemised notice of data and purpose, in English or an Eighth-Schedule language on request (§5) | Art. 13 information | ✅ In-app *Privacy & your data* screen | Publish the same text as a privacy-policy URL (Play needs one); add a Hindi version |
+| Purpose & data minimisation | Only data needed for the purpose (§4, §6) | Art. 5(1)(b,c) | ✅ Age is optional (2.9); no contacts, location or IDs | Remove "age" entirely if it isn't used for anything important |
+| Children | Under 18 = child: **verifiable parental consent**, no tracking, behavioural monitoring or targeted ads (§9) | Art. 8 - parental consent for information-society services under 16 (13–16 by country) | ⚠️ Age option includes "Under 13" / "13–17"; no tracking, no ads ✅ | If a learner picks an under-18 age, show a parent-consent step before voice recording (a "parent confirms" checkbox is reasonable for on-device-only data), or keep under-18 mode without saved recordings |
+| Special / sensitive data | Not separately defined in DPDP | Voice used to *identify* someone = biometric (Art. 9); voice for feedback only is ordinary personal data | ✅ Voice is used only for pronunciation feedback, never for identification | Say so in the policy |
+| Rights: access, correction, erasure | §11–13 | Art. 15–17, 20 (portability) | ✅ View in app, export file (portability), delete recordings, delete everything | Mention the rights and how to use them in the policy |
+| Grievance redressal | Contact for grievances (§13, Rules) | Contact for the controller (Art. 13) | ❌ No contact shown | Add a support email in Settings → About and in the policy |
+| Security safeguards | Reasonable safeguards (§8(5)) | Art. 32 | ✅ App-private storage, no network backend, recordings excluded from cloud backup | Consider encrypting exported backup files with a password |
+| Processors / third parties | Data processors under contract (§8(2)) | Art. 28 | Google speech recognition is the phone's own service, chosen by the user's device settings | Disclose it (done in-app); prefer on-device recognition where offered |
+| Cross-border transfer | Allowed except to countries the government restricts (§16) | Chapter V | Only via Google speech (Google's terms) | Disclose |
+| Breach notification | To the Data Protection Board and affected people (§8(6)) | Art. 33–34 (72 h) | No central data, so a breach would be device-level | Keep a simple incident note in `SECURITY.md` |
+| Retention | Erase when the purpose ends or consent is withdrawn (§8(7)) | Art. 5(1)(e) | Data stays until the learner deletes it or uninstalls | Optional "delete recordings older than N months" setting |
+| Analytics / crash reports (future) | Needs consent; no tracking of children | Consent (ePrivacy) | None today ✅ | If added: opt-in, anonymous, off for under-18 |
+
+**Bottom line:** the on-device design already gives you a strong position under both laws. The remaining gaps are paperwork and children's handling: a public privacy policy with a grievance contact, a consent line, and a parent-consent step (or reduced features) for learners under 18.
 
 ---
 

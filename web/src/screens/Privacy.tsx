@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { HardDrive, Mic, ShieldCheck, Trash2, Wifi } from "lucide-react";
+import { Download, HardDrive, Mic, ShieldCheck, Trash2, Wifi } from "lucide-react";
+import { go } from "../core/router";
 import { deleteAllData, deleteMedia } from "../core/privacy";
 import { updateProgress, toast } from "../core/store";
 import { Header } from "../ui/kit";
@@ -23,15 +24,18 @@ export default function Privacy() {
         <Row icon={<HardDrive size={19} />} t="Phone backups" d="If Android backup is on, your progress and settings can be restored on a new phone. Voice recordings and drawings are never included in cloud backups." />
       </div>
       <div className="section-title"><h2>Delete</h2></div>
+      <button className="card tap soft-ai" style={{ boxShadow: "none", marginBottom: 12 }} onClick={() => go("/me/backup")}>
+        <div className="row"><Download size={20} color="var(--ai)" /><div className="grow"><div style={{ fontWeight: 800 }}>Back up first</div><div className="xs mu">Save your progress to a file before deleting anything</div></div></div>
+      </button>
       <div className="card">
         {confirm === "media" ? (
-          <div className="row"><button className="btn grow" onClick={() => setConfirm("")}>Cancel</button><button className="btn grow" style={{ background: "var(--shu)", color: "#fff" }} onClick={async () => { await deleteMedia(); updateProgress((p) => { p.voiceLog = []; p.writeLog = {}; }); setConfirm(""); toast("Recordings and drawings deleted", "ok"); }}>Delete recordings & drawings</button></div>
-        ) : <button className="btn block" onClick={() => setConfirm("media")}><Trash2 size={16} /> Delete all voice recordings & drawings</button>}
+          <div className="col"><div className="sm" style={{ fontWeight: 700 }}>Delete every voice recording and drawing?</div><div className="row"><button className="btn grow" onClick={() => setConfirm("")}>Cancel</button><button className="btn grow" style={{ background: "var(--shu)", color: "#fff" }} onClick={async () => { await deleteMedia(); updateProgress((p) => { p.voiceLog = []; p.writeLog = {}; }); setConfirm(""); toast("Recordings and drawings deleted", "ok"); }}>Yes, delete</button></div></div>
+        ) : <button className="btn block" style={{ whiteSpace: "normal", height: "auto", minHeight: 46, padding: "10px 14px" }} onClick={() => setConfirm("media")}><Trash2 size={16} /> Delete recordings & drawings</button>}
         <div className="divider" />
         {confirm === "all" ? (
           <div><div className="sm" style={{ fontWeight: 700, color: "var(--shu)" }}>This erases everything - progress, XP, pledge, recordings, drawings, settings. It can’t be undone. Export a backup first if you might want it.</div>
-            <div className="row mt12"><button className="btn grow" onClick={() => setConfirm("")}>Cancel</button><button className="btn grow" style={{ background: "var(--shu)", color: "#fff" }} onClick={async () => { await deleteAllData(); location.hash = "#/"; location.reload(); }}>Erase everything</button></div></div>
-        ) : <button className="btn ghost block" style={{ color: "var(--shu)" }} onClick={() => setConfirm("all")}><Trash2 size={16} /> Delete ALL my data from this phone</button>}
+            <div className="row mt12"><button className="btn grow" onClick={() => setConfirm("")}>Cancel</button><button className="btn grow" style={{ background: "var(--shu)", color: "#fff" }} onClick={async () => { await deleteAllData(); location.hash = "#/"; location.reload(); }}>Yes, erase</button></div></div>
+        ) : <button className="btn ghost block" style={{ color: "var(--shu)", whiteSpace: "normal", height: "auto", minHeight: 46, padding: "10px 14px" }} onClick={() => setConfirm("all")}><Trash2 size={16} /> Delete ALL my data</button>}
       </div>
       <div className="xs mu mt12" style={{ lineHeight: 1.5 }}>Uninstalling the app also deletes all of its data. Questions: contact the developer listed on the download page.</div>
     </div>

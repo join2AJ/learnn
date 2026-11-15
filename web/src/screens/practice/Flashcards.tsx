@@ -12,6 +12,7 @@ import { RecBtn } from "../../ui/VoiceCompare";
 import { FreqMeter } from "../../core/freq";
 import type { Word } from "../../core/types";
 import { Icon } from "../../ui/icons";
+import { HlJp, HlRo } from "../../ui/Highlight";
 
 const DECKS = [
   { id: "words", top: "Words", sub: "शब्द", name: "Words (2,000 core)", en: "the most-spoken Japanese words, most frequent first, with meaning and an example sentence.", hi: "सबसे ज़्यादा बोले जाने वाले 2,000 जापानी शब्द - अर्थ और वाक्य के साथ।" },
@@ -119,7 +120,7 @@ export default function Flashcards({ deck }: { deck: string }) {
               {card.word && <div className="mt4"><FreqMeter w={card.word} /></div>}
               <div className="divider" style={{ width: "100%" }} />
               <div className="row" style={{ textAlign: "left", width: "100%" }}>
-                <div className="grow"><div className="jp" style={{ fontSize: 16 }}>{card.s}</div>{s.showRomaji && <div className="xs mu2">{card.sr}</div>}<div className="xs mu">{card.st}</div></div>
+                <div className="grow"><div className="jp" style={{ fontSize: 16 }}>{card.word ? <HlJp text={card.s!} word={card.word} /> : card.s}</div>{s.showRomaji && <div className="xs mu2">{card.word ? <HlRo text={card.sr!} word={card.word} /> : card.sr}</div>}<div className="xs mu">{card.st}</div></div>
                 <Say text={card.s!} size="s" />
               </div>
             </>) : (<>

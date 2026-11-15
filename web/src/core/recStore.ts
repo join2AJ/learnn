@@ -62,6 +62,10 @@ export async function getRec(t: number): Promise<StoredRec | undefined> {
   try { r = await tx("readonly", (s) => s.get(t) as IDBRequest<StoredRec | undefined>); } catch { /* fall through */ }
   return r || lsGet(t);
 }
+export async function allRecs(): Promise<StoredRec[]> { try { return await tx("readonly", (s) => s.getAll() as IDBRequest<StoredRec[]>); } catch { return []; } }
+export async function putRec(r: StoredRec) { try { await tx("readwrite", (s) => s.put(r)); } catch { /* ignore */ } }
+export const pcmToB64 = (b: ArrayBuffer) => b64(b);
+export const b64ToPcm = (s: string) => unb64(s);
 export async function deleteRec(t: number) { try { await tx("readwrite", (s) => s.delete(t)); } catch { /* ignore */ } try { localStorage.removeItem(LK(t)); } catch { /* ignore */ } }
 export async function savedKeys(): Promise<Set<number>> {
   const out = new Set<number>();

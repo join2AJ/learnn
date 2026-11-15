@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { BookOpen, Compass, Dumbbell, Home as HomeIcon, User } from "lucide-react";
 import { go, sectionOf, useRoute } from "./core/router";
-import { onUi, setSettings, toast, UiEvent, useProgress, useSettings } from "./core/store";
+import { getSettings, onUi, setSettings, toast, UiEvent, useProgress, useSettings } from "./core/store";
 import { setSection, startTracker } from "./core/timeTracker";
-import { setNativeTheme, setWarn, speak } from "./core/native";
+import { setNativeTheme, setWarn, speak, takeNativeAction } from "./core/native";
+import { backupDue, backupNow } from "./core/backup";
 import { Confetti, Sheet, tap } from "./ui/kit";
 import VoiceCompare from "./ui/VoiceCompare";
 import Tour from "./screens/Tour";
@@ -40,7 +41,20 @@ export default function App() {
   const [tour, setTour] = useState(false);
   const [news, setNews] = useState(false);
 
-  useEffect(() => { startTracker(); setWarn((m) => toast(m, "warn")); }, []);
+  useEffect(() => {
+    startTracker(); setWarn((m) => toast(m, "warn"));
+    // scheduled backup: run when a slot was missed, or when the reminder notification was tapped
+    const run = async (force: boolean) => {
+      if (!getSettings().onboarded) return;
+      if (!force && !backupDue()) return;
+      try { const where = await backupNow(); toast("Backup saved to " + where, "ok"); } catch (e) { toast("Automatic backup failed: " + (e as Error).message, "warn"); }
+    };
+    const check = () => { if (document.visibilityState === "visible") run(takeNativeAction() === "backup"); };
+    window.__nativeAction = () => run(takeNativeAction() === "backup" || true);
+    const t = window.setTimeout(check, 2500);
+    document.addEventListener("visibilitychange", check);
+    return () => { clearTimeout(t); document.removeEventListener("visibilitychange", check); };
+  }, []);
   useEffect(() => { setSection(sectionOf(route.parts)); window.scrollTo(0, 0); setVoice(null); }, [route.path]);
 
   // theme

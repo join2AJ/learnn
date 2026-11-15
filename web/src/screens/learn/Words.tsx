@@ -8,6 +8,7 @@ import { Header, Say, tap } from "../../ui/kit";
 import { RecBtn } from "../../ui/VoiceCompare";
 import { FreqMeter, freqInfo } from "../../core/freq";
 import { Icon } from "../../ui/icons";
+import { HlJp, HlRo } from "../../ui/Highlight";
 
 const TIERS: [string, number, number][] = [["All", 1, 2000], ["1–100", 1, 100], ["101–300", 101, 300], ["301–600", 301, 600], ["601–1000", 601, 1000], ["1001–2000", 1001, 2000]];
 const TYPE_COL: Record<string, string> = { verb: "var(--ai)", noun: "var(--matcha)", "i-adj": "var(--gold)", "na-adj": "var(--gold)", adverb: "var(--shu)", pron: "var(--plum)", num: "var(--ai)" };
@@ -95,7 +96,7 @@ export default function Words() {
             <div className="xs mu2">{freqInfo(w).oneIn ? "Heard about 1 in " + freqInfo(w).oneIn.toLocaleString() + " words in everyday Japanese" : ""}</div>
             <div style={{ fontWeight: 700, marginTop: 2 }}>{w.m}{s.showHindi && <span className="hi" style={{ fontWeight: 500 }}> · {w.h}</span>}</div>
             <div className="ex" style={{ paddingBottom: 4 }}>
-              <div className="grow"><div className="j" style={{ fontSize: 17 }}>{w.s}</div>{s.showRomaji && <div className="r">{w.sr}</div>}<div className="e mu">{w.st}</div></div>
+              <div className="grow"><div className="j" style={{ fontSize: 17 }}><HlJp text={w.s} word={w} /></div>{s.showRomaji && <div className="r"><HlRo text={w.sr} word={w} /></div>}<div className="e mu">{w.st}</div></div>
               <Say text={w.s} size="s" />
             </div>
             {(w.p || w.k) && <div className="xs mu row top gap4"><Icon name="bulb" size={13} color="var(--gold)" /><span>{[w.p, w.k].filter(Boolean).join(" · ")}</span></div>}
