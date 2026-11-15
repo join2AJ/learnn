@@ -9,7 +9,7 @@ const { chromium } = require('playwright');
   const list = only ? only.split(',').map(Number) : Array.from({ length: N }, (_, i) => i / F);
   for (let i = 0; i < list.length; i++) {
     await pg.evaluate((t) => window.render(t), list[i]);
-    await pg.screenshot({ path: `${out}/${String(i).padStart(5, '0')}.jpg`, type: 'jpeg', quality: 92 });
+    await pg.screenshot({ path: `${out}/${String(only ? Math.round(list[i] * F) : i).padStart(5, '0')}.jpg`, type: 'jpeg', quality: 92 });
   }
   await b.close();
 })();

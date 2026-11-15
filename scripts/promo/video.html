@@ -16,7 +16,9 @@
   .chip { background: #fff; color: #1d1d22; border-radius: 999px; padding: 10px 16px; font-weight: 800; font-size: 17px; box-shadow: 0 10px 24px rgba(0,0,0,.25); }
   .petal { position: absolute; width: 14px; height: 11px; border-radius: 14px 0 14px 0; background: rgba(255,214,226,.7); }
   .photo { position: absolute; inset: 0; overflow: hidden; opacity: 0; }
-  .photo img { position: absolute; width: 100%; height: 100%; object-fit: cover; }
+  .pblur { position: absolute; inset: -40px; background-size: cover; background-position: center; filter: blur(28px) brightness(.7) saturate(1.2); }
+  .photo img.pcard { position: absolute; left: 50%; top: 50%; width: 310px; height: auto; border-radius: 22px; box-shadow: 0 30px 70px rgba(0,0,0,.55), 0 0 0 6px rgba(255,255,255,.95); transform-origin: 50% 50%; }
+  .photo img:not(.pcard) { position: absolute; top: 0; left: 0; height: 100%; width: auto; max-width: none; image-rendering: high-quality; }
   .stat { position: absolute; left: 40px; right: 40px; display: flex; align-items: baseline; gap: 14px; }
   .stat b { font-size: 60px; font-weight: 900; letter-spacing: -.03em; min-width: 210px; text-align: right; }
   .stat span { font-size: 24px; font-weight: 700; opacity: .9; }
@@ -45,10 +47,10 @@
 
 <!-- S5 photos -->
 <div class="layer" id="s5">
-  <div class="photo" id="p0"><img src="a/fuji.webp"></div>
-  <div class="photo" id="p1"><img src="a/inari.webp"></div>
-  <div class="photo" id="p2"><img src="a/kinkaku.webp"></div>
-  <div class="photo" id="p3"><img src="a/shibuya.webp"></div>
+  <div class="photo" id="p0"><img src="a/fuji.jpg"></div>
+  <div class="photo" id="p1"><img src="a/inari.jpg"></div>
+  <div class="photo" id="p2"><div class="pblur" style="background-image:url(a/kinkaku.jpg)"></div><img class="pcard" src="a/kinkaku.jpg"></div>
+  <div class="photo" id="p3"><div class="pblur" style="background-image:url(a/shibuya.jpg)"></div><img class="pcard" style="width:370px" src="a/shibuya.jpg"></div>
   <div style="position:absolute;inset:0;z-index:5;background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,0) 40%,rgba(0,0,0,0) 60%,rgba(0,0,0,.65))"></div>
   <div class="cap" style="top:110px;z-index:6"><div class="kick">Discover Japan</div><div class="title" id="s5title" style="font-size:48px">See the places behind the words</div></div>
   <div id="s5label" style="z-index:6;position:absolute;left:36px;bottom:110px;font-size:30px;font-weight:800"></div>
@@ -108,6 +110,7 @@ $("kana").innerHTML = KANA.map(([k, r], i) => `<div id="k${i}" style="position:a
 const STATS = [["2,000", "most-spoken words"], ["5,000+", "example sentences"], ["104", "kana with stroke order"], ["25", "grammar lessons"], ["47", "prefectures on the map"], ["0", "ads · 100% offline"]];
 $("stats").innerHTML = STATS.map(([n, l], i) => `<div class="stat" id="st${i}" style="top:${300 + i * 92}px"><b id="stn${i}">${n}</b><span>${l}</span></div>`).join("");
 $("pills").innerHTML = ["English", "हिन्दी", "日本語"].map((p) => `<span class="chip" style="font-size:18px">${p}</span>`).join("");
+const PAN = [[0.35, 0.55], [0.55, 0.35], [0.3, 0.5], [0.6, 0.4]];
 const PH = [["Mount Fuji", "富士山"], ["Fushimi Inari, Kyoto", "伏見稲荷大社"], ["Kinkaku-ji, Kyoto", "金閣寺"], ["Shibuya, Tokyo", "渋谷"]];
 
 function render(t) {
@@ -162,7 +165,8 @@ function render(t) {
   // S5 photos: 4 x 1.2s ken burns
   { const lt = t - S.s5[0]; const n = Math.max(0, Math.min(3, Math.floor(lt / 1.2)));
     for (let i = 0; i < 4; i++) { const p = $("p" + i); const pl = lt - i * 1.2; p.style.opacity = i === n ? clamp(pl / 0.25) : i < n ? 1 : 0; p.style.zIndex = i;
-      p.querySelector("img").style.transform = `scale(${1.08 + 0.1 * clamp(pl / 1.6)}) translateX(${(i % 2 ? -1 : 1) * 12 * clamp(pl / 1.6)}px)`; }
+      const im = p.querySelector("img"); if (im.classList.contains("pcard")) { const e = eo((pl + 0.2) / 0.7); im.style.transform = `translate(-50%, -50%) rotate(${(i % 2 ? 3 : -3) * (1 - 0.4 * e)}deg) scale(${0.9 + 0.1 * e})`; continue; } const w = 960 * (im.naturalWidth / im.naturalHeight || 1.5); const span = Math.max(0, w - 540); const c0 = PAN[i][0] * span, c1 = PAN[i][1] * span; const e = clamp((pl + 0.3) / 1.8);
+      im.style.transform = `translateX(${-(c0 + (c1 - c0) * e)}px) scale(${1 + 0.025 * e})`; im.style.transformOrigin = "50% 50%"; }
     $("s5label").textContent = PH[n][0]; $("s5jp").textContent = PH[n][1];
     const tt = eo(lt / 0.6); $("s5title").parentElement.style.opacity = tt; }
   // S7 stats count up
