@@ -1,3 +1,4 @@
+import { getSection } from "./timeTracker";
 import { bumpDay, dayKey, emitUi, getProgress, getSettings, Progress, today, updateProgress } from "./store";
 import { vibrate } from "./native";
 
@@ -83,9 +84,11 @@ export function pledgeStatus(p: Progress) {
 export function award(xp: number, f?: (p: Progress) => void) {
   const before = getProgress();
   const lvBefore = levelOf(before.xp).level;
+  const src = getSection();
   updateProgress((p) => {
+    if (p.xpTrackedFrom == null) p.xpTrackedFrom = p.xp;
     p.xp += xp;
-    bumpDay(p, (d) => { d.xp += xp; });
+    bumpDay(p, (d) => { d.xp += xp; d.xpBy = { ...(d.xpBy || {}), [src]: (d.xpBy?.[src] || 0) + xp }; });
     f?.(p);
     touchStreak(p);
   });
@@ -93,6 +96,7 @@ export function award(xp: number, f?: (p: Progress) => void) {
   const after = getProgress();
   const lv = levelOf(after.xp).level;
   if (lv > lvBefore) {
+    updateProgress((p) => { p.levelUps = { ...(p.levelUps || {}) }; for (let l = lvBefore + 1; l <= lv; l++) p.levelUps[l] = Date.now(); });
     if (getSettings().haptics) vibrate(40);
     emitUi({ type: "celebrate", title: "Level " + lv + "!", sub: "You levelled up. Keep the momentum going.", jp: "レベルアップ！", icon: "star" });
   }

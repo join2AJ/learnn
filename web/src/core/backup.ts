@@ -1,7 +1,7 @@
 import { exportAll, getSettings, importAll, setSettings } from "./store";
 import { allRecs, b64ToPcm, pcmToB64, putRec } from "./recStore";
 import { allWrites, saveWrite, WriteRec } from "./writeStore";
-import { saveBackupFile } from "./native";
+import { saveBackupFile, writeCloud } from "./native";
 import { APP_VERSION } from "../changelog";
 
 /** Full backup as JSON text. Recordings/drawings are optional because they can be large. */
@@ -31,8 +31,10 @@ export async function restoreBackup(text: string): Promise<{ recordings: number;
 export async function backupNow(media = getSettings().backup.media): Promise<string> {
   const d = new Date(), z = (n: number) => String(n).padStart(2, "0");
   const name = `nihongo-path-backup-${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}.json`;
-  const where = saveBackupFile(name, await buildBackup(media));
+  const data = await buildBackup(media);
+  const where = saveBackupFile(name, data);
   if (where.startsWith("error:")) throw new Error(where.slice(6));
+  if (getSettings().backup.cloud) { const r = writeCloud(data); if (r !== "ok" && r !== "none") console.warn("cloud backup", r); }
   setSettings({ backup: { ...getSettings().backup, last: Date.now(), where } });
   return where;
 }
@@ -57,4 +59,9 @@ export function nextBackupText() {
   if (b.auto === "off") return "";
   const t = new Date(lastSlot(b)); t.setDate(t.getDate() + (b.auto === "daily" ? 1 : 7));
   return t.toLocaleString(undefined, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+}
+
+export function backupName() {
+  const d = new Date(), z = (n: number) => String(n).padStart(2, "0");
+  return `nihongo-path-backup-${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}.json`;
 }

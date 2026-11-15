@@ -7,13 +7,14 @@ import { BADGE_HOW, BADGES, goalStreak, HIRA46, KATA46, levelOf, masteredSet, pl
 import { emitUi } from "../core/store";
 import { pendingMs } from "../core/timeTracker";
 import { usePack } from "../pack";
-import { Bar, fmtMin, Header, Ring, Seg, Sheet } from "../ui/kit";
+import { Bar, fmtMin, Fold, Header, Ring, Seg, Sheet } from "../ui/kit";
 import Settings from "./Settings";
 import Recordings from "./Recordings";
 import MyWriting from "./MyWriting";
 import Privacy from "./Privacy";
 import Backup from "./Backup";
 import About, { BuildApp } from "./About";
+import LevelDetail from "./LevelDetail";
 import Support from "./Support";
 import PolicyText from "./PolicyText";
 import { Icon, IconTile } from "../ui/icons";
@@ -33,6 +34,7 @@ export default function Me({ route }: { route: Route }) {
   if (route.parts[1] === "support") return <Support />;
   if (route.parts[1] === "about") return <About />;
   if (route.parts[1] === "build") return <BuildApp />;
+  if (route.parts[1] === "level") return <LevelDetail />;
   if (route.parts[1] === "licenses") return <div className="screen"><Header title="Licences" backTo="/me/settings" /><div className="card xs mu" style={{ lineHeight: 1.8 }}>
     KanjiVG © Ulrich Apel, CC BY-SA 3.0<br />JMdict © EDRDG, CC BY-SA 4.0<br />wordfreq, CC BY-SA 4.0<br />Tatoeba, CC BY 2.0 FR<br />地球地図日本 © GSI<br />Photos: Wikimedia Commons (per photo)
   </div></div>;
@@ -67,7 +69,7 @@ function Stats() {
     <div className="screen">
       <Header title={s.name || "Your progress"} sub={"Studying since " + new Date(p.started).toLocaleDateString()} right={<button className="icon-btn" aria-label="Settings" onClick={() => go("/me/settings")}><Cog size={20} /></button>} />
 
-      <div className="card hero tint-ink">
+      <button className="card hero tint-ink tap" style={{ textAlign: "left", width: "100%" }} onClick={() => go("/me/level")}>
         <div className="row gap16">
           <Ring pct={lv.pct} size={92} stroke={9} color="#f1bd55" track="rgba(255,255,255,.14)">
             <div><div style={{ fontSize: 11, opacity: .7 }}>LEVEL</div><div style={{ fontSize: 28, fontWeight: 800 }}>{lv.level}</div></div>
@@ -82,7 +84,8 @@ function Stats() {
             </div>
           </div>
         </div>
-      </div>
+        <div className="xs mt12 row" style={{ opacity: .8, gap: 4 }}>{(lv.next - p.xp).toLocaleString()} XP to level {lv.level + 1} · tap to see how you earned your XP <ChevronRight size={13} /></div>
+      </button>
 
       {(() => { const ps = pledgeStatus(p); const gs = goalStreak(p); return ps ? (
         <div className="card soft-gold mt12" style={{ boxShadow: "none" }}>
@@ -114,8 +117,7 @@ function Stats() {
         </svg>
       </div>
 
-      <div className="section-title"><h2>Where your time goes</h2>{secs[0] && <span className="mu">Most: {secs[0][0]}</span>}</div>
-      <div className="card">
+      <Fold title="Where your time goes" summary={secs[0] ? "Most: " + secs[0][0] + " · " + fmtMin(secs[0][1]) : "Tap to see time per section"}>
         {secs.length === 0 ? <div className="sm mu">Study for a minute and your sections will appear here.</div> : (<>
           <div style={{ display: "flex", height: 14, borderRadius: 7, overflow: "hidden" }}>{secs.map(([k, v]) => <div key={k} style={{ width: (v / secTotal) * 100 + "%", background: SEC_COL[k] || "var(--ink-3)" }} />)}</div>
           <div className="mt12">
@@ -129,18 +131,16 @@ function Stats() {
             ))}
           </div>
         </>)}
-      </div>
+      </Fold>
 
-      <div className="section-title"><h2>Activity</h2><span className="mu">last 10 weeks</span></div>
-      <div className="card">
+      <Fold title="Activity" summary={"Last 10 weeks · " + heat.filter((x) => x > 0).length + " active days"}>
         <div className="heat">{heat.map((ms, i) => <i key={i} title={Math.round(ms / 60000) + " min"} style={ms ? { background: "var(--matcha)", opacity: 0.25 + Math.min(1, ms / (s.dailyGoalMin * 60000)) * 0.75 } : undefined} />)}</div>
-      </div>
+      </Fold>
 
       <VoiceSection />
       <PracticeLog />
 
-      <div className="section-title"><h2>Mastery</h2></div>
-      <div className="card">
+      <Fold title="Mastery" summary={"Hiragana " + masteredSet(p, HIRA46) + "/46 · Katakana " + masteredSet(p, KATA46) + "/46 · " + p.known.length + " words · " + Object.keys(p.lessons).length + " lessons"}>
         {[["Hiragana", masteredSet(p, HIRA46) / 46, masteredSet(p, HIRA46) + "/46", "var(--shu)"], ["Katakana", masteredSet(p, KATA46) / 46, masteredSet(p, KATA46) + "/46", "var(--ai)"],
           ["Grammar lessons", Object.keys(p.lessons).length / pk.lessons.length, Object.keys(p.lessons).length + "/" + pk.lessons.length, "var(--plum)"],
           ["Culture sections", Object.keys(p.culturesRead).length / pk.culture.length, Object.keys(p.culturesRead).length + "/" + pk.culture.length, "var(--gold)"],
@@ -152,7 +152,7 @@ function Stats() {
           </div>
         ))}
         <div className="row sm mt8 mu"><span className="grow">Speaking: {p.speak.ok}/{p.speak.tries} correct</span><span>Writing: {p.writes} characters</span></div>
-      </div>
+      </Fold>
 
       <button className="card tap mt16 tint-sakura" style={{ boxShadow: "0 10px 26px rgba(184,51,106,.3)" }} onClick={() => go("/me/about?open=support")}>
         <div className="row"><span style={{ width: 42, height: 42, borderRadius: 13, display: "grid", placeItems: "center", background: "rgba(255,255,255,.2)", flex: "none" }}><Heart size={22} color="#fff" fill="#fff" /></span><div className="grow"><div style={{ fontWeight: 800, fontSize: 16 }}>Support the app · About us</div><div className="xs" style={{ opacity: .9 }}>Donate or share · our story · build an app like this</div></div><ChevronRight size={18} /></div>
@@ -161,18 +161,27 @@ function Stats() {
       <div className="section-title"><h2>Badges</h2><span className="mu">{Object.keys(p.badges).length}/{BADGES.length}</span></div>
       <Sheet open={!!badge} onClose={() => setBadge(null)}>{badge && <BadgeDetail id={badge} onGo={(to) => { setBadge(null); go(to); }} />}</Sheet>
       <div className="xs mu" style={{ margin: "-4px 2px 10px" }}>Tap a badge to see how to earn it.</div>
+      {BADGE_GROUPS.map(([gname, ids]) => { const list = BADGES.filter((b) => ids.includes(b.id)); const n = list.filter((b) => p.badges[b.id]).length; return (<div key={gname}>
+      <div className="row" style={{ margin: "14px 2px 8px" }}><span className="grow" style={{ fontWeight: 800 }}>{gname}</span><span className="xs mu">{n}/{list.length}</span></div>
       <div className="grid3">
-        {BADGES.map((b) => { const got = !!p.badges[b.id]; const pr = BADGE_HOW[b.id]?.prog(p) || [0, 1]; return (
+        {list.map((b) => { const got = !!p.badges[b.id]; const pr = BADGE_HOW[b.id]?.prog(p) || [0, 1]; return (
           <button key={b.id} className={"badge-tile" + (got ? "" : " locked")} onClick={() => setBadge(b.id)}>
             <div className="b" style={{ position: "relative" }}><Icon name={b.icon} size={24} color={got ? "var(--gold)" : "var(--ink-2)"} />{!got && <span style={{ position: "absolute", right: -2, bottom: -2, width: 20, height: 20, borderRadius: 10, background: "var(--surface-3)", display: "grid", placeItems: "center" }}><Lock size={11} /></span>}</div>
             <div className="t">{b.title}</div>
             {got ? <div className="xs" style={{ color: "var(--gold)", fontWeight: 700 }}>Earned</div>
               : <><div className="bar thin" style={{ width: "80%" }}><i style={{ width: (pr[0] / pr[1]) * 100 + "%", background: "var(--gold)" }} /></div><div className="xs mu" style={{ fontWeight: 700 }}>{pr[0]} / {pr[1]}</div></>}
           </button>); })}
-      </div>
+      </div></div>); })}
     </div>
   );
 }
+
+const BADGE_GROUPS: [string, string[]][] = [
+  ["Habits & streaks", ["first", "pledge", "streak3", "streak7", "streak30", "keep3", "keep7", "keep21", "keep30", "hour"]],
+  ["Scripts & writing", ["kana10", "kana100", "hira", "kata", "write10", "write50", "writeAce", "writeHira"]],
+  ["Words & grammar", ["w50", "w100", "w300", "w1000", "w2000", "lesson1", "lesson10", "review100", "perfect", "culture"]],
+  ["Speaking & sound", ["speak10", "voice10", "lab"]],
+];
 
 
 function VoiceSection() {

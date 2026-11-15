@@ -11,6 +11,7 @@ let pending: Record<string, number> = {};
 let started = false;
 
 export const setSection = (s: string) => { section = s; };
+export const getSection = () => section;
 
 export function startTracker() {
   if (started) return;

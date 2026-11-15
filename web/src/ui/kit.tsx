@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ChevronLeft, Turtle, Volume2 } from "lucide-react";
+import { ChevronDown, ChevronLeft, Turtle, Volume2 } from "lucide-react";
 import { onSpeaking, speak, vibrate } from "../core/native";
 import { getSettings } from "../core/store";
 import { back } from "../core/router";
@@ -124,3 +124,17 @@ export const fmtMin = (ms: number) => {
 
 export function shuffle<T>(a: T[]): T[] { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [b[i], b[j]] = [b[j], b[i]]; } return b; }
 export const pick = <T,>(a: T[]) => a[(Math.random() * a.length) | 0];
+
+/** Section that stays closed until tapped (title + one-line summary). */
+export function Fold({ title, summary, children, open: init = false }: { title: ReactNode; summary?: ReactNode; children: ReactNode; open?: boolean }) {
+  const [open, setOpen] = useState(init);
+  return (
+    <div className="card mt12" style={{ padding: 0, overflow: "hidden" }}>
+      <button className="row" style={{ width: "100%", padding: "14px 16px", background: "none", border: 0, color: "inherit", textAlign: "left", gap: 10 }} aria-expanded={open} onClick={() => { tap(); setOpen(!open); }}>
+        <span className="grow"><span style={{ fontWeight: 800, fontSize: 16, display: "block" }}>{title}</span>{summary && <span className="xs mu" style={{ display: "block", marginTop: 2 }}>{summary}</span>}</span>
+        <ChevronDown size={20} style={{ transition: "transform .25s", transform: open ? "rotate(180deg)" : "none", flex: "none" }} />
+      </button>
+      {open && <div style={{ padding: "0 16px 16px", animation: "screenIn .3s both" }}>{children}</div>}
+    </div>
+  );
+}

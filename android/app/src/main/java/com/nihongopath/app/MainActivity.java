@@ -70,7 +70,8 @@ public class MainActivity extends Activity {
     private SpeechRecognizer captureRecognizer;
     private String pendingAction = null;
     private ValueCallback<Uri[]> fileCallback = null;
-    private static final int REQ_FILE = 20, REQ_NOTIF = 21;
+    private static final int REQ_FILE = 20, REQ_NOTIF = 21, REQ_CLOUD_SAVE = 22, REQ_CLOUD_PICK = 23;
+    private String pendingCloudContent = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -239,6 +240,29 @@ public class MainActivity extends Activity {
                 w.getDecorView().setSystemUiVisibility(flags);
             });
         }
+        /** Save a copy anywhere the user chooses - Google Drive, OneDrive, Dropbox… (system file picker). */
+        @JavascriptInterface public void saveBackupAs(String name, String content) {
+            pendingCloudContent = content;
+            runOnUiThread(() -> {
+                Intent i = new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("application/json").putExtra(Intent.EXTRA_TITLE, name);
+                try { startActivityForResult(i, REQ_CLOUD_SAVE); } catch (Exception e) { js("window.__npCloud&&window.__npCloud('error','No file picker available')"); }
+            });
+        }
+        /** Choose one cloud file that automatic backups keep updating. */
+        @JavascriptInterface public void pickCloudTarget(String name) {
+            runOnUiThread(() -> {
+                Intent i = new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("application/json").putExtra(Intent.EXTRA_TITLE, name)
+                    .addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                try { startActivityForResult(i, REQ_CLOUD_PICK); } catch (Exception e) { js("window.__npCloud&&window.__npCloud('error','No file picker available')"); }
+            });
+        }
+        /** Overwrite the chosen cloud file. Returns "ok", "none" or "error:…". */
+        @JavascriptInterface public String writeCloudTarget(String content) {
+            String u = getSharedPreferences("np", MODE_PRIVATE).getString("cloudUri", null);
+            if (u == null) return "none";
+            return writeUri(Uri.parse(u), content);
+        }
+        @JavascriptInterface public void clearCloudTarget() { getSharedPreferences("np", MODE_PRIVATE).edit().remove("cloudUri").apply(); }
         @JavascriptInterface public void openExternal(String url) { runOnUiThread(() -> openExternalUri(Uri.parse(url))); }
         @JavascriptInterface public void shareText(String subject, String text) {
             runOnUiThread(() -> {
@@ -410,6 +434,20 @@ public class MainActivity extends Activity {
         try { startActivity(new Intent(Intent.ACTION_VIEW, u).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); }
         catch (ActivityNotFoundException ignored) { }
     }
+    private String writeUri(Uri u, String content) {
+        try (java.io.OutputStream os = getContentResolver().openOutputStream(u, "wt")) {
+            if (os == null) return "error:cannot open";
+            os.write(content.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            return "ok";
+        } catch (Exception e) { return "error:" + e.getMessage(); }
+    }
+    private String describe(Uri u) {
+        String app = u.getAuthority() == null ? "" : u.getAuthority();
+        String name = app.contains("google.android.apps.docs") ? "Google Drive" : app.contains("skydrive") || app.contains("onedrive") ? "OneDrive" : app.contains("dropbox") ? "Dropbox" : app.contains("externalstorage") || app.contains("downloads") ? "Phone storage" : app;
+        String file = "";
+        try (android.database.Cursor c = getContentResolver().query(u, new String[]{android.provider.OpenableColumns.DISPLAY_NAME}, null, null, null)) { if (c != null && c.moveToFirst()) file = c.getString(0); } catch (Exception e) { /* ignore */ }
+        return name + (file.isEmpty() ? "" : " · " + file);
+    }
     private void js(final String code) { runOnUiThread(() -> { if (web != null) web.evaluateJavascript(code, null); }); }
 
     @Override
@@ -421,6 +459,21 @@ public class MainActivity extends Activity {
     @Override
     protected void onActivityResult(int req, int res, Intent data) {
         super.onActivityResult(req, res, data);
+        if (req == REQ_CLOUD_SAVE || req == REQ_CLOUD_PICK) {
+            Uri u = (res == RESULT_OK && data != null) ? data.getData() : null;
+            if (u == null) { pendingCloudContent = null; js("window.__npCloud&&window.__npCloud('cancel','')"); return; }
+            String where = describe(u);
+            if (req == REQ_CLOUD_PICK) {
+                try { getContentResolver().takePersistableUriPermission(u, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION); } catch (Exception e) { /* provider may not allow - still try once */ }
+                getSharedPreferences("np", MODE_PRIVATE).edit().putString("cloudUri", u.toString()).apply();
+                js("window.__npCloud&&window.__npCloud('picked'," + org.json.JSONObject.quote(where) + ")");
+            } else {
+                String r = writeUri(u, pendingCloudContent == null ? "" : pendingCloudContent);
+                pendingCloudContent = null;
+                js("window.__npCloud&&window.__npCloud(" + org.json.JSONObject.quote(r.equals("ok") ? "saved" : "error") + "," + org.json.JSONObject.quote(r.equals("ok") ? where : r) + ")");
+            }
+            return;
+        }
         if (req == REQ_FILE && fileCallback != null) {
             Uri u = (res == RESULT_OK && data != null) ? data.getData() : null;
             fileCallback.onReceiveValue(u == null ? null : new Uri[]{u});

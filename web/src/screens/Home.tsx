@@ -48,8 +48,8 @@ export default function Home() {
           <Ring pct={goalPct} size={86} stroke={9} color="#ff7a5c" track="rgba(255,255,255,.14)">
             <div><div style={{ fontSize: 20, fontWeight: 800 }}>{Math.floor(mins)}</div><div style={{ fontSize: 10, opacity: .7 }}>/ {s.dailyGoalMin} min</div></div>
           </Ring>
-          <div className="grow">
-            <div className="kicker">Level {lv.level} · <span className="jp">{lvName.jp}</span></div>
+          <div className="grow" role="button" onClick={() => go("/me/level")} style={{ cursor: "pointer" }}>
+            <div className="kicker">Level {lv.level} · <span className="jp">{lvName.jp}</span> ›</div>
             <div style={{ fontSize: 20, fontWeight: 800, margin: "2px 0 8px" }}>{lvName.en}</div>
             <Bar pct={lv.pct} white />
             <div className="xs mu mt4">{p.xp - lv.cur} / {lv.next - lv.cur} XP to level {lv.level + 1}</div>

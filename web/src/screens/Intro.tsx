@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Volume2 } from "lucide-react";
-import { speak } from "../core/native";
+import { ArrowLeft, ArrowRight, Volume2, VolumeX } from "lucide-react";
+import { speak, stopSpeaking } from "../core/native";
+import { setSettings, useSettings } from "../core/store";
 import { tap } from "../ui/kit";
 import { Icon } from "../ui/icons";
 
@@ -22,8 +23,10 @@ export default function Intro({ onDone, tour }: { onDone: () => void; tour?: boo
   const x0 = useRef<number | null>(null);
   const sl = SLIDES[i];
   const last = i === SLIDES.length - 1;
+  const muted = !!useSettings().introMuted;
   const say = () => speak(sl.jp, { lang: "ja-JP", rate: 0.85 });
-  useEffect(() => { const t = window.setTimeout(say, 450); return () => window.clearTimeout(t); }, [i]); // eslint-disable-line
+  useEffect(() => { if (muted) return; const t = window.setTimeout(say, 450); return () => window.clearTimeout(t); }, [i]); // eslint-disable-line
+  const toggleSound = () => { tap(); if (muted) { setSettings({ introMuted: false }); say(); } else { stopSpeaking(); setSettings({ introMuted: true }); } };
   const goTo = (n: number) => { if (n < 0 || n >= SLIDES.length) return; tap(); setDir(n > i ? 1 : -1); setI(n); };
 
   return (
@@ -56,9 +59,14 @@ export default function Intro({ onDone, tour }: { onDone: () => void; tour?: boo
         <div className="intro-kicker">{sl.kicker}</div>
         <h1>{sl.title}</h1>
         <p>{sl.text}</p>
-        <button className="intro-say" onClick={(e) => { e.stopPropagation(); say(); }}>
-          <Volume2 size={16} /><span className="jp">{sl.jp}</span><span className="ro">{sl.jpRo} · {sl.jpEn}</span>
-        </button>
+        <div className="row" style={{ gap: 8, marginTop: 12 }}>
+          <button className="intro-say" style={{ marginTop: 0 }} onClick={(e) => { e.stopPropagation(); if (muted) toggleSound(); else say(); }}>
+            <span className="jp">{sl.jp}</span><span className="ro">{sl.jpRo} · {sl.jpEn}</span>
+          </button>
+          <button className="intro-say intro-mute" style={{ marginTop: 0 }} aria-label={muted ? "Turn sound on" : "Mute sound"} onClick={(e) => { e.stopPropagation(); toggleSound(); }}>
+            {muted ? <VolumeX size={17} /> : <Volume2 size={17} />}<span className="ro">{muted ? "Sound off" : "Sound on"}</span>
+          </button>
+        </div>
       </div>
 
       <div className="intro-nav">

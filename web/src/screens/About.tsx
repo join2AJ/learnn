@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowRight, BookHeart, Check, ChevronDown, Copy, Heart, Mail, MessageCircle, Send, Share2, Smartphone } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, Copy, Heart, Mail, MessageCircle, Send, Share2, Smartphone } from "lucide-react";
 import { go } from "../core/router";
 import { SupportBlock } from "./Support";
 import { ABOUT_ME, BUILD_CONTACT } from "../support";
@@ -162,9 +162,11 @@ export default function About() {
     <div className="screen">
       <Header title="About us" sub={"Nihongo Path · version " + APP_VERSION} backTo="/me" />
       <AboutBlock />
-      <Fold id="story" open={open === "story"} onToggle={() => toggle("story")} icon={<BookHeart size={20} />} title="Our story" sub={ABOUT_ME.title}>
-        {ABOUT_ME.paragraphs.map((t, i) => <p key={i} className="sm" style={{ lineHeight: 1.65, margin: i ? "10px 0 0" : 0 }}>{t}</p>)}
-      </Fold>
+      <div className="card mt12">
+        <div className="kicker">Our story</div>
+        <div style={{ fontWeight: 800, fontSize: 17, marginTop: 2 }}>{ABOUT_ME.title}</div>
+        {ABOUT_ME.paragraphs.map((t, i) => <p key={i} className="sm" style={{ lineHeight: 1.65, margin: "8px 0 0" }}>{t}</p>)}
+      </div>
       <Fold id="support" open={open === "support"} onToggle={() => toggle("support")} icon={<Heart size={20} color="#fff" />} title="Support us" sub="Donate or share - keep it free for every learner" tone="tint-sakura">
         <SupportBlock />
       </Fold>

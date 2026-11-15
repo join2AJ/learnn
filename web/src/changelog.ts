@@ -1,6 +1,12 @@
 /** Shown once after each update ("What's new"). Newest first. */
-export const APP_VERSION = "3.7";
+export const APP_VERSION = "3.8";
 export const CHANGELOG: { v: string; date: string; items: [string, string][] }[] = [
+  { v: "3.8", date: "17 Nov 2026", items: [
+    ["earth", "Cloud backup: save to Google Drive, OneDrive or any cloud app - or keep one cloud copy updated with every backup."],
+    ["star", "Tap your level to see where your XP came from, XP per day, when you reached each level and how to earn more."],
+    ["award", "Badges grouped into 4 sections; big stats sections open when you tap them."],
+    ["volume", "Tour: turn the sound on or off with one tap."],
+  ] },
   { v: "3.7", date: "17 Nov 2026", items: [
     ["compass", "New app tour: the colourful swipe-through slides with real screens (also under ? on Home)."],
     ["heart", "About us: tap a section to open it. “Support us” has an “I want to donate” button; “Build an app like this” - we will build it for you."],

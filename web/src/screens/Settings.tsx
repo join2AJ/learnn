@@ -8,7 +8,7 @@ import { go } from "../core/router";
 import { deleteMedia } from "../core/privacy";
 import { contentStats } from "../core/contentStats";
 import { APP_VERSION } from "../changelog";
-import { Header, Seg, Switch, tap } from "../ui/kit";
+import { Header, Seg, Switch, tap , Fold } from "../ui/kit";
 import { GoalEditor } from "../ui/Goal";
 
 export default function Settings() {
@@ -85,7 +85,7 @@ export default function Settings() {
           : <div className="col"><div className="sm" style={{ color: "var(--shu)", fontWeight: 700 }}>Reset progress, recordings and drawings? Settings stay.</div><div className="row"><button className="btn grow" onClick={() => setConfirm(false)}>Cancel</button><button className="btn primary grow" onClick={async () => { await deleteMedia(); resetProgress(); setConfirm(false); toast("Progress, recordings and drawings reset"); }}>Yes, reset</button></div></div>}
       </div>
 
-      <div className="section-title"><h2>What’s inside</h2><span className="mu">{pk.name} pack</span></div>
+      <Fold title="What’s inside" summary={contentStats(pk).words.toLocaleString() + " words · " + (contentStats(pk).sentences + contentStats(pk).sentenceBank).toLocaleString() + " sentences · tap for everything"}>
       {(() => { const c = contentStats(pk); const items: [string, string][] = [
         ["Core words (most spoken first)", c.words.toLocaleString()], ["Example sentences", c.sentences.toLocaleString()], ["Sentence bank (Tatoeba)", c.sentenceBank.toLocaleString()], ["Hindi translations", c.hindi.toLocaleString()],
         ["Grammar lessons", c.lessons + " in " + c.units + " units"], ["Core grammar words", String(c.coreGrammar)], ["Lesson quiz questions", String(c.lessonQuiz)],
@@ -96,6 +96,7 @@ export default function Settings() {
       ]; return (
         <div className="list">{items.map(([k, v]) => <div key={k} className="li" style={{ padding: "11px 16px" }}><span className="grow sm" style={{ fontWeight: 600 }}>{k}</span><span className="sm" style={{ fontWeight: 800 }}>{v}</span></div>)}
           <div className="li" style={{ display: "block" }}><div className="xs mu">Words by type: {Object.entries(c.types).sort((a, b) => b[1] - a[1]).map(([t, n]) => t + " " + n).join(" · ")}</div></div></div>); })()}
+      </Fold>
 
       <div className="section-title"><h2>About</h2></div>
       <div className="card sm" style={{ lineHeight: 1.6 }}>

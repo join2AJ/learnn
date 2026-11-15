@@ -15,6 +15,10 @@ interface NativeApi {
   vibrate(ms: number): void;
   openExternal(url: string): void;
   shareText?(subject: string, text: string): void;
+  saveBackupAs?(name: string, content: string): void;
+  pickCloudTarget?(name: string): void;
+  writeCloudTarget?(content: string): string;
+  clearCloudTarget?(): void;
   appVersion(): string;
   setTheme?(dark: boolean): void;
   recordAndRecognize?(lang: string, ms: number, id: string): void;
@@ -220,6 +224,19 @@ export function saveBackupFile(name: string, content: string): string {
   setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   return "Downloads/" + name;
 }
+/* ---------- cloud (Google Drive, OneDrive… via the system file picker) ---------- */
+type CloudCb = (kind: "saved" | "picked" | "cancel" | "error", where: string) => void;
+let cloudCb: CloudCb | null = null;
+(window as unknown as { __npCloud: CloudCb }).__npCloud = (k, w) => { const f = cloudCb; cloudCb = null; f?.(k, w); };
+export const hasCloud = () => !!N()?.saveBackupAs;
+export function saveToCloud(name: string, content: string, cb: CloudCb) {
+  const n = N();
+  if (n?.saveBackupAs) { cloudCb = cb; n.saveBackupAs(name, content); }
+  else { saveBackupFile(name, content); cb("saved", "Downloads"); }
+}
+export function pickCloud(name: string, cb: CloudCb) { const n = N(); if (n?.pickCloudTarget) { cloudCb = cb; n.pickCloudTarget(name); } else cb("error", "Only available in the Android app"); }
+export const writeCloud = (content: string) => N()?.writeCloudTarget?.(content) || "none";
+export const clearCloud = () => N()?.clearCloudTarget?.();
 export const scheduleBackupReminder = (h: number, m: number, weekday: number) => N()?.scheduleBackup?.(h, m, weekday);
 export const cancelBackupReminder = () => N()?.cancelBackup?.();
 export const takeNativeAction = () => { try { return N()?.takeAction?.() || ""; } catch { return ""; } };

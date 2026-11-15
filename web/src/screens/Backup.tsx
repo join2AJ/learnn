@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
-import { Clock, Download, FileUp, HardDriveDownload } from "lucide-react";
+import { Clock, Cloud, CloudUpload, Download, FileUp, HardDriveDownload, RefreshCw } from "lucide-react";
 import { setSettings, toast, useSettings } from "../core/store";
-import { backupNow, buildBackup, nextBackupText, restoreBackup } from "../core/backup";
-import { cancelBackupReminder, nativeBackup, scheduleBackupReminder } from "../core/native";
+import { backupName, backupNow, buildBackup, nextBackupText, restoreBackup } from "../core/backup";
+import { cancelBackupReminder, clearCloud, hasCloud, nativeBackup, pickCloud, saveToCloud, scheduleBackupReminder, writeCloud } from "../core/native";
 import { Header, Seg, Switch, tap } from "../ui/kit";
 
 const DAYS: [number, string][] = [[2, "Mon"], [3, "Tue"], [4, "Wed"], [5, "Thu"], [6, "Fri"], [7, "Sat"], [1, "Sun"]];
@@ -40,10 +40,24 @@ export default function Backup() {
       <div className="card hero tint-ai">
         <HardDriveDownload size={28} />
         <div style={{ fontWeight: 800, fontSize: 18, marginTop: 6 }}>Back up now</div>
-        <div className="sm mu mt4">{nativeBackup() ? "Saves a file to Downloads/NihongoPath on your phone. It stays there even if you uninstall the app - you can also copy it to Google Drive." : "Downloads a backup file."}</div>
+        <div className="sm mu mt4">{nativeBackup() ? "Saves a file to Downloads/NihongoPath on your phone. It stays there even if you uninstall the app." : "Downloads a backup file."}</div>
         <div className="row mt12"><span className="sm grow">Include voice recordings & drawings (bigger file)</span><Switch on={b.media} onChange={(v) => set({ media: v })} /></div>
         <button className="btn white block mt12" disabled={busy} onClick={now}><Download size={17} /> {busy ? "Saving…" : "Save backup file"}</button>
         <div className="xs mu mt8">{b.last ? "Last backup: " + new Date(b.last).toLocaleString() + (b.where ? " · " + b.where : "") : "No backup yet"}</div>
+
+      <div className="card mt12">
+        <div className="row"><Cloud size={22} color="var(--ai)" /><div className="grow"><div style={{ fontWeight: 800 }}>Cloud backup</div><div className="xs mu">Google Drive, OneDrive, Dropbox - any cloud app on your phone</div></div></div>
+        <button className="btn block mt12" disabled={busy} onClick={async () => { tap(); setBusy(true); saveToCloud(backupName(), await buildBackup(b.media), (k, w) => { setBusy(false); if (k === "saved") toast("Saved to " + w, "ok"); else if (k === "error") toast("Couldn't save: " + w, "warn"); }); }}><CloudUpload size={17} /> Save a copy to the cloud</button>
+        <div className="xs mu mt8">Opens the file picker - choose Drive, OneDrive or another app in the menu.</div>
+        <div style={{ borderTop: "1px solid var(--line)", margin: "12px 0" }} />
+        <div className="row"><span className="sm grow" style={{ fontWeight: 700 }}>Keep a cloud copy up to date</span><Switch on={!!b.cloud} onChange={(v) => {
+          if (!v) { clearCloud(); set({ cloud: "" }); return; }
+          if (!hasCloud()) { toast("Available in the Android app", "info"); return; }
+          pickCloud("nihongo-path-autobackup.json", async (k, w) => { if (k === "picked") { set({ cloud: w || "cloud" }); const r = writeCloud(await buildBackup(b.media)); toast(r === "ok" ? "Cloud copy saved - it updates with every backup" : "Saved the choice, but writing failed: " + r, r === "ok" ? "ok" : "warn"); } else if (k === "error") toast(w, "warn"); });
+        }} /></div>
+        {b.cloud ? <div className="xs mu mt4"><RefreshCw size={11} style={{ verticalAlign: -1 }} /> Updates {b.auto === "off" ? "each time you tap “Save backup file”" : "with every automatic backup"} · {b.cloud}</div>
+          : <div className="xs mu mt4">Pick one file in Drive or OneDrive once - every backup then overwrites it, so your latest progress is always in the cloud.</div>}
+      </div>
       </div>
 
       <div className="section-title"><h2>Automatic backup</h2>{b.auto !== "off" && <span className="mu">next ≈ {nextBackupText()}</span>}</div>

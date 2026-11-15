@@ -16,6 +16,7 @@ export interface Settings {
   profiled: boolean;
   toured: boolean;
   newIntro?: boolean;
+  introMuted?: boolean;
   age: string;
   reasons: string[];
   pledge: { min: number; start: string; days: number } | null;
@@ -25,13 +26,13 @@ export interface Settings {
   minor: boolean;
   parentConsent: { name: string; date: string } | null;
   privacyOk: boolean;
-  backup: { auto: "off" | "daily" | "weekly"; hour: number; minute: number; weekday: number; media: boolean; last: number; where: string };
+  backup: { auto: "off" | "daily" | "weekly"; hour: number; minute: number; weekday: number; media: boolean; last: number; where: string; cloud?: string };
 }
 
 export interface SrsCard { due: number; ivl: number; ease: number; reps: number; lapses: number; last: number; }
 /** Summary of one voice recording (audio itself is not stored). */
 export interface VoiceRec { t: number; w: string; bands: [number, number, number]; ref: [number, number, number]; db: number; dur: number; exp: number; f0: [number, number]; score: number; match?: number; heard?: string; }
-export interface DayStat { ms: number; sec: Record<string, number>; xp: number; reviews: number; correct: number; wrong: number; learned: number; spoke?: number; }
+export interface DayStat { ms: number; sec: Record<string, number>; xp: number; reviews: number; correct: number; wrong: number; learned: number; spoke?: number; xpBy?: Record<string, number>; }
 
 export interface Progress {
   xp: number;
@@ -52,11 +53,13 @@ export interface Progress {
   culturesRead: Record<string, boolean>;
   voiceLog: VoiceRec[];
   started: number;
+  levelUps?: Record<string, number>;
+  xpTrackedFrom?: number;
 }
 
 const defSettings: Settings = {
   lang: "ja", name: "", onboarded: false, showHindi: true, showRomaji: true, rate: 0.9,
-  theme: "auto", dailyGoalMin: 20, newPerDay: 15, haptics: true, autoplay: true, profiled: false, toured: false, age: "", reasons: [], pledge: null, seenVersion: "", cardsReverse: false, goal: null, minor: false, parentConsent: null, privacyOk: false, backup: { auto: "off", hour: 21, minute: 0, weekday: 1, media: false, last: 0, where: "" },
+  theme: "auto", dailyGoalMin: 20, newPerDay: 15, haptics: true, autoplay: true, profiled: false, toured: false, age: "", reasons: [], pledge: null, seenVersion: "", cardsReverse: false, goal: null, minor: false, parentConsent: null, privacyOk: false, backup: { auto: "off", hour: 21, minute: 0, weekday: 1, media: false, last: 0, where: "", cloud: "" },
 };
 const defProgress = (): Progress => ({
   xp: 0, known: [], kana: {}, lessons: {}, srs: {}, badges: {}, quiz: { correct: 0, wrong: 0, best: 0 },
