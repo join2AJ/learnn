@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ChevronRight, Heart, Lock, Settings as Cog, Smartphone } from "lucide-react";
+import { ChevronRight, Heart, Lock, Settings as Cog } from "lucide-react";
 import type { Route } from "../core/router";
 import { go } from "../core/router";
 import { dayKey, emptyDay, useProgress, useSettings } from "../core/store";
@@ -13,11 +13,10 @@ import Recordings from "./Recordings";
 import MyWriting from "./MyWriting";
 import Privacy from "./Privacy";
 import Backup from "./Backup";
-import About from "./About";
+import About, { BuildApp } from "./About";
 import Support from "./Support";
 import PolicyText from "./PolicyText";
 import { Icon, IconTile } from "../ui/icons";
-import { childMode } from "../core/child";
 
 const SEC_COL: Record<string, string> = {
   Alphabet: "#e0452b", Writing: "#d29a2e", Pronunciation: "#7b4fb0", Grammar: "#2f4b8a", Vocabulary: "#3f8a4f", Phrases: "#e47aa0",
@@ -33,6 +32,7 @@ export default function Me({ route }: { route: Route }) {
   if (route.parts[1] === "backup") return <Backup />;
   if (route.parts[1] === "support") return <Support />;
   if (route.parts[1] === "about") return <About />;
+  if (route.parts[1] === "build") return <BuildApp />;
   if (route.parts[1] === "licenses") return <div className="screen"><Header title="Licences" backTo="/me/settings" /><div className="card xs mu" style={{ lineHeight: 1.8 }}>
     KanjiVG © Ulrich Apel, CC BY-SA 3.0<br />JMdict © EDRDG, CC BY-SA 4.0<br />wordfreq, CC BY-SA 4.0<br />Tatoeba, CC BY 2.0 FR<br />地球地図日本 © GSI<br />Photos: Wikimedia Commons (per photo)
   </div></div>;
@@ -155,11 +155,8 @@ function Stats() {
       </div>
 
       <button className="card tap mt16" onClick={() => go("/me/about")}>
-        <div className="row"><Smartphone size={22} color="var(--ai)" /><div className="grow"><div style={{ fontWeight: 800 }}>About · build your own app</div><div className="xs mu">Why I made Nihongo Path · request an Android app for you</div></div><ChevronRight size={18} /></div>
+        <div className="row"><Heart size={22} color="var(--sakura)" /><div className="grow"><div style={{ fontWeight: 800 }}>About us</div><div className="xs mu">Our story · support us · build an app like this</div></div><ChevronRight size={18} /></div>
       </button>
-      {!childMode() && <button className="card tap mt16 soft-sakura" style={{ boxShadow: "none" }} onClick={() => go("/me/support")}>
-        <div className="row"><Heart size={22} color="var(--sakura)" /><div className="grow"><div style={{ fontWeight: 800 }}>Support Nihongo Path</div><div className="xs mu">Free forever - help keep it that way</div></div></div>
-      </button>}
 
       <div className="section-title"><h2>Badges</h2><span className="mu">{Object.keys(p.badges).length}/{BADGES.length}</span></div>
       <Sheet open={!!badge} onClose={() => setBadge(null)}>{badge && <BadgeDetail id={badge} onGo={(to) => { setBadge(null); go(to); }} />}</Sheet>

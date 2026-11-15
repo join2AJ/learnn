@@ -1,0 +1,182 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 540px; height: 960px; overflow: hidden; background: #000; font-family: "Inter", "WenQuanYi Zen Hei", sans-serif; color: #fff; }
+  #bg { position: absolute; inset: 0; }
+  .layer { position: absolute; inset: 0; opacity: 0; }
+  .jp { font-family: "WenQuanYi Zen Hei", sans-serif; }
+  .phone { position: absolute; width: 250px; height: 541px; border-radius: 34px; overflow: hidden; background: #111; box-shadow: 0 0 0 7px #0b0b0d, 0 0 0 8px rgba(255,255,255,.28), 0 40px 80px rgba(0,0,0,.5); }
+  .phone img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+  .cap { position: absolute; left: 36px; right: 36px; top: 70px; }
+  .kick { font-size: 15px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; opacity: .85; }
+  .title { font-size: 40px; font-weight: 800; line-height: 1.08; letter-spacing: -.02em; margin-top: 8px; }
+  .title em { font-style: normal; color: #ffd36b; }
+  .chips { position: absolute; left: 0; right: 0; bottom: 64px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; padding: 0 30px; }
+  .chip { background: #fff; color: #1d1d22; border-radius: 999px; padding: 10px 16px; font-weight: 800; font-size: 17px; box-shadow: 0 10px 24px rgba(0,0,0,.25); }
+  .petal { position: absolute; width: 14px; height: 11px; border-radius: 14px 0 14px 0; background: rgba(255,214,226,.7); }
+  .photo { position: absolute; inset: 0; overflow: hidden; opacity: 0; }
+  .photo img { position: absolute; width: 100%; height: 100%; object-fit: cover; }
+  .stat { position: absolute; left: 40px; right: 40px; display: flex; align-items: baseline; gap: 14px; }
+  .stat b { font-size: 60px; font-weight: 900; letter-spacing: -.03em; min-width: 210px; text-align: right; }
+  .stat span { font-size: 24px; font-weight: 700; opacity: .9; }
+</style></head>
+<body>
+<div id="bg"></div>
+<div id="petals"></div>
+
+<!-- S0 logo -->
+<div class="layer" id="s0">
+  <div id="logo" style="position:absolute;left:50%;top:300px;width:170px;height:170px;margin-left:-85px;border-radius:48px;background:#fff;display:grid;place-items:center;box-shadow:0 30px 80px rgba(0,0,0,.35)"><span class="jp" style="font-size:110px;color:#e2553c;font-weight:800;line-height:1">道</span></div>
+  <div id="s0name" style="position:absolute;left:0;right:0;top:510px;text-align:center;font-size:56px;font-weight:900;letter-spacing:-.02em">Nihongo Path</div>
+  <div id="s0jp" class="jp" style="position:absolute;left:0;right:0;top:585px;text-align:center;font-size:32px;opacity:.9">日本語の道</div>
+  <div id="s0tag" style="position:absolute;left:0;right:0;top:660px;text-align:center;font-size:22px;font-weight:600;opacity:.9">The beginner-first way to learn Japanese</div>
+</div>
+
+<!-- S1 hook: kana -->
+<div class="layer" id="s1">
+  <div class="cap" style="top:120px;text-align:center"><div class="kick">Start from zero</div><div class="title" style="font-size:46px">Your first <em class="jp">あ</em> to real conversations</div></div>
+  <div id="kana" style="position:absolute;left:0;right:0;top:420px;height:300px"></div>
+  <div style="position:absolute;left:0;right:0;bottom:120px;text-align:center;font-size:22px;font-weight:700;opacity:.92">Explained in English <span style="opacity:.6">+</span> हिन्दी</div>
+</div>
+
+<!-- feature scenes S2,S3,S4,S6,S8 built in JS -->
+<div id="features"></div>
+
+<!-- S5 photos -->
+<div class="layer" id="s5">
+  <div class="photo" id="p0"><img src="a/fuji.webp"></div>
+  <div class="photo" id="p1"><img src="a/inari.webp"></div>
+  <div class="photo" id="p2"><img src="a/kinkaku.webp"></div>
+  <div class="photo" id="p3"><img src="a/shibuya.webp"></div>
+  <div style="position:absolute;inset:0;z-index:5;background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,0) 40%,rgba(0,0,0,0) 60%,rgba(0,0,0,.65))"></div>
+  <div class="cap" style="top:110px;z-index:6"><div class="kick">Discover Japan</div><div class="title" id="s5title" style="font-size:48px">See the places behind the words</div></div>
+  <div id="s5label" style="z-index:6;position:absolute;left:36px;bottom:110px;font-size:30px;font-weight:800"></div>
+  <div id="s5jp" class="jp" style="z-index:6;position:absolute;left:36px;bottom:72px;font-size:24px;opacity:.9"></div>
+  <div style="z-index:6;position:absolute;left:36px;right:36px;bottom:24px;font-size:10px;opacity:.6">Photos: Suicasmo, Basile Morin, Nacaru (CC BY-SA 4.0), David Kernan (CC BY 4.0) via Wikimedia Commons</div>
+</div>
+
+<!-- S7 stats -->
+<div class="layer" id="s7">
+  <div class="cap" style="top:110px"><div class="kick">All inside one free app</div><div class="title">Everything you need to begin</div></div>
+  <div id="stats"></div>
+</div>
+
+<!-- S9 outro -->
+<div class="layer" id="s9">
+  <div id="logo2" style="position:absolute;left:50%;top:240px;width:150px;height:150px;margin-left:-75px;border-radius:42px;background:#fff;display:grid;place-items:center;box-shadow:0 30px 80px rgba(0,0,0,.35)"><span class="jp" style="font-size:96px;color:#e2553c;font-weight:800;line-height:1">道</span></div>
+  <div style="position:absolute;left:0;right:0;top:425px;text-align:center;font-size:52px;font-weight:900">Nihongo Path</div>
+  <div style="position:absolute;left:0;right:0;top:495px;text-align:center;font-size:24px;font-weight:600;opacity:.92">Start your Japanese journey today</div>
+  <div id="pills" style="position:absolute;left:0;right:0;top:570px;display:flex;justify-content:center;gap:10px"></div>
+  <div id="cta" style="position:absolute;left:70px;right:70px;top:680px;height:74px;border-radius:24px;background:#fff;color:#1d1d22;display:grid;place-items:center;font-size:26px;font-weight:900;box-shadow:0 20px 50px rgba(0,0,0,.3)">Free on Android</div>
+  <div id="bye" class="jp" style="position:absolute;left:0;right:0;top:800px;text-align:center;font-size:30px;opacity:.9">がんばって！</div>
+</div>
+
+<script>
+const BAR = 2.4;
+const S = { s0: [0, 4.8], s1: [4.8, 9.6], s2: [9.6, 14.4], s3: [14.4, 19.2], s4: [19.2, 24], s5: [24, 28.8], s6: [28.8, 33.6], s7: [33.6, 38.4], s8: [38.4, 43.2], s9: [43.2, 50.4] };
+const BG = { s0: ["#e2553c", "#7d1f35"], s1: ["#1f2a44", "#0c1222"], s2: ["#2f6fb0", "#14254d"], s3: ["#d0531c", "#561a0c"], s4: ["#3f8a55", "#123321"], s5: ["#111", "#000"], s6: ["#7a3fa0", "#28123f"], s7: ["#1f2a44", "#0c1222"], s8: ["#c58a21", "#4a2a08"], s9: ["#e2553c", "#7d1f35"] };
+const FEAT = {
+  s2: { kick: "Read & write", title: "All 104 kana <em>in days</em>", front: "kana", back: "write", chips: ["Hear every sound", "Stroke order", "Hindi hints"] },
+  s3: { kick: "Speak", title: "Speak - and <em>see</em> your voice", front: "speak", back: "lab", chips: ["Record & replay", "Spectrogram", "Vowel map"] },
+  s4: { kick: "Words that matter", title: "The <em>2,000 words</em> people really say", front: "words", back: "cards", chips: ["Smart flashcards", "JLPT N5–N1", "15 topics"] },
+  s6: { kick: "Explore", title: "Map, places & <em>culture</em>", front: "famous", back: "geo", chips: ["47 prefectures", "Map quiz", "Etiquette"] },
+  s8: { kick: "Every day", title: "Streaks, badges & <em>your goal</em>", front: "home", back: "me", chips: ["Daily plan", "30+ badges", "Offline"] },
+};
+const $ = (id) => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const eo = (x) => 1 - Math.pow(1 - clamp(x), 3);
+const eb = (x) => { x = clamp(x); const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const lerp = (a, b, t) => a + (b - a) * t;
+const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+const mix = (a, b, t) => { const x = hex(a), y = hex(b); return "rgb(" + x.map((v, i) => Math.round(lerp(v, y[i], t))).join(",") + ")"; };
+
+// build feature scenes
+let html = "";
+for (const [k, f] of Object.entries(FEAT)) {
+  html += `<div class="layer" id="${k}"><div class="cap"><div class="kick">${f.kick}</div><div class="title">${f.title}</div></div>
+    <div class="phone" id="${k}b" style="left:250px;top:290px"><img src="a/${f.back}.png"></div>
+    <div class="phone" id="${k}f" style="left:46px;top:258px"><img src="a/${f.front}.png"></div>
+    <div class="chips">${f.chips.map((c, i) => `<span class="chip" id="${k}c${i}">${c}</span>`).join("")}</div></div>`;
+}
+$("features").innerHTML = html;
+// petals
+$("petals").innerHTML = Array.from({ length: 14 }, (_, i) => `<i class="petal" id="pt${i}"></i>`).join("");
+// kana
+const KANA = [["あ", "a"], ["い", "i"], ["う", "u"], ["え", "e"], ["お", "o"], ["か", "ka"], ["さ", "sa"], ["た", "ta"], ["な", "na"], ["日", "sun"], ["本", "book"], ["語", "word"]];
+$("kana").innerHTML = KANA.map(([k, r], i) => `<div id="k${i}" style="position:absolute;width:100px;height:110px;border-radius:24px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;left:${30 + (i % 4) * 122}px;top:${Math.floor(i / 4) * 128 - 40}px"><span class="jp" style="font-size:54px;font-weight:700;line-height:1">${k}</span><span style="font-size:15px;opacity:.7;margin-top:4px">${r}</span></div>`).join("");
+const STATS = [["2,000", "most-spoken words"], ["5,000+", "example sentences"], ["104", "kana with stroke order"], ["25", "grammar lessons"], ["47", "prefectures on the map"], ["0", "ads · 100% offline"]];
+$("stats").innerHTML = STATS.map(([n, l], i) => `<div class="stat" id="st${i}" style="top:${300 + i * 92}px"><b id="stn${i}">${n}</b><span>${l}</span></div>`).join("");
+$("pills").innerHTML = ["English", "हिन्दी", "日本語"].map((p) => `<span class="chip" style="font-size:18px">${p}</span>`).join("");
+const PH = [["Mount Fuji", "富士山"], ["Fushimi Inari, Kyoto", "伏見稲荷大社"], ["Kinkaku-ji, Kyoto", "金閣寺"], ["Shibuya, Tokyo", "渋谷"]];
+
+function render(t) {
+  // background: blend between scene colours around boundaries
+  const keys = Object.keys(S);
+  let cur = keys.find((k) => t >= S[k][0] && t < S[k][1]) || "s9";
+  const ci = keys.indexOf(cur), [a, b] = S[cur];
+  const nxt = keys[ci + 1];
+  const tb = nxt ? clamp((t - (b - 0.35)) / 0.35) : 0;
+  const c0 = BG[cur], c1 = nxt ? BG[nxt] : BG[cur];
+  $("bg").style.background = `radial-gradient(130% 75% at 80% 0%, ${mix(c0[0], c1[0], tb)}, ${mix(c0[1], c1[1], tb)} 72%)`;
+  // petals
+  for (let i = 0; i < 14; i++) {
+    const sp = 7 + (i % 5) * 1.6, ph = (t / sp + i * 0.137) % 1;
+    const p = $("pt" + i);
+    p.style.left = ((i * 41) % 540) - ph * 90 + Math.sin(t * 1.3 + i) * 18 + "px";
+    p.style.top = -20 + ph * 1000 + "px";
+    p.style.transform = `rotate(${ph * 600 + i * 30}deg)`;
+    p.style.opacity = cur === "s5" ? 0 : 0.85 * Math.sin(ph * Math.PI);
+  }
+  // layers visibility with crossfade
+  for (const k of keys) {
+    const [x, y] = S[k], el = $(k);
+    const lt = t - x, d = y - x;
+    let o = 0;
+    if (t >= x - 0.01 && t < y + 0.3) o = clamp(lt / 0.3) * (k === "s9" ? 1 : clamp((y - t) / 0.3 + 0.0001));
+    if (k === "s9" && t >= x) o = clamp(lt / 0.3);
+    el.style.opacity = o;
+    el.style.display = o > 0 ? "block" : "none";
+    if (o <= 0) continue;
+    if (FEAT[k]) {
+      const f = $(k + "f"), bk = $(k + "b");
+      const e1 = eo(lt / 0.8), e2 = eo((lt - 0.12) / 0.9);
+      const drift = lt * 4;
+      f.style.transform = `translateY(${(1 - e1) * 140 - drift}px) rotate(${lerp(6, -5, e1)}deg) scale(${lerp(0.9, 1, e1)})`;
+      bk.style.transform = `translateY(${(1 - e2) * 180 - drift * 0.6}px) rotate(${lerp(0, 7, e2)}deg) scale(${lerp(0.8, 0.9, e2)})`;
+      bk.style.opacity = e2 * 0.92;
+      const cap = el.querySelector(".cap");
+      cap.style.transform = `translateX(${(1 - eo(lt / 0.6)) * -60}px)`; cap.style.opacity = eo(lt / 0.6);
+      for (let i = 0; i < 3; i++) { const c = $(k + "c" + i); const e = eb((lt - 0.7 - i * 0.15) / 0.45); c.style.transform = `scale(${e})`; c.style.opacity = clamp(e * 2); }
+    }
+  }
+  // S0 logo
+  { const lt = t - S.s0[0];
+    $("logo").style.transform = `scale(${eb(lt / 0.8)}) rotate(${(1 - eo(lt / 0.8)) * -20}deg)`;
+    $("s0name").style.opacity = eo((lt - 0.5) / 0.5); $("s0name").style.transform = `translateY(${(1 - eo((lt - 0.5) / 0.5)) * 30}px)`;
+    $("s0jp").style.opacity = eo((lt - 0.8) / 0.5) * 0.9;
+    $("s0tag").style.opacity = eo((lt - 1.2) / 0.6) * 0.9; }
+  // S1 kana pop in on beats
+  { const lt = t - S.s1[0];
+    for (let i = 0; i < KANA.length; i++) { const e = eb((lt - 0.6 - i * 0.3) / 0.4); const el = $("k" + i); el.style.transform = `scale(${e}) translateY(${Math.sin(t * 2 + i) * 3}px)`; el.style.opacity = clamp(e); el.style.background = (lt - 0.6 - i * 0.3) > 0 && (lt - 0.6 - i * 0.3) < 0.3 ? "rgba(226,85,60,.85)" : "rgba(255,255,255,.1)"; } }
+  // S5 photos: 4 x 1.2s ken burns
+  { const lt = t - S.s5[0]; const n = Math.max(0, Math.min(3, Math.floor(lt / 1.2)));
+    for (let i = 0; i < 4; i++) { const p = $("p" + i); const pl = lt - i * 1.2; p.style.opacity = i === n ? clamp(pl / 0.25) : i < n ? 1 : 0; p.style.zIndex = i;
+      p.querySelector("img").style.transform = `scale(${1.08 + 0.1 * clamp(pl / 1.6)}) translateX(${(i % 2 ? -1 : 1) * 12 * clamp(pl / 1.6)}px)`; }
+    $("s5label").textContent = PH[n][0]; $("s5jp").textContent = PH[n][1];
+    const tt = eo(lt / 0.6); $("s5title").parentElement.style.opacity = tt; }
+  // S7 stats count up
+  { const lt = t - S.s7[0];
+    STATS.forEach(([n, l], i) => { const e = eo((lt - 0.4 - i * 0.35) / 0.5); const el = $("st" + i); el.style.opacity = e; el.style.transform = `translateX(${(1 - e) * 80}px)`;
+      const num = parseInt(n.replace(/[^0-9]/g, "")) || 0; const cnt = Math.round(num * eo((lt - 0.4 - i * 0.35) / 0.9));
+      $("stn" + i).textContent = num ? cnt.toLocaleString("en-US") + (n.endsWith("+") ? "+" : "") : n; }); }
+  // S9 outro
+  { const lt = t - S.s9[0];
+    $("logo2").style.transform = `scale(${eb(lt / 0.7)})`;
+    $("cta").style.transform = `scale(${eb((lt - 0.9) / 0.5) * (1 + 0.03 * Math.sin(lt * 5))})`;
+    $("bye").style.opacity = eo((lt - 1.6) / 0.6);
+    const fade = clamp((50.4 - t) / 0.8); document.body.style.opacity = fade; }
+}
+window.render = render;
+</script>
+</body></html>

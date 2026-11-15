@@ -2,26 +2,26 @@ import { Coffee, Github, Heart, IndianRupee, Share2 } from "lucide-react";
 import { SUPPORT, hasSupport } from "../support";
 import { openExternal } from "../core/native";
 import { toast } from "../core/store";
-import { Header } from "../ui/kit";
+import { useEffect } from "react";
+import { go } from "../core/router";
 import { childMode } from "../core/child";
-import { AboutBlock } from "./About";
 
 /** Optional, voluntary support - the app stays free with no locked features. */
-export default function Support() {
+export function SupportBlock() {
   const share = async () => {
     const text = "I’m learning Japanese with Nihongo Path - free, with Hindi explanations, voice analysis and stroke order." + (SUPPORT.shareUrl ? " " + SUPPORT.shareUrl : "");
     try { if (navigator.share) { await navigator.share({ text }); return; } } catch { /* fall back */ }
     openExternal("https://wa.me/?text=" + encodeURIComponent(text));
   };
   const upi = (amt: number) => openExternal(`upi://pay?pa=${encodeURIComponent(SUPPORT.upiId)}&pn=${encodeURIComponent(SUPPORT.upiName || "Nihongo Path")}&am=${amt}&cu=INR&tn=${encodeURIComponent("Support Nihongo Path")}`);
-  if (childMode()) return <div className="screen"><Header title="Support" backTo="/me" /><div className="card sm">Support options are not shown in child mode. Thank you for learning with us!</div></div>;
+  if (childMode()) return <div className="card sm">Thank you for learning with us!</div>;
   return (
-    <div className="screen">
-      <Header title="Support Nihongo Path" sub="Free forever - support is optional" backTo="/me" />
-      <div className="card hero tint-shu">
-        <Heart size={30} />
-        <div style={{ fontSize: 20, fontWeight: 800, marginTop: 6 }}>Keep it free for every learner</div>
-        <div className="sm mu mt4" style={{ lineHeight: 1.6 }}>No ads, no tracking, nothing locked. If the app helps you, a small contribution pays for new languages, more words and better voice tools. Every feature stays free whether you support or not.</div>
+    <>
+      <div className="card">
+        <div className="row top" style={{ gap: 12 }}>
+          <Heart size={22} color="var(--sakura)" style={{ flex: "none", marginTop: 2 }} />
+          <div className="sm" style={{ lineHeight: 1.55 }}>No ads, no tracking, nothing locked. If the app helps you, a small contribution pays for new languages, more words and better voice tools.</div>
+        </div>
       </div>
       {SUPPORT.upiId && (
         <div className="card mt12">
@@ -37,13 +37,15 @@ export default function Support() {
           {SUPPORT.githubSponsors && <button className="li" onClick={() => openExternal(SUPPORT.githubSponsors)}><span className="ico soft-ai"><Github size={19} color="var(--ai)" /></span><span className="grow"><div className="t">GitHub Sponsors</div><div className="d">For developers</div></span></button>}
         </div>
       )}
-      {!hasSupport() && <div className="card flat mt12 sm mu">Support options will appear here soon.</div>}
-      <div className="section-title"><h2>About the app</h2></div>
-      <AboutBlock />
+      {!hasSupport() && <div className="card flat mt12 sm mu">Ways to contribute are coming soon.</div>}
       <div className="section-title"><h2>Free ways to help</h2></div>
       <div className="list">
         <button className="li" onClick={share}><span className="ico soft-matcha"><Share2 size={19} color="var(--matcha)" /></span><span className="grow"><div className="t">Share with a friend</div><div className="d">The best support is another learner</div></span></button>
       </div>
-    </div>
+    </>
   );
 }
+
+/** Old route: support now lives on the About page. */
+export default function Support() { return <SupportRedirect />; }
+function SupportRedirect() { useEffect(() => { go("/me/about", true); }, []); return null; }

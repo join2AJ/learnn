@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
-import { Check, Copy, Mail, MessageCircle, Send, Share2, Smartphone } from "lucide-react";
+import { ArrowRight, Check, Copy, Mail, MessageCircle, Send, Share2, Smartphone } from "lucide-react";
+import { go } from "../core/router";
+import { SupportBlock } from "./Support";
 import { ABOUT_ME, BUILD_CONTACT } from "../support";
 import { APP_VERSION } from "../changelog";
 import { openExternal, shareText } from "../core/native";
@@ -24,7 +26,7 @@ const BUDGETS = ["Under ₹10,000", "₹10,000 – 25,000", "₹25,000 – 50,00
 const TIMELINES = ["As soon as possible", "Within 1 month", "1 – 3 months", "Flexible"];
 const STAGES = ["Just an idea", "Have a design / sketch", "Have an existing app to improve"];
 
-export default function About() {
+export function BuildApp() {
   const st = useSettings();
   const [cat, setCat] = useState("");
   const [sub, setSub] = useState("");
@@ -69,14 +71,8 @@ export default function About() {
 
   return (
     <div className="screen">
-      <Header title="About" sub={"Nihongo Path · version " + APP_VERSION} backTo="/me" />
-
-      <AboutBlock />
-
-      <div className="card mt16 soft-ai" style={{ boxShadow: "none" }}>
-        <div className="row"><Smartphone size={24} color="var(--ai)" /><div className="grow"><div style={{ fontWeight: 800, fontSize: 17 }}>Want your own Android app?</div><div className="sm">I build apps like this one. Tell me what you need - it takes 2 minutes.</div></div></div>
-      </div>
-
+      <Header title="Build an app like this" sub="Tell me what you need - about 2 minutes" backTo="/me/about" />
+      <div className="card" style={{ padding: "4px 16px" }}>
       <Step n={1} title="What kind of app?">
         <div className="chips" style={{ flexWrap: "wrap" }}>{Object.keys(APP_CATEGORIES).map((c) => <button key={c} className={"chip" + (cat === c ? " on" : "")} onClick={() => { tap(); setCat(c); setSub(APP_CATEGORIES[c].length === 1 ? APP_CATEGORIES[c][0] : ""); }}>{c}</button>)}</div>
         {cat && <><div className="xs mu mt12" style={{ fontWeight: 700 }}>Sub-category</div>
@@ -102,6 +98,7 @@ export default function About() {
         <div className="xs mu mt8">Only sent when you press a button below, through your own email or WhatsApp. Nothing is stored or uploaded by this app.</div>
       </Step>
 
+      </div>
       {!ready && <div className="xs mu mt12 center">Still needed: {missing.join(", ")}</div>}
       <div className="col gap8 mt12">
         {BUILD_CONTACT.whatsapp && <button className="btn primary block" disabled={!ready} onClick={() => send("wa")}><MessageCircle size={17} /> Send on WhatsApp</button>}
@@ -116,9 +113,9 @@ export default function About() {
 
 function Step({ n, title, hint, children }: { n: number; title: string; hint?: string; children: React.ReactNode }) {
   return (
-    <div className="card mt12">
+    <div style={{ padding: "16px 0", borderTop: n > 1 ? "1px solid var(--line)" : "none" }}>
       <div className="row" style={{ marginBottom: 10 }}>
-        <span style={{ width: 26, height: 26, borderRadius: 13, background: "var(--ai)", color: "#fff", display: "grid", placeItems: "center", fontWeight: 800, fontSize: 13 }}>{n}</span>
+        <span className="xs" style={{ fontWeight: 800, color: "var(--ink-3)", width: 18 }}>{n}</span>
         <div className="grow" style={{ fontWeight: 800 }}>{title}</div>
         {hint && <span className="xs mu">{hint}</span>}
       </div>
@@ -132,7 +129,7 @@ export function AboutBlock() {
   const pk = usePack();
   const stats = useMemo(() => contentStats(pk), [pk]);
   return (<>
-      <div className="card hero tint-shu">
+      <div className="card hero tint-shu" style={{ marginTop: 0 }}>
       <div className="watermark">道</div>
       <div className="kicker">About the app</div>
       <div style={{ fontWeight: 800, fontSize: 19, margin: "2px 0 6px" }}>Nihongo Path · 日本語の道</div>
@@ -141,10 +138,32 @@ export function AboutBlock() {
     </div>
 
     <div className="card mt12">
-      <div className="kicker">From the developer</div>
+      <div className="kicker">Our story</div>
       <div style={{ fontWeight: 800, fontSize: 17, marginTop: 2 }}>{ABOUT_ME.title}</div>
       {ABOUT_ME.paragraphs.map((t, i) => <p key={i} className="sm" style={{ lineHeight: 1.65, margin: "8px 0 0" }}>{t}</p>)}
     </div>
 
   </>);
+}
+
+export default function About() {
+  return (
+    <div className="screen">
+      <Header title="About us" sub={"Nihongo Path · version " + APP_VERSION} backTo="/me" />
+      <AboutBlock />
+      <div id="support" className="section-title"><h2>Support us</h2></div>
+      <SupportBlock />
+      <div className="section-title"><h2>Build an app like this</h2></div>
+      <div className="card">
+        <div className="row top" style={{ gap: 12 }}>
+          <span className="ico" style={{ background: "var(--surface-2)", width: 40, height: 40, borderRadius: 12, display: "grid", placeItems: "center", flex: "none" }}><Smartphone size={20} /></span>
+          <div className="grow">
+            <div style={{ fontWeight: 800 }}>Want your own Android app?</div>
+            <div className="sm mu mt4" style={{ lineHeight: 1.5 }}>For a shop, school, clinic, community or idea - tell me the type of app, features and budget, and I’ll get back to you.</div>
+          </div>
+        </div>
+        <button className="btn block mt12" onClick={() => go("/me/build")}>Request an app <ArrowRight size={16} /></button>
+      </div>
+    </div>
+  );
 }

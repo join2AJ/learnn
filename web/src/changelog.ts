@@ -1,6 +1,9 @@
 /** Shown once after each update ("What's new"). Newest first. */
-export const APP_VERSION = "3.5";
+export const APP_VERSION = "3.6";
 export const CHANGELOG: { v: string; date: string; items: [string, string][] }[] = [
+  { v: "3.6", date: "17 Nov 2026", items: [
+    ["heart", "One “About us” page: our story, how to support the app, and a request form for your own Android app - simpler and calmer."],
+  ] },
   { v: "3.5", date: "17 Nov 2026", items: [
     ["sparkles", "Brand-new intro: swipe through real screens of the app, hear Japanese on every slide, then set up in a minute."],
     ["heart", "Support page now tells the story of the app and why it was made."],

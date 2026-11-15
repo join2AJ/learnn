@@ -1,0 +1,22 @@
+const { chromium } = require('playwright');
+(async () => {
+  const out = process.argv[2], dark = process.argv[3] !== 'light';
+  const b = await chromium.launch();
+  const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true, colorScheme: dark ? 'dark' : 'light' });
+  await ctx.addInitScript(() => { if (!localStorage.getItem('np2:settings')) localStorage.setItem('np2:settings', JSON.stringify({ onboarded: true, profiled: true, toured: true, seenVersion: '3.5', privacyOk: true, showHindi: true })); });
+  const pg = await ctx.newPage(); const base = 'http://localhost:4173/index.html';
+  const shot = async (route, name, act) => { await pg.goto(base + '#/explore/resources'); await pg.waitForTimeout(150); await pg.goto(base + '#' + route); await pg.waitForTimeout(900); if (act) await act(); await pg.waitForTimeout(600); await pg.screenshot({ path: out + '/' + name + '.png' }); };
+  await shot('/', 'home');
+  await shot('/learn/kana/hira', 'kana');
+  await shot('/practice/speak', 'speak');
+  await shot('/lab', 'lab', async () => { await pg.locator('button', { hasText: 'Vowels' }).first().click(); });
+  await shot('/practice/cards', 'cards', async () => { await pg.locator('button', { hasText: 'Show answer' }).click(); });
+  await shot('/practice/write', 'write');
+  await shot('/explore/famous', 'famous', async () => { await await pg.locator('h2', { hasText: 'Top attractions' }).evaluate((e) => e.scrollIntoView()); await pg.evaluate(() => window.scrollBy(0, -70)); });
+  await shot('/explore/map', 'geo', async () => { await pg.locator('button', { hasText: 'Landscape' }).click(); });
+  await shot('/explore/map', 'sights', async () => { await pg.locator('button', { hasText: 'Sights' }).click(); });
+  await shot('/learn/words', 'words');
+  await shot('/explore/culture/do', 'culture');
+  await shot('/me', 'me');
+  await b.close();
+})();
