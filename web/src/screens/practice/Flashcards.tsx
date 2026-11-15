@@ -9,16 +9,18 @@ import type { LetterCell } from "../../core/types";
 import { usePack } from "../../pack";
 import { Bar, Header, pick, Say, Seg, tap } from "../../ui/kit";
 import { RecBtn } from "../../ui/VoiceCompare";
+import { FreqMeter } from "../../core/freq";
+import type { Word } from "../../core/types";
 import { Icon } from "../../ui/icons";
 
 const DECKS = [
-  { id: "words", top: "Words", sub: "शब्द", name: "Words (1,000 core)", en: "the most-used Japanese words, with meaning and an example sentence.", hi: "सबसे ज़्यादा इस्तेमाल होने वाले 1,000 जापानी शब्द - अर्थ और वाक्य के साथ।" },
+  { id: "words", top: "Words", sub: "शब्द", name: "Words (2,000 core)", en: "the most-spoken Japanese words, most frequent first, with meaning and an example sentence.", hi: "सबसे ज़्यादा बोले जाने वाले 2,000 जापानी शब्द - अर्थ और वाक्य के साथ।" },
   { id: "hira", top: "ひらがな", sub: "Hiragana", name: "Hiragana", en: "the basic Japanese alphabet used for native words and grammar endings.", hi: "मूल जापानी वर्णमाला - जापानी शब्दों और व्याकरण के लिए।" },
   { id: "kata", top: "カタカナ", sub: "Katakana", name: "Katakana", en: "the same sounds in angular shapes, used for foreign words like コーヒー (coffee).", hi: "वही ध्वनियाँ, कोणीय अक्षर - विदेशी शब्दों के लिए (जैसे コーヒー = कॉफ़ी)।" },
   { id: "kanji", top: "漢字", sub: "Kanji", name: "Kanji", en: "characters from Chinese that carry meaning, like 日 (sun/day) and 山 (mountain).", hi: "चीनी से आए अर्थ वाले अक्षर - जैसे 日 (सूर्य/दिन), 山 (पहाड़)।" },
 ];
 
-type Card = { id: string; front: string; reading?: string; romaji?: string; meaning: string; hindi?: string; s?: string; sr?: string; st?: string; speakText: string; kind: "word" | "kana" };
+type Card = { word?: Word; id: string; front: string; reading?: string; romaji?: string; meaning: string; hindi?: string; s?: string; sr?: string; st?: string; speakText: string; kind: "word" | "kana" };
 
 export default function Flashcards({ deck }: { deck: string }) {
   const pk = usePack();
@@ -27,7 +29,7 @@ export default function Flashcards({ deck }: { deck: string }) {
 
   const cards = useMemo(() => {
     const m = new Map<string, Card>();
-    if (deck === "words") pk.words.forEach((w) => m.set("w:" + w.n, { id: "w:" + w.n, front: w.w, reading: w.r, romaji: w.ro, meaning: w.m, hindi: w.h, s: w.s, sr: w.sr, st: w.st, speakText: w.r, kind: "word" }));
+    if (deck === "words") pk.words.forEach((w) => m.set("w:" + w.n, { word: w, id: "w:" + w.n, front: w.w, reading: w.r, romaji: w.ro, meaning: w.m, hindi: w.h, s: w.s, sr: w.sr, st: w.st, speakText: w.r, kind: "word" }));
     else {
       const a = pk.alphabets.find((x) => x.id === deck);
       a?.groups.forEach((g) => g.rows.forEach((r) => (r.cells.filter(Boolean) as LetterCell[]).forEach((c) =>
@@ -114,6 +116,7 @@ export default function Flashcards({ deck }: { deck: string }) {
               <div className="jp mu" style={{ fontSize: 18 }}>{card.reading}{s.showRomaji && <span className="mu2"> · {card.romaji}</span>}</div>
               <div style={{ fontWeight: 800, fontSize: 21, marginTop: 8 }}>{card.meaning}</div>
               {s.showHindi && <div className="hi lg">{card.hindi}</div>}
+              {card.word && <div className="mt4"><FreqMeter w={card.word} /></div>}
               <div className="divider" style={{ width: "100%" }} />
               <div className="row" style={{ textAlign: "left", width: "100%" }}>
                 <div className="grow"><div className="jp" style={{ fontSize: 16 }}>{card.s}</div>{s.showRomaji && <div className="xs mu2">{card.sr}</div>}<div className="xs mu">{card.st}</div></div>

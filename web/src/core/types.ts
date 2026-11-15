@@ -20,6 +20,9 @@ export interface Word {
   p?: string;         // pronunciation note
   k?: string;         // remark / usage note
   b?: string;         // rank basis
+  z?: number;         // Zipf frequency (wordfreq)
+  pm?: number;        // uses per million words in everyday sentences (Tatoeba)
+  rank?: number;      // position when ordered by how often it is spoken (1 = most)
 }
 
 export interface CoreGrammar {

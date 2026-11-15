@@ -7,7 +7,7 @@ import { speak, vibrate } from "../core/native";
 import { Switch, tap } from "../ui/kit";
 import { Icon } from "../ui/icons";
 
-const AGES = ["Under 13", "13–17", "18–24", "25–34", "35–44", "45–59", "60+"];
+const AGES = ["Under 13", "13–17", "18–24", "25–34", "35–44", "45–59", "60+", "Prefer not to say"];
 const REASONS: [string, string, string][] = [["travel", "Travel to Japan", "plane"], ["anime", "Anime, manga, games", "game"], ["job", "Job in Japan", "briefcase"], ["jlpt", "Pass the JLPT", "notebook"], ["study", "Study in Japan", "grad"], ["friends", "Friends or family", "users"], ["business", "Business / clients", "building"], ["fun", "Brain training & fun", "brain"]];
 const TIMES = [10, 15, 20, 30, 45, 60];
 
@@ -40,7 +40,7 @@ export default function Onboarding() {
         <h1 style={{ fontSize: 34, margin: "0 0 6px", letterSpacing: "-.02em", lineHeight: 1.1 }}>Nihongo Path</h1>
         <p style={{ fontSize: 17, margin: "0 0 18px", opacity: .92, lineHeight: 1.45 }}>Learn Japanese from your very first あ to real conversations - explained in English and हिन्दी.</p>
         <div className="col" style={{ gap: 8, marginBottom: 22 }}>
-          {[["timer", "Just 20 minutes a day, with a clear plan"], ["bookCheck", "1,000 words that cover about 80% of daily speech"], ["mic", "See your voice and your handwriting scored"], ["trophy", "XP, streaks, badges and a 30-day pledge"]].map(([ic, t]) => (
+          {[["timer", "Just 20 minutes a day, with a clear plan"], ["bookCheck", "2,000 most-spoken words - the first 1,000 cover about 80% of daily speech"], ["mic", "See your voice and your handwriting scored"], ["trophy", "XP, streaks, badges and a 30-day pledge"]].map(([ic, t]) => (
             <div key={t} className="row" style={{ gap: 10 }}><span style={{ width: 32, height: 32, borderRadius: 10, background: "rgba(255,255,255,.18)", display: "grid", placeItems: "center", flex: "none" }}><Icon name={ic} size={17} /></span><span className="sm" style={{ fontWeight: 600 }}>{t}</span></div>
           ))}
         </div>
@@ -105,11 +105,11 @@ export default function Onboarding() {
       <Head kicker="About you" title="Nice to meet you! What’s your name?" sub="はじめまして - we’ll use it to cheer you on." />
       <input type="text" value={name} placeholder="Your name" onChange={(e) => setName(e.target.value)} autoComplete="given-name" />
       {name.trim() && <div className="card soft-shu mt12" style={{ boxShadow: "none" }}><div className="jp" style={{ fontSize: 20, fontWeight: 700 }}>はじめまして、{name.trim()}さん！</div><div className="xs mu">hajimemashite, {name.trim()}-san - nice to meet you</div></div>}
-      <div className="sm mu mt16" style={{ fontWeight: 700 }}>Your age</div>
+      <div className="sm mu mt16" style={{ fontWeight: 700 }}>Your age (optional)</div>
       <div className="row wrap mt8 gap6">{AGES.map((a) => <button key={a} className={"chip" + (age === a ? " shu on" : "")} onClick={() => { tap(); setAge(a); }}>{a}</button>)}</div>
-      <div className="xs mu mt8">Used only on this phone to suggest a sensible daily pace.</div>
+      <div className="xs mu mt8">Optional. Stays on this phone only and is used to suggest a sensible daily pace. Under 18? Please check with a parent before using voice features.</div>
       <div style={{ flex: 1 }} />
-      <button className="btn primary lg block mt24" disabled={!name.trim() || !age} onClick={() => { setSettings({ name: name.trim(), age }); if (name.trim()) speak("はじめまして、" + name.trim() + "さん", { lang: "ja-JP" }); next(); }}>Continue <ArrowRight size={18} /></button>
+      <button className="btn primary lg block mt24" disabled={!name.trim()} onClick={() => { setSettings({ name: name.trim(), age }); if (name.trim()) speak("はじめまして、" + name.trim() + "さん", { lang: "ja-JP" }); next(); }}>Continue <ArrowRight size={18} /></button>
     </div>
   );
 

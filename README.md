@@ -1,6 +1,6 @@
 # Nihongo Path - learn Japanese fast (Android)
 
-**Install:** download [`release/NihongoPath-v2.7.apk`](release/NihongoPath-v2.7.apk) to your phone, open it and allow "install unknown apps". Android 7.0+.
+**Install:** download [`release/NihongoPath-v2.8.apk`](release/NihongoPath-v2.8.apk) to your phone, open it and allow "install unknown apps". Android 7.0+.
 
 A beginner-first Japanese course with English **and Hindi** explanations:
 
@@ -20,9 +20,10 @@ Rewards: XP and levels (初心者 → 伝説), streaks, daily-goal bonus, badges
 
 | Content | Count |
 |---|---|
-| Core words (frequency-ranked, with Hindi) | 1,000 |
-| Example sentences | 1,214 |
-| Hindi translations | 1,200 |
+| Core words (ordered by how often they are spoken, with Hindi) | 2,000 |
+| Example sentences (on words, lessons, phrases) | ~2,200 |
+| Sentence bank (real Tatoeba sentences, by level) | 3,200 |
+| Hindi translations | 2,200+ |
 | Grammar lessons / units / quiz questions | 25 / 5 / 75 |
 | Core grammar words | 30 |
 | Survival phrases (8 topics) | 49 |
@@ -67,6 +68,9 @@ per language.
 ## Phone setup tips
 - No sound? Settings → System → Languages → Text-to-speech → install the **Japanese** voice (or Me → Settings → Japanese voice).
 - Speak aloud needs the Google app's speech recognition (internet, or the offline Japanese pack).
+
+## Security & continuity
+See [docs/AUDIT.md](docs/AUDIT.md) for the ISO 27001 / 22301 / 31000 and NIST CSF review and the action plan. Third-party data licences: [LICENSES.md](LICENSES.md). Rebuild the word list with `scripts/build_words.py` (see its header).
 
 ## Credits
 Stroke order: [KanjiVG](https://kanjivg.tagaini.net) (CC BY-SA 3.0). Word ranks: Mindomax (OpenSubtitles + Tatoeba) and wordfreq. Example sentences are AI-written; formant values are rounded literature averages.

@@ -12,6 +12,7 @@ import { GrammarList, LessonView, CoreGrammarView } from "./learn/Grammar";
 import Verbs from "./learn/Verbs";
 import Words from "./learn/Words";
 import Phrases from "./learn/Phrases";
+import Sentences from "./learn/Sentences";
 
 export default function Learn({ route }: { route: Route }) {
   const [, sub, id] = route.parts;
@@ -24,6 +25,7 @@ export default function Learn({ route }: { route: Route }) {
     case "verbs": return <Verbs initial={route.query.get("w")} />;
     case "words": return <Words />;
     case "phrases": return <Phrases />;
+    case "sentences": return <Sentences />;
   }
   return <LearnHub />;
 }
@@ -62,8 +64,9 @@ function LearnHub() {
 
       <div className="section-title"><h2>3 · Words & phrases</h2></div>
       <div className="list">
-        <Item to="/learn/words" tint="soft-gold" icon={<BookA size={19} color="var(--gold)" />} title="1,000 core words" desc={p.known.length + " known · by frequency, with Hindi + sentences"} pct={p.known.length / 1000} />
+        <Item to="/learn/words" tint="soft-gold" icon={<BookA size={19} color="var(--gold)" />} title="2,000 core words" desc={p.known.length + " known · most spoken first, with Hindi + sentences"} pct={p.known.length / 2000} />
         <Item to="/learn/phrases" tint="soft-sakura" icon={<MessageCircle size={19} color="var(--sakura)" />} title="Survival phrases" desc="Greetings, food, travel, shopping - tap to hear" />
+        <Item to="/learn/sentences" tint="soft-ai" icon={<MessageCircle size={19} color="var(--ai)" />} title="Sentence bank" desc="3,200 real sentences, simplest & most common first" />
       </div>
     </div>
   );

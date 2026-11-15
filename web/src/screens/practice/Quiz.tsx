@@ -26,7 +26,7 @@ const N = 10;
 function wordPool(pk: LanguagePack) {
   const known = new Set(getProgress().known);
   const size = Math.max(120, known.size + 60);
-  return pk.words.filter((w) => w.n <= size && w.t !== "expr" && w.m.length < 40);
+  return pk.words.filter((w) => (w.rank ?? w.n) <= size && w.t !== "expr" && w.m.length < 40);
 }
 const distract = <T,>(pool: T[], ans: T, n: number, key: (t: T) => string) => {
   const out = new Map<string, T>([[key(ans), ans]]);
@@ -70,7 +70,7 @@ function makeQuestions(mode: string, set: string, pk: LanguagePack, hindi: boole
     }));
   }
   if (mode === "verb") {
-    const verbs = pk.words.filter((w) => w.n <= 400 && pk.conjugate?.(w));
+    const verbs = pk.words.filter((w) => (w.rank ?? w.n) <= 600 && pk.conjugate?.(w));
     const keys = ["masu", "nai", "ta", "mashita", "te", "teiru", "tai", "masen", "nakatta", "pot"];
     return Array.from({ length: N }, () => {
       const v = pick(verbs); const forms = pk.conjugate!(v)!; const k = pick(keys); const f = forms.find((x) => x.key === k)!;

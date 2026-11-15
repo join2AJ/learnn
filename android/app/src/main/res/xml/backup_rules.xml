@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Back up progress and settings, but never voice recordings or drawings (IndexedDB). -->
 <full-backup-content>
     <include domain="root" path="app_webview/" />
+    <exclude domain="root" path="app_webview/Default/IndexedDB/" />
+    <exclude domain="root" path="app_webview/IndexedDB/" />
 </full-backup-content>

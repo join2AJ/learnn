@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Settings as Cog } from "lucide-react";
+import { Heart, Settings as Cog } from "lucide-react";
 import type { Route } from "../core/router";
 import { go } from "../core/router";
 import { dayKey, emptyDay, useProgress, useSettings } from "../core/store";
@@ -11,6 +11,8 @@ import { Bar, fmtMin, Header, Ring, Seg } from "../ui/kit";
 import Settings from "./Settings";
 import Recordings from "./Recordings";
 import MyWriting from "./MyWriting";
+import Privacy from "./Privacy";
+import Support from "./Support";
 import { Icon, IconTile } from "../ui/icons";
 
 const SEC_COL: Record<string, string> = {
@@ -23,6 +25,8 @@ export default function Me({ route }: { route: Route }) {
   if (route.parts[1] === "settings") return <Settings />;
   if (route.parts[1] === "recordings") return <Recordings />;
   if (route.parts[1] === "writing") return <MyWriting />;
+  if (route.parts[1] === "privacy") return <Privacy />;
+  if (route.parts[1] === "support") return <Support />;
   return <Stats />;
 }
 
@@ -44,8 +48,9 @@ function Stats() {
   const maxDay = Math.max(1, ...days.map((d) => d.st.ms));
   const acc = p.quiz.correct + p.quiz.wrong ? p.quiz.correct / (p.quiz.correct + p.quiz.wrong) : 0;
   const activeDays = Object.values(p.days).filter((d) => d.ms > 60_000).length;
-  const tiers: [string, number, number][] = [["1–100", 1, 100], ["101–300", 101, 300], ["301–600", 301, 600], ["601–1000", 601, 1000]];
-  const known = new Set(p.known);
+  const tiers: [string, number, number][] = [["1–100", 1, 100], ["101–300", 101, 300], ["301–600", 301, 600], ["601–1000", 601, 1000], ["1001–2000", 1001, 2000]];
+  const rankOf = new Map(pk.words.map((w) => [w.n, w.rank ?? w.n]));
+  const known = new Set(p.known.map((n) => rankOf.get(n) ?? n));
 
   return (
     <div className="screen">
@@ -137,6 +142,10 @@ function Stats() {
         ))}
         <div className="row sm mt8 mu"><span className="grow">Speaking: {p.speak.ok}/{p.speak.tries} correct</span><span>Writing: {p.writes} characters</span></div>
       </div>
+
+      <button className="card tap mt16 soft-sakura" style={{ boxShadow: "none" }} onClick={() => go("/me/support")}>
+        <div className="row"><Heart size={22} color="var(--sakura)" /><div className="grow"><div style={{ fontWeight: 800 }}>Support Nihongo Path</div><div className="xs mu">Free forever - help keep it that way</div></div></div>
+      </button>
 
       <div className="section-title"><h2>Badges</h2><span className="mu">{Object.keys(p.badges).length}/{BADGES.length}</span></div>
       <div className="grid3">

@@ -21,6 +21,7 @@ export function checkTask(check: string | undefined, p: Progress, pk: LanguagePa
     case "w300": return p.known.length >= 300;
     case "w600": return p.known.length >= 600;
     case "w1000": return p.known.length >= 1000;
+    case "w2000": return p.known.length >= 2000;
   }
   return false;
 }
@@ -41,6 +42,6 @@ export function nextStep(pk: LanguagePack, p: Progress): { title: string; sub: s
   if (kata < 46) return { title: "Katakana · " + kata + "/46 mastered", sub: "Same sounds, sharper shapes", to: kata < 10 ? "/learn/kana/kata" : "/practice/quiz/kana?set=kata", jp: "ア" };
   const next = pk.lessons.find((l) => !p.lessons[l.id]);
   if (next && (Object.keys(p.lessons).length < 5 || p.known.length >= Object.keys(p.lessons).length * 20)) return { title: next.title, sub: "Grammar · " + next.minutes + " min · " + next.unit, to: "/learn/grammar/" + next.id, jp: "文" };
-  if (p.known.length < 1000) return { title: "Words " + (p.known.length + 1) + "–" + Math.min(1000, p.known.length + 20), sub: "Flashcards with spaced repetition", to: "/practice/cards", jp: "語" };
+  if (p.known.length < 2000) return { title: "Words " + (p.known.length + 1) + "–" + Math.min(2000, p.known.length + 20), sub: "Flashcards with spaced repetition", to: "/practice/cards", jp: "語" };
   return { title: "Keep reviewing", sub: "Spaced repetition keeps everything fresh", to: "/practice/cards", jp: "復" };
 }

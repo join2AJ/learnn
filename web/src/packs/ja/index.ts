@@ -9,11 +9,11 @@ import * as C from "./content";
 
 const japanese: LanguagePack = {
   id: "ja", name: "Japanese", native: "日本語", flag: "🇯🇵", ttsLang: "ja-JP", status: "ready",
-  tagline: "Hiragana → 1,000 core words → real conversation",
+  tagline: "Hiragana → 2,000 most-spoken words → real conversation",
   greeting: C.greeting,
   alphabets,
   strokes: strokes as Record<string, string[]>,
-  words: (core as { words: Word[] }).words,
+  words: [...(core as { words: Word[] }).words].sort((a, b) => (a.rank ?? a.n) - (b.rank ?? b.n)),
   coreGrammar: (core as { grammar: CoreGrammar[] }).grammar,
   lessons, culture,
   phrases: C.phrases, roadmap: C.roadmap, resources: C.resources, pronunciation: C.pronunciation,

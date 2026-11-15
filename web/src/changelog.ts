@@ -1,6 +1,12 @@
 /** Shown once after each update ("What's new"). Newest first. */
-export const APP_VERSION = "2.7";
+export const APP_VERSION = "2.8";
 export const CHANGELOG: { v: string; date: string; items: [string, string][] }[] = [
+  { v: "2.8", date: "16 Nov 2026", items: [
+    ["book", "2,000 words (was 1,000) with Hindi - all ordered by how often they are spoken, with a “how common” meter (e.g. heard about 1 in 23 words)."],
+    ["chat", "Sentence bank: 3,200 real sentences, simplest first, filter by top-100 / 300 / 600 / 1,000 / 2,000 words."],
+    ["shield", "Privacy & your data: see what is stored and delete recordings or everything. Reset now also clears recordings and drawings."],
+    ["heart", "Support page - the app stays free; support is optional."],
+  ] },
   { v: "2.7", date: "16 Nov 2026", items: [
     ["mic", "Speak aloud now saves every attempt to My recordings with the full voice analysis and what the phone heard."],
     ["flag", "Kana chart: TODAY follows the calendar day of your plan, NEXT marks the row to learn - plus an ahead / behind note."],

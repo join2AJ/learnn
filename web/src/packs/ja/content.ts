@@ -91,7 +91,7 @@ export const roadmap: P["roadmap"] = [
     tasks: [{ text: "Grammar Unit 5", check: "unit5" }, { text: "Words 301–600", check: "w600" }, { text: "Words 601–1,000", check: "w1000" }, { text: "Learn kanji through words you know" }],
     checkpoint: "Hold a 10-minute conversation on familiar topics. JLPT N5 level." },
   { id: "p6", title: "Grow to N4 → N3", when: "Months 6–18", goal: "2,000–3,700 words, 300–650 kanji, natural listening.",
-    tasks: [{ text: "Read NHK News Web Easy weekly" }, { text: "Watch anime/dramas with Japanese subtitles" }, { text: "Shadow native audio 10 min a day" }],
+    tasks: [{ text: "Words 1,001–2,000 (most-spoken order)", check: "w2000" }, { text: "Read the Sentence bank: 3,200 real sentences" }, { text: "Read NHK News Web Easy weekly" }, { text: "Watch anime/dramas with Japanese subtitles" }, { text: "Shadow native audio 10 min a day" }],
     checkpoint: "Understand slow native conversations and simple news." },
 ];
 

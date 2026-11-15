@@ -21,7 +21,7 @@ export default function Speak() {
   const [mode, setMode] = useState<"phrases" | "words">("phrases");
   const items = useMemo<Item[]>(() => mode === "phrases"
     ? shuffle(pk.phrases.flatMap((g) => g.items.filter((i) => !i.jp.includes("/")).map((i) => ({ jp: i.jp, alt: [i.jp], ro: i.ro, en: i.en, hi: i.hi }))))
-    : shuffle(pk.words.filter((w) => w.n <= Math.max(150, p.known.length + 50)).map((w) => ({ jp: w.w, alt: [w.w, w.r], ro: w.ro, en: w.m, hi: w.h }))), [mode, pk]); // eslint-disable-line
+    : shuffle(pk.words.filter((w) => (w.rank ?? w.n) <= Math.max(150, p.known.length + 50)).map((w) => ({ jp: w.w, alt: [w.w, w.r], ro: w.ro, en: w.m, hi: w.h }))), [mode, pk]); // eslint-disable-line
   const [idx, setIdx] = useState(0);
   const [state, setState] = useState<"idle" | "listening" | "done">("idle");
   const [heard, setHeard] = useState<string[]>([]);

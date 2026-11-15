@@ -26,6 +26,7 @@ export function contentStats(pk: LanguagePack) {
     pron: pk.pronunciation.length, sounds: pk.sounds.length, vowels: pk.vowels.length, pitchWords: pk.pitch.length,
     sentenceBuilder: pk.sentenceBuilder.length, particleQuiz: pk.particleQuiz.length,
     resources: res.length, youtube: res.filter((r) => r.kind === "youtube" || r.kind === "search").length,
+    sentenceBank: 3200,
     quizTypes: 8, badges: BADGES.length, roadmap: pk.roadmap.length, hindi,
   };
 }

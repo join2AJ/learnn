@@ -4,6 +4,8 @@ import { dayKey, emitUi, exportAll, importAll, resetProgress, setSettings, toast
 import { appVersion, openExternal, openTtsSettings, speak, ttsStatus } from "../core/native";
 import { PACKS } from "../packs/registry";
 import { usePack } from "../pack";
+import { go } from "../core/router";
+import { deleteMedia } from "../core/privacy";
 import { contentStats } from "../core/contentStats";
 import { APP_VERSION } from "../changelog";
 import { Header, Seg, Switch, tap } from "../ui/kit";
@@ -65,6 +67,8 @@ export default function Settings() {
           <button className="btn sm" onClick={() => { setSettings({ pledge: { min: s.dailyGoalMin, start: dayKey(), days: 30 } }); toast("New 30-day pledge started", "ok"); }}>{s.pledge ? "Renew" : "Pledge"}</button>
         </Row>
         <Row t="Edit profile" d={[s.age, (s.reasons || []).join(", ")].filter(Boolean).join(" · ") || "Name, age, reasons"}><button className="btn sm" onClick={() => setSettings({ profiled: false })}>Edit</button></Row>
+        <Row t="Privacy & your data" d="What is stored, what leaves the phone, delete everything"><button className="btn sm" onClick={() => go("/me/privacy")}>Open</button></Row>
+        <Row t="Support the app" d="Optional - the app stays free"><button className="btn sm" onClick={() => go("/me/support")}>Open</button></Row>
         <Row t="App tour" d="How to use each tab"><button className="btn sm" onClick={() => emitUi({ type: "tour" })}>Show</button></Row>
         <Row t="What’s new" d={"Changes in v" + APP_VERSION + " and earlier"}><button className="btn sm" onClick={() => emitUi({ type: "whatsnew" })}>Show</button></Row>
       </div>
@@ -78,12 +82,12 @@ export default function Settings() {
         </div>
         <textarea value={backup} onChange={(e) => setBackup(e.target.value)} placeholder="Backup text appears here, or paste one to import" style={{ width: "100%", minHeight: 70, marginTop: 10, borderRadius: 12, border: 0, boxShadow: "inset 0 0 0 1px var(--line)", background: "var(--surface-2)", padding: 10, fontSize: 11, fontFamily: "monospace" }} />
         {!confirm ? <button className="btn ghost block mt12" style={{ color: "var(--shu)" }} onClick={() => setConfirm(true)}><RotateCcw size={15} /> Reset all progress</button>
-          : <div className="row mt12"><button className="btn grow" onClick={() => setConfirm(false)}>Cancel</button><button className="btn primary grow" onClick={() => { resetProgress(); setConfirm(false); toast("Progress reset"); }}>Yes, reset</button></div>}
+          : <div className="row mt12"><button className="btn grow" onClick={() => setConfirm(false)}>Cancel</button><button className="btn primary grow" onClick={async () => { await deleteMedia(); resetProgress(); setConfirm(false); toast("Progress, recordings and drawings reset"); }}>Yes, reset</button></div>}
       </div>
 
       <div className="section-title"><h2>What’s inside</h2><span className="mu">{pk.name} pack</span></div>
       {(() => { const c = contentStats(pk); const items: [string, string][] = [
-        ["Core words", c.words.toLocaleString()], ["Example sentences", c.sentences.toLocaleString()], ["Hindi translations", c.hindi.toLocaleString()],
+        ["Core words (most spoken first)", c.words.toLocaleString()], ["Example sentences", c.sentences.toLocaleString()], ["Sentence bank (Tatoeba)", c.sentenceBank.toLocaleString()], ["Hindi translations", c.hindi.toLocaleString()],
         ["Grammar lessons", c.lessons + " in " + c.units + " units"], ["Core grammar words", String(c.coreGrammar)], ["Lesson quiz questions", String(c.lessonQuiz)],
         ["Survival phrases", c.phrases + " in " + c.phraseGroups + " topics"], ["Hiragana / Katakana", c.hiragana + " / " + c.katakana], ["Starter kanji", String(c.kanji)],
         ["Stroke-order characters", String(c.strokeChars)], ["Memory tricks", String(c.mnemonics)], ["Verbs to conjugate", c.verbs + " × 20 forms = " + c.verbForms.toLocaleString()],
@@ -97,7 +101,7 @@ export default function Settings() {
       <div className="card sm" style={{ lineHeight: 1.6 }}>
         <div><b>Nihongo Path</b> · v{APP_VERSION} ({appVersion()})</div>
         <div className="mu mt4">Built as a multi-language engine: each language is a content pack (scripts, words, grammar, culture, sounds). Japanese is the first pack.</div>
-        <div className="mu mt8">Credits: stroke order from <a onClick={() => openExternal("https://kanjivg.tagaini.net")}>KanjiVG</a> (CC BY-SA 3.0, Ulrich Apel). Word ranks from Mindomax (OpenSubtitles + Tatoeba) and the wordfreq project. Example sentences were AI-written and reviewed; treat them as study material. Formant values are rounded literature averages.</div>
+        <div className="mu mt8">Credits: stroke order from <a onClick={() => openExternal("https://kanjivg.tagaini.net")}>KanjiVG</a> (CC BY-SA 3.0, Ulrich Apel). Word ranks from Mindomax (OpenSubtitles + Tatoeba), the wordfreq project and how often words appear in ~200,000 Tatoeba sentences. Dictionary data from JMdict (EDRDG, CC BY-SA 4.0). Sentences from Tatoeba (CC BY 2.0 FR). Example sentences were AI-written and reviewed; treat them as study material. Formant values are rounded literature averages.</div>
       </div>
     </div>
   );
