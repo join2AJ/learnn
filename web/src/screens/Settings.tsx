@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Check, Download, RotateCcw, Volume2 } from "lucide-react";
 import { dayKey, emitUi, resetProgress, setSettings, toast, useSettings } from "../core/store";
-import { appVersion, openExternal, openTtsSettings, speak, ttsStatus } from "../core/native";
+import { appVersion, openTtsSettings, speak, ttsStatus } from "../core/native";
 import { PACKS } from "../packs/registry";
 import { usePack } from "../pack";
 import { go } from "../core/router";
@@ -100,8 +100,7 @@ export default function Settings() {
       <div className="section-title"><h2>About</h2></div>
       <div className="card sm" style={{ lineHeight: 1.6 }}>
         <div><b>Nihongo Path</b> · v{APP_VERSION} ({appVersion()})</div>
-        <div className="mu mt4">Built as a multi-language engine: each language is a content pack (scripts, words, grammar, culture, sounds). Japanese is the first pack.</div>
-        <div className="mu mt8">Credits: stroke order from <a onClick={() => openExternal("https://kanjivg.tagaini.net")}>KanjiVG</a> (CC BY-SA 3.0, Ulrich Apel). Word ranks from Mindomax (OpenSubtitles + Tatoeba), the wordfreq project and how often words appear in ~200,000 Tatoeba sentences. Dictionary data from JMdict (EDRDG, CC BY-SA 4.0). Sentences from Tatoeba (CC BY 2.0 FR). Example sentences were AI-written and reviewed; treat them as study material. Formant values are rounded literature averages.</div>
+        <button className="mu mt8 xs" style={{ background: "none", border: 0, padding: 0, textDecoration: "underline", color: "var(--ink-3)" }} onClick={() => go("/me/licenses")}>Open-source licences</button>
       </div>
     </div>
   );

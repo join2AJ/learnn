@@ -33,6 +33,16 @@ export default function Me({ route }: { route: Route }) {
   if (route.parts[1] === "backup") return <Backup />;
   if (route.parts[1] === "support") return <Support />;
   if (route.parts[1] === "about") return <About />;
+  if (route.parts[1] === "licenses") return <div className="screen"><Header title="Open-source licences" backTo="/me/settings" /><div className="card xs mu" style={{ lineHeight: 1.7 }}>
+    This app includes data licensed by third parties:<br />
+    · Stroke data: KanjiVG, © Ulrich Apel, CC BY-SA 3.0 (kanjivg.tagaini.net)<br />
+    · Dictionary data: JMdict, EDRDG, CC BY-SA 4.0<br />
+    · Word frequency: wordfreq (CC BY-SA 4.0), Mindomax<br />
+    · Sentences: Tatoeba, CC BY 2.0 FR<br />
+    · Map outlines: Global Map Japan, GSI<br />
+    · Attraction photos: Wikimedia Commons contributors (credited on each place)<br />
+    Share-alike licences apply only to that data, not to the app's own code or design. Example sentences are study material; formant values are rounded averages.
+  </div></div>;
   if (route.parts[1] === "policy") return <div className="screen"><Header title="Privacy policy" backTo="/me/privacy" /><div className="card"><PolicyText /></div></div>;
   return <Stats />;
 }
