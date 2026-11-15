@@ -25,6 +25,9 @@ export default function PolicyText() {
         <li><b>Speech recognition</b> (Speak aloud, word check) uses your phone’s speech service (usually Google), which may process audio on Google’s servers under Google’s privacy policy.</li>
         <li><b>Links</b> to YouTube and websites open in your browser or the YouTube app.</li>
         <li><b>Backups</b> you save go to your phone’s Downloads folder; you choose whether to copy them elsewhere. Android cloud backup may include progress and settings, never recordings or drawings.</li>
+        <li><b>Cloud backup</b> (optional): if you save to Google Drive, OneDrive or another cloud app, that service stores the file under its own privacy policy.</li>
+        <li><b>Feedback and problem reports</b> (optional) are sent only when you press send, through the app you choose (WhatsApp, email…). If you leave “Include device & app details” on, the message also contains your device model, Android and app version, screen size, language, install and join dates, and learning stats (level, XP, words, streak, study time) - you can see the full list before sending. Your IP address and location are never collected.</li>
+        <li><b>Share images</b> (your level card, the invite card) are created on your phone and shared only where you choose.</li>
         <li><b>Support payments</b> (optional) are handled entirely by the payment app you choose (UPI, Buy Me a Coffee, Ko-fi); the app does not see payment details.</li>
       </ul>
       <H>5. Your consent and your rights</H>

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ChevronRight, Heart, Lock, Settings as Cog } from "lucide-react";
+import { ChevronRight, Heart, Lock, MessageSquareHeart, Settings as Cog, Share2 } from "lucide-react";
 import type { Route } from "../core/router";
 import { go } from "../core/router";
 import { dayKey, emptyDay, useProgress, useSettings } from "../core/store";
@@ -15,6 +15,8 @@ import Privacy from "./Privacy";
 import Backup from "./Backup";
 import About, { BuildApp } from "./About";
 import LevelDetail from "./LevelDetail";
+import Share from "./Share";
+import Feedback from "./Feedback";
 import Support from "./Support";
 import PolicyText from "./PolicyText";
 import { Icon, IconTile } from "../ui/icons";
@@ -35,6 +37,8 @@ export default function Me({ route }: { route: Route }) {
   if (route.parts[1] === "about") return <About />;
   if (route.parts[1] === "build") return <BuildApp />;
   if (route.parts[1] === "level") return <LevelDetail />;
+  if (route.parts[1] === "share") return <Share />;
+  if (route.parts[1] === "feedback") return <Feedback />;
   if (route.parts[1] === "licenses") return <div className="screen"><Header title="Licences" backTo="/me/settings" /><div className="card xs mu" style={{ lineHeight: 1.8 }}>
     KanjiVG © Ulrich Apel, CC BY-SA 3.0<br />JMdict © EDRDG, CC BY-SA 4.0<br />wordfreq, CC BY-SA 4.0<br />Tatoeba, CC BY 2.0 FR<br />地球地図日本 © GSI<br />Photos: Wikimedia Commons (per photo)
   </div></div>;
@@ -157,6 +161,10 @@ function Stats() {
       <button className="card tap mt16 tint-sakura" style={{ boxShadow: "0 10px 26px rgba(184,51,106,.3)" }} onClick={() => go("/me/about?open=support")}>
         <div className="row"><span style={{ width: 42, height: 42, borderRadius: 13, display: "grid", placeItems: "center", background: "rgba(255,255,255,.2)", flex: "none" }}><Heart size={22} color="#fff" fill="#fff" /></span><div className="grow"><div style={{ fontWeight: 800, fontSize: 16 }}>Support the app · About us</div><div className="xs" style={{ opacity: .9 }}>Donate or share · our story · build an app like this</div></div><ChevronRight size={18} /></div>
       </button>
+      <div className="grid2 mt12">
+        <button className="card tap" style={{ margin: 0 }} onClick={() => go("/me/share")}><div className="row" style={{ gap: 10 }}><Share2 size={20} color="var(--ai)" /><div><div style={{ fontWeight: 800 }}>Share</div><div className="xs mu">App & my level</div></div></div></button>
+        <button className="card tap" style={{ margin: 0 }} onClick={() => go("/me/feedback")}><div className="row" style={{ gap: 10 }}><MessageSquareHeart size={20} color="var(--matcha)" /><div><div style={{ fontWeight: 800 }}>Feedback</div><div className="xs mu">Thanks · problem · idea</div></div></div></button>
+      </div>
 
       <div className="section-title"><h2>Badges</h2><span className="mu">{Object.keys(p.badges).length}/{BADGES.length}</span></div>
       <Sheet open={!!badge} onClose={() => setBadge(null)}>{badge && <BadgeDetail id={badge} onGo={(to) => { setBadge(null); go(to); }} />}</Sheet>

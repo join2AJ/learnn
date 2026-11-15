@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, Download, RotateCcw, Volume2 } from "lucide-react";
+import { Check, ChevronRight, Download, Heart, RotateCcw, Volume2 } from "lucide-react";
 import { dayKey, emitUi, resetProgress, setSettings, toast, useSettings } from "../core/store";
 import { appVersion, openTtsSettings, speak, ttsStatus } from "../core/native";
 import { PACKS } from "../packs/registry";
@@ -71,7 +71,13 @@ export default function Settings() {
         </Row>
         <Row t="Edit profile" d={[s.age, (s.reasons || []).join(", ")].filter(Boolean).join(" · ") || "Name, age, reasons"}><button className="btn sm" onClick={() => setSettings({ profiled: false })}>Edit</button></Row>
         <Row t="Privacy & your data" d="What is stored, what leaves the phone, delete everything"><button className="btn sm" onClick={() => go("/me/privacy")}>Open</button></Row>
-        <Row t="Support the app" d="Optional - the app stays free"><button className="btn sm" onClick={() => go("/me/support")}>Open</button></Row>
+        <button className="li tint-sakura" style={{ width: "100%", textAlign: "left" }} onClick={() => go("/me/about?open=support")}>
+          <span style={{ width: 38, height: 38, borderRadius: 12, display: "grid", placeItems: "center", background: "rgba(255,255,255,.2)", flex: "none" }}><Heart size={19} color="#fff" fill="#fff" /></span>
+          <span className="grow"><div className="t" style={{ color: "#fff" }}>Support the app</div><div className="d" style={{ color: "rgba(255,255,255,.88)" }}>Donate or share - the app stays free</div></span>
+          <ChevronRight size={18} color="#fff" />
+        </button>
+        <Row t="Send feedback" d="Say thanks, report a problem or suggest an idea"><button className="btn sm" onClick={() => go("/me/feedback")}>Open</button></Row>
+        <Row t="Share the app" d="Send a friend a picture and invite"><button className="btn sm" onClick={() => go("/me/share")}>Share</button></Row>
         <Row t="App tour" d="How to use each tab"><button className="btn sm" onClick={() => emitUi({ type: "tour" })}>Show</button></Row>
         <Row t="What’s new" d={"Changes in v" + APP_VERSION + " and earlier"}><button className="btn sm" onClick={() => emitUi({ type: "whatsnew" })}>Show</button></Row>
       </div>

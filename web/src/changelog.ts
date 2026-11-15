@@ -1,6 +1,12 @@
 /** Shown once after each update ("What's new"). Newest first. */
-export const APP_VERSION = "3.8";
+export const APP_VERSION = "3.9";
 export const CHANGELOG: { v: string; date: string; items: [string, string][] }[] = [
+  { v: "3.9", date: "17 Nov 2026", items: [
+    ["chat", "Send feedback: say thanks with a star rating, report a problem (category → what exactly → how often) or suggest an idea - device and app details can be added so we can fix it faster."],
+    ["sparkles", "Share the app with a beautiful invite picture, and share your level card as a JPG."],
+    ["shield", "Content protection: the app’s lessons and words are encrypted and can only be opened by the official app; text can’t be copied."],
+    ["heart", "Support the app is highlighted in Settings too."],
+  ] },
   { v: "3.8", date: "17 Nov 2026", items: [
     ["earth", "Cloud backup: save to Google Drive, OneDrive or any cloud app - or keep one cloud copy updated with every backup."],
     ["star", "Tap your level to see where your XP came from, XP per day, when you reached each level and how to earn more."],

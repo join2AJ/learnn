@@ -94,6 +94,7 @@ public class MainActivity extends Activity {
             }
         });
 
+        WebView.setWebContentsDebuggingEnabled(false); // no remote inspection of the app
         web = new WebView(this);
         web.setBackgroundColor(Color.parseColor("#F7F3EC"));
         WebSettings s = web.getSettings();
@@ -263,6 +264,38 @@ public class MainActivity extends Activity {
             return writeUri(Uri.parse(u), content);
         }
         @JavascriptInterface public void clearCloudTarget() { getSharedPreferences("np", MODE_PRIVATE).edit().remove("cloudUri").apply(); }
+        /** Device details for feedback/bug reports (only sent if the user chooses to send a report). */
+        @JavascriptInterface public String deviceInfo() {
+            try {
+                org.json.JSONObject o = new org.json.JSONObject();
+                o.put("manufacturer", android.os.Build.MANUFACTURER); o.put("model", android.os.Build.MODEL);
+                o.put("android", android.os.Build.VERSION.RELEASE); o.put("sdk", android.os.Build.VERSION.SDK_INT);
+                android.content.pm.PackageInfo wv = android.os.Build.VERSION.SDK_INT >= 26 ? WebView.getCurrentWebViewPackage() : null;
+                o.put("webview", wv == null ? "" : wv.versionName);
+                o.put("locale", java.util.Locale.getDefault().toString());
+                android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
+                o.put("screen", dm.widthPixels + "x" + dm.heightPixels + " @" + dm.densityDpi + "dpi");
+                android.content.pm.PackageInfo me = getPackageManager().getPackageInfo(getPackageName(), 0);
+                o.put("installed", me.firstInstallTime); o.put("updated", me.lastUpdateTime);
+                return o.toString();
+            } catch (Exception e) { return "{}"; }
+        }
+        /** Share a JPEG (base64) with text via the Android share sheet. */
+        @JavascriptInterface public void shareImage(String b64, String name, String text) {
+            runOnUiThread(() -> {
+                try {
+                    java.io.File dir = new java.io.File(getCacheDir(), "share"); dir.mkdirs();
+                    java.io.File f = new java.io.File(dir, name.replaceAll("[^A-Za-z0-9._-]", "_"));
+                    try (java.io.FileOutputStream os = new java.io.FileOutputStream(f)) { os.write(android.util.Base64.decode(b64, android.util.Base64.DEFAULT)); }
+                    Uri u = androidx.core.content.FileProvider.getUriForFile(MainActivity.this, getPackageName() + ".files", f);
+                    Intent i = new Intent(Intent.ACTION_SEND).setType("image/jpeg").putExtra(Intent.EXTRA_STREAM, u).putExtra(Intent.EXTRA_TEXT, text).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    startActivity(Intent.createChooser(i, "Share"));
+                } catch (Exception e) { js("window.__npToast&&window.__npToast('Could not share: '+" + org.json.JSONObject.quote(String.valueOf(e.getMessage())) + ")"); }
+            });
+        }
+        /** Key that unlocks the app's encrypted content. Derived from this app's signing certificate,
+         *  so a modified / re-signed copy of the app cannot read the content. */
+        @JavascriptInterface public String contentKey() { return ContentKey.derive(MainActivity.this); }
         @JavascriptInterface public void openExternal(String url) { runOnUiThread(() -> openExternalUri(Uri.parse(url))); }
         @JavascriptInterface public void shareText(String subject, String text) {
             runOnUiThread(() -> {

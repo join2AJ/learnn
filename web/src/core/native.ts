@@ -15,6 +15,9 @@ interface NativeApi {
   vibrate(ms: number): void;
   openExternal(url: string): void;
   shareText?(subject: string, text: string): void;
+  shareImage?(b64: string, name: string, text: string): void;
+  deviceInfo?(): string;
+  contentKey?(): string;
   saveBackupAs?(name: string, content: string): void;
   pickCloudTarget?(name: string): void;
   writeCloudTarget?(content: string): string;
@@ -178,6 +181,20 @@ export function shareText(subject: string, text: string): boolean {
   const nav = navigator as Navigator & { share?: (d: { title: string; text: string }) => Promise<void> };
   if (nav.share) { nav.share({ title: subject, text }).catch(() => {}); return true; }
   return false;
+}
+/** Share a JPEG with a message (Android share sheet; download on the web). */
+export function shareImage(b64: string, name: string, text: string) {
+  const n = N();
+  if (n?.shareImage) { n.shareImage(b64, name, text); return; }
+  const bin = atob(b64); const u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  const file = new File([u8], name, { type: "image/jpeg" });
+  const nav = navigator as Navigator & { canShare?: (d: { files: File[] }) => boolean; share?: (d: { files?: File[]; text?: string }) => Promise<void> };
+  if (nav.canShare?.({ files: [file] })) { nav.share!({ files: [file], text }).catch(() => {}); return; }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(file); a.download = name; a.click();
+}
+export function deviceInfo(): Record<string, string | number> {
+  try { const n = N(); if (n?.deviceInfo) return JSON.parse(n.deviceInfo()); } catch { /* ignore */ }
+  return { model: navigator.userAgent.replace(/^.*?\(([^)]*)\).*$/, "$1"), screen: screen.width + "x" + screen.height, locale: navigator.language };
 }
 export const appVersion = () => N()?.appVersion() || "web";
 export const setNativeTheme = (dark: boolean) => { try { N()?.setTheme?.(dark); } catch { /* older shell */ } };

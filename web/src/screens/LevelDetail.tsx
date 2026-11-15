@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import { Check, Lock } from "lucide-react";
+import { Check, Lock, Share2 } from "lucide-react";
+import { go } from "../core/router";
 import { dayKey, useProgress } from "../core/store";
 import { LEVEL_XP, levelOf } from "../core/rewards";
 import { usePack } from "../pack";
@@ -73,6 +74,8 @@ export default function LevelDetail() {
           </div>
         </div>
       </div>
+
+      <button className="btn block mt12" onClick={() => go("/me/share")}><Share2 size={17} /> Share my level as a picture</button>
 
       <div className="section-title"><h2>Where your XP came from</h2></div>
       <div className="card">

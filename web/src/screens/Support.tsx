@@ -8,11 +8,7 @@ import { childMode } from "../core/child";
 
 /** Optional, voluntary support - the app stays free with no locked features. */
 export function SupportBlock() {
-  const share = async () => {
-    const text = "I’m learning Japanese with Nihongo Path - free, with Hindi explanations, voice analysis and stroke order." + (SUPPORT.shareUrl ? " " + SUPPORT.shareUrl : "");
-    try { if (navigator.share) { await navigator.share({ text }); return; } } catch { /* fall back */ }
-    openExternal("https://wa.me/?text=" + encodeURIComponent(text));
-  };
+  const share = () => go("/me/share");
   const upi = (amt: number) => openExternal(`upi://pay?pa=${encodeURIComponent(SUPPORT.upiId)}&pn=${encodeURIComponent(SUPPORT.upiName || "Nihongo Path")}&am=${amt}&cu=INR&tn=${encodeURIComponent("Support Nihongo Path")}`);
   const askDonate = () => {
     const msg = "Hi! I'd like to donate to support Nihongo Path. Please send me how I can contribute.";

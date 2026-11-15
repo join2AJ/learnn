@@ -5,10 +5,22 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
     <meta name="theme-color" content="#F7F3EC" />
     <title>Nihongo Path</title>
-    <script type="module" crossorigin src="./assets/index-DOjKE2wN.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-JbTbQPBW.css">
+    
+    <link rel="stylesheet" crossorigin href="./assets/index-DXLHCym3.css">
   </head>
   <body>
     <div id="root"></div>
-  </body>
+  <script>
+(function(){
+  function fail(){document.getElementById("root").innerHTML='<div style="font:16px system-ui;padding:40px 24px;text-align:center;color:#555">This copy of Nihongo Path cannot open its content.<br><br>Please install the official app.</div>';}
+  var N=window.Native, hex=(N&&N.contentKey)?N.contentKey():(window.__npKey||"");
+  if(!hex||!window.crypto||!crypto.subtle){fail();return;}
+  var k=new Uint8Array(hex.match(/../g).map(function(h){return parseInt(h,16)}));
+  fetch("assets/app.bin").then(function(r){return r.arrayBuffer()}).then(function(buf){
+    var raw=new Uint8Array(buf);
+    return crypto.subtle.importKey("raw",k,"AES-GCM",false,["decrypt"]).then(function(key){return crypto.subtle.decrypt({name:"AES-GCM",iv:raw.slice(0,12)},key,raw.slice(12));});
+  }).then(function(pt){var s=document.createElement("script");s.type="module";s.src=URL.createObjectURL(new Blob([pt],{type:"text/javascript"}));document.body.appendChild(s);}).catch(fail);
+})();
+</script>
+</body>
 </html>
