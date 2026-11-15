@@ -1,0 +1,103 @@
+import { bumpDay, dayKey, emitUi, getProgress, getSettings, Progress, today, updateProgress } from "./store";
+import { vibrate } from "./native";
+
+export const LEVEL_XP = [0, 100, 250, 500, 900, 1400, 2000, 2800, 3800, 5000, 6500, 8500, 11000, 14000, 18000, 23000, 30000];
+
+export function levelOf(xp: number) {
+  let i = 0;
+  while (i + 1 < LEVEL_XP.length && xp >= LEVEL_XP[i + 1]) i++;
+  const cur = LEVEL_XP[i];
+  const next = LEVEL_XP[i + 1] ?? cur + 10000;
+  return { level: i + 1, cur, next, pct: Math.min(1, (xp - cur) / (next - cur)) };
+}
+
+export interface Badge { id: string; icon: string; title: string; desc: string; test: (p: Progress) => boolean; }
+export const BADGES: Badge[] = [
+  { id: "first", icon: "🌱", title: "First step", desc: "Earn your first XP", test: (p) => p.xp > 0 },
+  { id: "kana10", icon: "あ", title: "Kana sprout", desc: "Answer 10 kana right", test: (p) => sumKana(p) >= 10 },
+  { id: "kana100", icon: "🈁", title: "Kana runner", desc: "Answer 100 kana right", test: (p) => sumKana(p) >= 100 },
+  { id: "hira", icon: "ひ", title: "Hiragana master", desc: "Master all 46 basic hiragana", test: (p) => masteredSet(p, HIRA46) >= 46 },
+  { id: "kata", icon: "カ", title: "Katakana master", desc: "Master all 46 basic katakana", test: (p) => masteredSet(p, KATA46) >= 46 },
+  { id: "w50", icon: "📗", title: "50 words", desc: "Mark 50 words as known", test: (p) => p.known.length >= 50 },
+  { id: "w100", icon: "📘", title: "100 words", desc: "≈65% of everyday speech", test: (p) => p.known.length >= 100 },
+  { id: "w300", icon: "📙", title: "300 words", desc: "Daily-life vocabulary", test: (p) => p.known.length >= 300 },
+  { id: "w1000", icon: "🏯", title: "1,000 words", desc: "Finish the core pack", test: (p) => p.known.length >= 1000 },
+  { id: "lesson1", icon: "📝", title: "Grammar begins", desc: "Finish your first grammar lesson", test: (p) => Object.keys(p.lessons).length >= 1 },
+  { id: "lesson10", icon: "🧠", title: "Grammar brain", desc: "Finish 10 grammar lessons", test: (p) => Object.keys(p.lessons).length >= 10 },
+  { id: "streak3", icon: "🔥", title: "On fire", desc: "3-day streak", test: (p) => p.streak.best >= 3 },
+  { id: "streak7", icon: "⚡", title: "One week", desc: "7-day streak", test: (p) => p.streak.best >= 7 },
+  { id: "streak30", icon: "🌸", title: "Sakura month", desc: "30-day streak", test: (p) => p.streak.best >= 30 },
+  { id: "review100", icon: "🃏", title: "Card shark", desc: "100 flashcard reviews", test: (p) => totalReviews(p) >= 100 },
+  { id: "speak10", icon: "🎤", title: "Loud & proud", desc: "10 words spoken correctly", test: (p) => p.speak.ok >= 10 },
+  { id: "write10", icon: "✍️", title: "Calligrapher", desc: "Practise writing 10 characters", test: (p) => p.writes >= 10 },
+  { id: "lab", icon: "📈", title: "Sound scientist", desc: "Open the Sound Lab mic", test: (p) => p.labSessions >= 1 },
+  { id: "culture", icon: "⛩️", title: "Culture curious", desc: "Read 5 culture sections", test: (p) => Object.keys(p.culturesRead).length >= 5 },
+  { id: "hour", icon: "⏱️", title: "Hour of power", desc: "Study 60 minutes total", test: (p) => totalMs(p) >= 3600_000 },
+  { id: "perfect", icon: "💯", title: "Perfect round", desc: "10/10 in a quiz", test: (p) => p.quiz.best >= 10 },
+];
+
+const HIRA46 = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん";
+const KATA46 = Array.from(HIRA46).map((c) => String.fromCharCode(c.charCodeAt(0) + 0x60)).join("");
+export const sumKana = (p: Progress) => Object.values(p.kana).reduce((a, b) => a + b.c, 0);
+export const isMastered = (s?: { c: number; w: number }) => !!s && s.c >= 3 && s.c >= s.w * 2;
+export const masteredSet = (p: Progress, set: string) => Array.from(set).filter((c) => isMastered(p.kana[c])).length;
+export const totalMs = (p: Progress) => Object.values(p.days).reduce((a, d) => a + d.ms, 0);
+export const totalReviews = (p: Progress) => Object.values(p.days).reduce((a, d) => a + d.reviews, 0);
+export { HIRA46, KATA46 };
+
+/** Award XP, update streak, and fire level-up / badge celebrations. */
+export function award(xp: number, f?: (p: Progress) => void) {
+  const before = getProgress();
+  const lvBefore = levelOf(before.xp).level;
+  updateProgress((p) => {
+    p.xp += xp;
+    bumpDay(p, (d) => { d.xp += xp; });
+    f?.(p);
+    touchStreak(p);
+  });
+  if (xp > 0) emitUi({ type: "xp", amount: xp });
+  const after = getProgress();
+  const lv = levelOf(after.xp).level;
+  if (lv > lvBefore) {
+    if (getSettings().haptics) vibrate(40);
+    emitUi({ type: "celebrate", title: "Level " + lv + "!", sub: "You levelled up. Keep the momentum going.", jp: "レベルアップ！", icon: "⭐" });
+  }
+  checkBadges();
+}
+
+export function touchStreak(p: Progress) {
+  const k = dayKey();
+  if (p.streak.last === k) return;
+  const y = new Date(); y.setDate(y.getDate() - 1);
+  const count = p.streak.last === dayKey(y) ? p.streak.count + 1 : 1;
+  p.streak = { count, best: Math.max(p.streak.best, count), last: k };
+}
+
+export function checkBadges() {
+  const p = getProgress();
+  const fresh = BADGES.filter((b) => !p.badges[b.id] && b.test(p));
+  if (!fresh.length) return;
+  updateProgress((q) => { fresh.forEach((b) => (q.badges[b.id] = Date.now())); });
+  const b = fresh[0];
+  emitUi({ type: "celebrate", title: "Badge unlocked", sub: b.title + " — " + b.desc, jp: "おめでとう！", icon: b.icon });
+}
+
+export function checkGoal() {
+  const s = getSettings();
+  const p = getProgress();
+  const k = dayKey();
+  if (p.goalHit[k]) return;
+  if (today(p).ms >= s.dailyGoalMin * 60_000) {
+    updateProgress((q) => { q.goalHit[k] = true; });
+    award(30);
+    emitUi({ type: "celebrate", title: "Daily goal reached", sub: s.dailyGoalMin + " minutes today. +30 XP bonus.", jp: "よくできました！", icon: "🎯" });
+  }
+}
+
+/** Record a right/wrong answer in the day stats. */
+export function recordAnswer(ok: boolean) {
+  updateProgress((p) => {
+    bumpDay(p, (d) => { if (ok) d.correct++; else d.wrong++; });
+    if (ok) p.quiz.correct++; else p.quiz.wrong++;
+  });
+}
