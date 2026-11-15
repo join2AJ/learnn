@@ -1,6 +1,9 @@
 /** Shown once after each update ("What's new"). Newest first. */
-export const APP_VERSION = "3.2";
+export const APP_VERSION = "3.3";
 export const CHANGELOG: { v: string; date: string; items: [string, string][] }[] = [
+  { v: "3.3", date: "17 Nov 2026", items: [
+    ["shield", "Privacy policy now opens full-screen on top of everything, shows how far you have read, and must be read to the end before you can tick “I agree”."],
+  ] },
   { v: "3.2", date: "17 Nov 2026", items: [
     ["earth", "Map of Japan: new Landscape view (seas, neighbours, Mt Fuji, Japanese Alps, Lake Biwa, the 4 main islands) and Sights view with famous places on the map."],
     ["landmark", "Explore: “Japan is famous for…” - 10 things Japan is known for and 18 top attractions with photos, best season and tips (English & Hindi)."],

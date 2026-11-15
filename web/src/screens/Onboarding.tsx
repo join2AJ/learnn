@@ -4,8 +4,8 @@ import { dayKey, getProgress, setSettings, useSettings } from "../core/store";
 import { checkBadges } from "../core/rewards";
 import { PACKS } from "../packs/registry";
 import { speak, vibrate } from "../core/native";
-import { Sheet, Switch, tap } from "../ui/kit";
-import PolicyText from "./PolicyText";
+import { Switch, tap } from "../ui/kit";
+import PolicyReader from "./PolicyReader";
 import { ParentConsent } from "./Privacy";
 import { MINOR_AGES } from "../core/child";
 import { StrokeView } from "../ui/StrokeView";
@@ -26,6 +26,7 @@ export default function Onboarding() {
   const [mins, setMins] = useState(s.dailyGoalMin || 20);
   const [consent, setConsent] = useState(s.privacyOk);
   const [policy, setPolicy] = useState(false);
+  const [readPolicy, setReadPolicy] = useState(s.privacyOk);
   const [parentView, setParentView] = useState(false);
   const next = () => { tap(); setParentView(false); setStep(step + 1); };
   const backBtn = step > (s.onboarded ? 4 : 1) && <button className="icon-btn" aria-label="Back" onClick={() => setStep(step - 1)}><ArrowLeft size={20} /></button>;
@@ -125,10 +126,12 @@ export default function Onboarding() {
       <div className="xs mu mt8">Optional. Stays on this phone only and is used to suggest a sensible daily pace. Under 18? Please check with a parent before using voice features.</div>
       <div style={{ flex: 1 }} />
       <label className="row top mt16 sm" style={{ gap: 10, lineHeight: 1.5 }}>
-        <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} style={{ width: 20, height: 20, marginTop: 2, accentColor: "var(--shu)" }} />
+        <input type="checkbox" checked={consent} onChange={(e) => { if (!readPolicy) { e.preventDefault(); setPolicy(true); return; } setConsent(e.target.checked); }} style={{ width: 20, height: 20, marginTop: 2, accentColor: "var(--shu)" }} />
         <span>I agree that my profile, progress, voice recordings and drawings are stored <b>on this phone only</b>, as explained in the <button style={{ color: "var(--shu)", fontWeight: 700, textDecoration: "underline" }} onClick={(e) => { e.preventDefault(); setPolicy(true); }}>privacy policy</button>. I can delete them any time.</span>
       </label>
-      <Sheet open={policy} onClose={() => setPolicy(false)}><PolicyText /></Sheet>
+      {!readPolicy && <button className="btn white block mt8" onClick={() => setPolicy(true)}>Read the privacy policy (needed to continue)</button>}
+      {readPolicy && !consent && <div className="xs mt8" style={{ color: "var(--matcha)", fontWeight: 700 }}>✓ Policy read - tick the box to agree.</div>}
+      <PolicyReader open={policy} onClose={() => setPolicy(false)} onRead={() => setReadPolicy(true)} />
       <button className="btn primary lg block mt24" disabled={!name.trim() || !consent} onClick={() => {
         const minor = MINOR_AGES.includes(age);
         setSettings({ name: name.trim(), age, minor, privacyOk: true });
