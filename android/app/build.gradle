@@ -2,14 +2,14 @@ plugins { id 'com.android.application' }
 
 android {
     namespace 'com.nihongopath.app'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.nihongopath.app"
         minSdk 24
-        targetSdk 35
-        versionCode 22
-        versionName "4.0"
+        targetSdk 36
+        versionCode 23
+        versionName "4.1"
     }
 
     // A fixed, committed signing key so every build (here or in Android Studio) can

@@ -6,6 +6,22 @@
 
 ---
 
+## 0. Status update - v4.1 (17 Nov 2026)
+
+| Finding | Status |
+|---|---|
+| 🔴 Signing key and password in the repository | **Open (risk accepted)** - closes when Play App Signing uses our key via PEPK (see `docs/PLAY_LAUNCH.md` §2) and the keystore leaves the repo |
+| 🔴 Children's data | **Closed in app** - optional age, consent, parent consent, child mode (no recordings saved), privacy policy with grievance contact (Artin Studios, artinstudios.official@gmail.com) |
+| 🟠 Privacy policy / licence notice | **Ready** - in app, `docs/PRIVACY.md`, `docs/privacy-policy.html` for hosting; `LICENSES.md` + in-app Licences. Remaining: publish the URL |
+| 🟠 No CI / tests / dependency scanning | **Open** |
+| 🟠 Data only on the phone | **Closed** - file backup, scheduled backup, Google Drive / OneDrive copy, encrypted `.npbak` |
+| 🟡 No crash reporting | **Partly closed** - feedback form with device details (mandatory for problem reports); no automatic crash reports by design |
+| 🟡 AI-written sentences may contain mistakes | **Open** - native/fluent review recommended before wide launch |
+| New: content protection | **Added** - app bundle AES-256-GCM encrypted, key bound to signing cert; copy/select disabled; WebView debugging off; R8 obfuscation |
+| New: Play payments policy | **Closed** - payment/tip links hidden in the Play build |
+
+---
+
 ## 1. Summary
 
 The app's architecture is already privacy-friendly: **no server, no account, no analytics, no ads, all data on the phone.** That removes most classic risks (breaches of a central database, credential theft, server downtime).

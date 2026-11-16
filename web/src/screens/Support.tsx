@@ -20,16 +20,16 @@ export function SupportBlock() {
   return (
     <>
       <div className="sm" style={{ lineHeight: 1.55 }}>No ads, no tracking, nothing locked. If the app helps you, a small contribution pays for new languages, more words and better voice tools.</div>
-      {SUPPORT.upiId && (
+      {hasSupport() && SUPPORT.upiId && (
         <div className="card mt12">
           <div className="row"><IndianRupee size={20} /><b className="grow">UPI (India)</b></div>
           <div className="grid3 mt12">{[49, 99, 199].map((a) => <button key={a} className="btn white" onClick={() => upi(a)}>₹{a}</button>)}</div>
           <button className="btn ghost block mt8" style={{ color: "#fff" }} onClick={() => { navigator.clipboard?.writeText(SUPPORT.upiId); toast("UPI ID copied", "ok"); }}>Copy UPI ID: {SUPPORT.upiId}</button>
         </div>
       )}
-      {SUPPORT.buyMeACoffee && <button className="btn white block mt12" onClick={() => openExternal(SUPPORT.buyMeACoffee)}><Coffee size={17} /> Buy me a coffee</button>}
-      {SUPPORT.kofi && <button className="btn white block mt8" onClick={() => openExternal(SUPPORT.kofi)}><Coffee size={17} /> Ko-fi</button>}
-      {SUPPORT.githubSponsors && <button className="btn white block mt8" onClick={() => openExternal(SUPPORT.githubSponsors)}><Github size={17} /> GitHub Sponsors</button>}
+      {hasSupport() && SUPPORT.buyMeACoffee && <button className="btn white block mt12" onClick={() => openExternal(SUPPORT.buyMeACoffee)}><Coffee size={17} /> Buy me a coffee</button>}
+      {hasSupport() && SUPPORT.kofi && <button className="btn white block mt8" onClick={() => openExternal(SUPPORT.kofi)}><Coffee size={17} /> Ko-fi</button>}
+      {hasSupport() && SUPPORT.githubSponsors && <button className="btn white block mt8" onClick={() => openExternal(SUPPORT.githubSponsors)}><Github size={17} /> GitHub Sponsors</button>}
       {!hasSupport() && <button className="btn white block mt12" onClick={askDonate}><Heart size={17} /> I want to donate</button>}
       <button className="btn block mt8" style={{ background: "rgba(255,255,255,.18)", color: "#fff" }} onClick={share}><Share2 size={17} /> Share with a friend</button>
     </>

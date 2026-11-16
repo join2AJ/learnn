@@ -96,6 +96,12 @@ public class MainActivity extends Activity {
 
         WebView.setWebContentsDebuggingEnabled(false); // no remote inspection of the app
         web = new WebView(this);
+        // Android 13+ back gesture (required for target SDK 36 where onBackPressed is no longer called).
+        if (Build.VERSION.SDK_INT >= 33) {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT, () -> {
+                if (web != null && web.canGoBack()) web.goBack(); else finish();
+            });
+        }
         web.setBackgroundColor(Color.parseColor("#F7F3EC"));
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);

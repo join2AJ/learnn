@@ -13,18 +13,21 @@ export const SUPPORT = {
 
 /** Privacy contact (required by the DPDP Act: grievance officer). Fill in before publishing. */
 export const CONTACT = {
-  developer: "Nihongo Path",
-  grievanceOfficer: "",  // name of the person who handles privacy requests
-  email: "",             // e.g. "privacy@yourdomain.com"
+  developer: "Artin Studios",
+  grievanceOfficer: "Grievance Officer, Artin Studios",  // person/role who handles privacy requests
+  email: "artinstudios.official@gmail.com",
   policyUrl: "",         // public URL of the privacy policy (needed for Google Play)
   policyUpdated: "16 November 2026",
 };
-export const hasSupport = () => !!(SUPPORT.upiId || SUPPORT.buyMeACoffee || SUPPORT.kofi || SUPPORT.githubSponsors);
+/** Google Play build: payment links (UPI, Buy Me a Coffee, Ko-fi, Sponsors) are hidden because Play's
+ *  payments policy requires Play Billing for tips to the developer. "I want to donate" still lets people write to us. */
+export const PLAY_STORE_BUILD = true;
+export const hasSupport = () => !PLAY_STORE_BUILD && !!(SUPPORT.upiId || SUPPORT.buyMeACoffee || SUPPORT.kofi || SUPPORT.githubSponsors);
 
 /** "Build your own app" requests. Fill at least one so requests reach you directly;
  *  if all are empty the app opens the share sheet / copies the request instead. */
 export const BUILD_CONTACT = {
-  email: "",      // e.g. "apps@yourdomain.com"
+  email: "artinstudios.official@gmail.com",
   whatsapp: "",   // international number without + or spaces, e.g. "919876543210"
 };
 

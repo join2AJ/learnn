@@ -6,7 +6,7 @@ Nihongo Path helps you learn Japanese. It is built so that **your data stays on 
 
 ## 1. Who is responsible
 The publisher of Nihongo Path is the *data fiduciary* (India, Digital Personal Data Protection Act 2023) and *controller* (EU GDPR) for how the app handles personal data.
-**Grievance officer:** _[name]_ - **Email:** _[privacy contact email]_
+**Developer:** Artin Studios - **Grievance officer:** Grievance Officer, Artin Studios - **Email:** artinstudios.official@gmail.com
 
 ## 2. What the app stores - only on your phone
 - Profile you enter: name, optional age range, reasons for learning, daily goal, pledge, personal goal.
