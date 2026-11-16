@@ -7,10 +7,10 @@ import { emitUi, getProgress, toast, updateProgress, bumpDay, useSettings, Voice
 import { award, checkBadges } from "../core/rewards";
 import { asrUnsupported, captureNative, captureSupported, listen, speak, speechSupported, stopListening } from "../core/native";
 import { matchScore } from "../core/match";
+import { pack } from "../pack";
 import { VowelChart, VowelPoint } from "./VowelChart";
 import { formants } from "../core/dsp";
 import { go } from "../core/router";
-import { romaji } from "../packs/ja/verbs";
 import { usePack } from "../pack";
 import { tap } from "./kit";
 import { Icon } from "./icons";
@@ -34,7 +34,7 @@ type Result = VoiceRec & { mine: AudioBuffer | null; contour: number[] };
 export default function VoiceCompare({ text, ro, en, reviewT }: { text: string; ro?: string; en?: string; reviewT?: number }) {
   const pk = usePack();
   const word = pk.words.find((w) => w.w === text);
-  const roma = (ro || word?.ro || romaji(text)).replace(/[^a-zA-Zāīūēō' ]/g, " ").trim();
+  const roma = (ro || word?.ro || (pack().romanize?.(text) ?? text)).replace(/[^a-zA-Zāīūēō' ]/g, " ").trim();
   const meaning = en || word?.m;
   const refCv = useRef<HTMLCanvasElement>(null);
   const myCv = useRef<HTMLCanvasElement>(null);
@@ -384,7 +384,7 @@ function VowelMap({ buf, contour, roma, f0 }: { buf: AudioBuffer; contour: numbe
   return (
     <div className="card flat mt12" style={{ padding: 12 }}>
       <div className="xs mu" style={{ fontWeight: 700 }}>WHERE YOUR VOWELS LAND · each beat on the mouth map</div>
-      <div className="xs mu2 mt4">Red circles = Japanese targets · green = your vowel close to target · gold = off target (dashed line shows how far). Up = closed mouth, down = open; left = tongue forward, right = back.</div>
+      <div className="xs mu2 mt4">Red circles = {pk.name} targets · green = your vowel close to target · gold = off target (dashed line shows how far). Up = closed mouth, down = open; left = tongue forward, right = back.</div>
       <div className="mt8"><VowelChart refs={pk.vowels} show={{ target: true, en: false, hi: false }} scale={scale} points={pts} height={240} /></div>
       <div className="mt8">
         {pts.map((p, i) => (

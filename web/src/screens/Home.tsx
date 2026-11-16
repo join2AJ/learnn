@@ -6,7 +6,7 @@ import { goalStreak, levelOf, pledgeStatus } from "../core/rewards";
 import { dueCount } from "../core/srs";
 import { nextStep } from "../core/path";
 import { pendingMs } from "../core/timeTracker";
-import { usePack } from "../pack";
+import { pack, usePack } from "../pack";
 import { Bar, Jp, Ring, Say, tap } from "../ui/kit";
 import { RecBtn } from "../ui/VoiceCompare";
 import { Icon, IconTile, LangPill } from "../ui/icons";
@@ -35,7 +35,7 @@ export default function Home() {
     <div className="screen">
       <div className="hdr flat" style={{ paddingBottom: 4, position: "relative" }}>
         <div className="grow">
-          <div className="jp" style={{ fontSize: 24, fontWeight: 700, letterSpacing: ".01em" }}>{g.jp}{s.name ? "、" + s.name + "さん" : ""}</div>
+          <div className="jp" style={{ fontSize: 24, fontWeight: 700, letterSpacing: ".01em" }}>{g.jp}{s.name ? (pk.id === "ja" ? "、" + s.name + "さん" : ", " + s.name) : ""}</div>
           <div className="sm mu">{g.ro} · {g.en}</div>
         </div>
         <button className="icon-btn ghost" aria-label="How to use this app" onClick={() => emitUi({ type: "tour" })}><HelpCircle size={22} /></button>
@@ -74,9 +74,9 @@ export default function Home() {
           <span className="t">Review cards</span><span className="d">{due ? due + " due now" : "Learn new words"}</span>
           {due > 0 && <span className="tag" style={{ position: "absolute", top: 12, right: 12, background: "var(--shu)", color: "#fff" }}>{due}</span>}
         </button>
-        <button className="tile" onClick={() => go("/practice/quiz/kana?set=hira")}>
-          <span className="ico soft-ai jp" style={{ color: "var(--ai)", fontWeight: 700 }}>あ</span>
-          <span className="t">Kana sprint</span><span className="d">10 quick questions</span>
+        <button className="tile" onClick={() => go("/practice/quiz/kana?set=" + pk.alphabets[0].id)}>
+          <span className="ico soft-ai jp" style={{ color: "var(--ai)", fontWeight: 700 }}>{pk.id === "ja" ? "あ" : "é"}</span>
+          <span className="t">{pk.id === "ja" ? "Kana sprint" : "Sound sprint"}</span><span className="d">10 quick questions</span>
         </button>
         <button className="tile" onClick={() => go("/practice/speak")}>
           <span className="ico soft-matcha"><Mic size={20} color="var(--matcha)" /></span>
@@ -115,7 +115,7 @@ export default function Home() {
       <div className="section-title"><h2>Keep exploring</h2></div>
       <div className="list">
         <button className="li" onClick={() => go("/learn/grammar")}><span className="ico soft-ai"><Brain size={19} color="var(--ai)" /></span><span className="grow"><div className="t">Grammar course</div><div className="d">{Object.keys(p.lessons).length}/{pk.lessons.length} lessons · tenses, verbs, particles</div></span><ArrowRight size={18} className="mu2" /></button>
-        <button className="li" onClick={() => go("/practice/write")}><span className="ico soft-gold"><PenLine size={19} color="var(--gold)" /></span><span className="grow"><div className="t">Writing practice</div><div className="d">Animated stroke order + tracing pad</div></span><ArrowRight size={18} className="mu2" /></button>
+        {pk.writing !== false && <button className="li" onClick={() => go("/practice/write")}><span className="ico soft-gold"><PenLine size={19} color="var(--gold)" /></span><span className="grow"><div className="t">Writing practice</div><div className="d">Animated stroke order + tracing pad</div></span><ArrowRight size={18} className="mu2" /></button>}
         <button className="li" onClick={() => go("/explore/roadmap")}><span className="ico soft-matcha"><Sparkles size={19} color="var(--matcha)" /></span><span className="grow"><div className="t">Your roadmap</div><div className="d">Timeline from day 1 to JLPT N3</div></span><ArrowRight size={18} className="mu2" /></button>
       </div>
 
@@ -172,7 +172,7 @@ function TodayPlan() {
           </div>
         </div>
       )}
-      <div className="xs mu mt8"><Jp text="Tap a task to jump straight there. 頑張って！" /></div>
+      <div className="xs mu mt8"><Jp text={"Tap a task to jump straight there. " + (pack().id === "ja" ? "頑張って！" : "Courage !")} /></div>
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { speak } from "../../core/native";
 import { formants, paintColumn, pitch, playBuffer, renderSpectrogram, synthesize } from "../../core/dsp";
 import { closeMic, Mic as MicH, openMic, record, toBuffer } from "../../core/mic";
 import type { SoundRef, VowelRef } from "../../core/types";
-import { usePack } from "../../pack";
+import { pack, usePack } from "../../pack";
 import { Header, Seg, tap } from "../../ui/kit";
 import { VowelChart } from "../../ui/VowelChart";
 import { toast } from "../../core/store";
@@ -17,8 +17,8 @@ export default function SoundLab() {
   const [tab, setTab] = useState<"live" | "vowels" | "sounds" | "pitch">("live");
   return (
     <div className="screen">
-      <Header title="Sound Lab" sub="See what Japanese sounds look like - and how yours compare" backTo="/practice" />
-      <Seg value={tab} options={[["live", "Live"], ["vowels", "Vowels"], ["sounds", "Sounds"], ["pitch", "Pitch"]]} onChange={setTab} />
+      <Header title="Sound Lab" sub={"See what " + pack().name + " sounds look like - and how yours compare"} backTo="/practice" />
+      <Seg value={tab} options={pack().hasPitch === false ? [["live", "Live"], ["vowels", "Vowels"], ["sounds", "Sounds"]] : [["live", "Live"], ["vowels", "Vowels"], ["sounds", "Sounds"], ["pitch", "Pitch"]]} onChange={setTab} />
       <div className="mt12">
         {tab === "live" && <Live />}
         {tab === "vowels" && <Vowels />}
@@ -104,7 +104,7 @@ function Live() {
         </div>
       </div>
       <div className="card">
-        <div className="row"><div className="grow"><div style={{ fontWeight: 800 }}>Where your vowel lands</div><div className="xs mu">Say あ… い… う… え… お… slowly and hold each one.</div></div>
+        <div className="row"><div className="grow"><div style={{ fontWeight: 800 }}>Where your vowel lands</div><div className="xs mu">{pack().id === "ja" ? "Say あ… い… う… え… お… slowly and hold each one." : "Say a… é… i… o… ou… u… slowly and hold each one."}</div></div>
           {read?.near && <span className="tag jp" style={{ background: "var(--matcha)", color: "#fff", height: 30, fontSize: 15 }}>≈ {read.near}</span>}</div>
         <div className="mt8"><VowelChart refs={pk.vowels} show={{ target: true, en: false, hi: false }} live={read && read.f1 ? [read.f1, read.f2] : null} trail={trail} scale={scale} onTap={(v) => speak(v.example || v.label, { lang: pk.ttsLang })} /></div>
         <div className="mt8"><Seg value={String(scale)} options={[["1", "Lower voice"], ["1.15", "Higher voice"]]} onChange={(v) => setScale(+v)} /></div>
@@ -131,7 +131,7 @@ function Vowels() {
         <div style={{ fontWeight: 800 }}>The vowel map</div>
         <div className="sm mu mt4" style={{ lineHeight: 1.55 }}>Every vowel is defined by two resonances: <b>F1</b> (how open your mouth is) and <b>F2</b> (how far forward your tongue is). Japanese uses just 5 spots; English uses many more. Tap a dot to hear it.</div>
         <div className="row wrap mt12 gap6">
-          <button className={"chip" + (show.target ? " shu on" : "")} onClick={() => setShow({ ...show, target: !show.target })}><LangPill l="ja" /> Japanese</button>
+          <button className={"chip" + (show.target ? " shu on" : "")} onClick={() => setShow({ ...show, target: !show.target })}><LangPill l="ja" /> {pk.name}</button>
           <button className={"chip" + (show.en ? " on" : "")} onClick={() => setShow({ ...show, en: !show.en })}><LangPill l="en" /> English</button>
           <button className={"chip" + (show.hi ? " on" : "")} onClick={() => setShow({ ...show, hi: !show.hi })}><LangPill l="hi" /> Hindi</button>
         </div>
@@ -141,9 +141,15 @@ function Vowels() {
       <div className="card soft-gold" style={{ boxShadow: "none" }}>
         <div style={{ fontWeight: 800 }}>What the map tells you</div>
         <ul className="sm" style={{ lineHeight: 1.65, paddingLeft: 18, margin: "6px 0 0" }}>
+          {pk.id !== "ja" ? (<>
+          <li>French <b>u</b> (tu) sits between <b>i</b> and <b>ou</b>: same tongue as i, lips rounded. Neither English nor Hindi has it.</li>
+          <li>The nasal vowels <b>an, on, in</b> sit near a, o and è - the air through your nose is what changes them.</li>
+          <li>Hindi <span className="hi">ई ए आ ओ ऊ</span> land close to French i, é, a, ô, ou - a great head start.</li>
+          </>) : (<>
           <li>Japanese <b className="jp">う</b> sits much further <b>forward</b> (higher F2) than English “oo” or Hindi ऊ - keep your lips relaxed, not rounded.</li>
           <li>Hindi <span className="hi">इ ए ओ आ</span> land almost exactly on Japanese <span className="jp">い え お あ</span>. You already own 4 of 5 vowels!</li>
           <li>English speakers: avoid gliding “ay”/“oh” - Japanese <span className="jp">え</span> and <span className="jp">お</span> are pure, steady points.</li>
+                  </>)}
         </ul>
       </div>
       <div className="card"><FormantHelp open /></div>

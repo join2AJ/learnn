@@ -6,7 +6,6 @@ import { isMastered } from "../../core/rewards";
 import { speak } from "../../core/native";
 import type { LetterCell } from "../../core/types";
 import { usePack } from "../../pack";
-import { toHira } from "../../packs/ja/kana";
 import { Header, Say, Seg, Sheet, tap } from "../../ui/kit";
 import { StrokeView } from "../../ui/StrokeView";
 import { RecBtn } from "../../ui/VoiceCompare";
@@ -34,10 +33,10 @@ export default function KanaChart({ id }: { id: string }) {
       <Seg value={alpha.id} options={pk.alphabets.map((a) => [a.id, <span className="jp">{a.native}</span>] as [string, React.ReactNode])} onChange={(v) => go("/learn/kana/" + v, true)} />
       <div className="row mt12 gap6">
         <button className="btn primary sm grow" onClick={() => go("/practice/quiz/kana?set=" + alpha.id)}><Zap size={16} /> Quiz this script</button>
-        <button className="btn sm grow" onClick={() => go("/practice/write?set=" + alpha.id)}><PenLine size={16} /> Writing</button>
+        {pk.writing !== false && <button className="btn sm grow" onClick={() => go("/practice/write?set=" + alpha.id)}><PenLine size={16} /> Writing</button>}
       </div>
       <div className="sm mu mt12" style={{ lineHeight: 1.5 }}>{alpha.blurb}</div>
-      {alpha.id !== "kanji" && nextDay > 0 && (
+      {pk.id === "ja" && alpha.id !== "kanji" && nextDay > 0 && (
         <div className="card flat mt12" style={{ padding: "10px 12px" }}>
           <div className="sm"><b>Plan day {Math.max(1, planDay)}</b> of the 7-day {alpha.name.toLowerCase()} plan · next to learn: <b style={{ color: "var(--shu)" }}>Day {nextDay} rows</b></div>
           <div className="xs mu mt4">{nextDay > Math.max(1, planDay) ? "You’re ahead of schedule - great! Keep going or review." : nextDay < Math.max(1, planDay) ? "A little behind the plan - a few minutes today will catch you up." : "Right on schedule."} The plan day changes at midnight; NEXT moves when you master a row in quizzes.</div>
@@ -66,7 +65,17 @@ export default function KanaChart({ id }: { id: string }) {
         </div>
       ))}
 
-      {alpha.id !== "kanji" && (
+      {pk.id !== "ja" && (
+        <div className="card mt16">
+          <div style={{ fontWeight: 800 }}>Three rules to read French</div>
+          <ul className="sm" style={{ lineHeight: 1.7, margin: "6px 0 0", paddingLeft: 18 }}>
+            <li>The last consonant is usually <b>silent</b>: peti(t), vou(s), Pari(s) - except c, r, f, l (sac, bonjour, neuf, mal).</li>
+            <li>A final <b>-e</b> without accent is silent: un<b>e</b>, bell<b>e</b>. With an accent it is said: caf<b>é</b>.</li>
+            <li><b>n</b> or <b>m</b> after a vowel makes it nasal (an, on, in) - unless another vowel follows: bon / bonne.</li>
+          </ul>
+        </div>
+      )}
+      {pk.id === "ja" && alpha.id !== "kanji" && (
         <div className="card mt16">
           <div style={{ fontWeight: 800 }}>Three rules to learn with the chart</div>
           <ul className="sm" style={{ lineHeight: 1.7, margin: "6px 0 0", paddingLeft: 18 }}>
@@ -89,14 +98,15 @@ function CellDetail({ c, alphaId, mnemonic, onStep, pos }: { c: LetterCell; alph
   const stat = p.kana[c.ch];
   const examples = useMemo(() => {
     if (alphaId === "kanji") return pk.words.filter((w) => w.w.includes(c.ch)).slice(0, 3);
-    const h = toHira(c.ch);
+    if (pk.id !== "ja") { const ch = c.ch.toLowerCase(); const bare = (w: string) => w.replace(/^(le |la |les |l'|un |une )/i, "").toLowerCase(); return pk.words.filter((w) => (ch.length === 1 && /[a-z]/.test(ch) ? bare(w.w).startsWith(ch) : bare(w.w).includes(ch))).slice(0, 3); }
+    const h = c.ch.replace(/[ァ-ヶ]/g, (x) => String.fromCharCode(x.charCodeAt(0) - 0x60));
     return pk.words.filter((w) => (alphaId === "kata" ? w.r.includes(c.ch) || w.w.includes(c.ch) : w.r.startsWith(h))).slice(0, 3);
   }, [c, alphaId, pk]);
   return (
     <div>
       <div className="row top">
         <div className="grow">
-          <div className="kicker">{alphaId === "kanji" ? "Kanji" : alphaId === "kata" ? "Katakana" : "Hiragana"}</div>
+          <div className="kicker">{pk.alphabets.find((a) => a.id === alphaId)?.name || alphaId}</div>
           <div style={{ fontSize: 30, fontWeight: 800, lineHeight: 1.1 }}>{c.rom}</div>
           {s.showHindi && c.hint && <div className="hi lg">{c.hint}</div>}
           {stat && <div className="xs mu mt4">Quiz: {stat.c} right · {stat.w} wrong {isMastered(stat) ? "· mastered ✓" : ""}</div>}

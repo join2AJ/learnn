@@ -1,6 +1,6 @@
-import { toHira } from "../packs/ja/kana";
+import { pack } from "../pack";
 
-export const norm = (s: string) => toHira(s).replace(/[\s、。！？!?,.・「」『』〜~]/g, "").toLowerCase();
+export const norm = (s: string) => { const f = pack().normalize; return f ? f(s) : s.toLowerCase().replace(/[\s\p{P}]/gu, ""); };
 function lev(a: string, b: string) {
   const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
   for (let j = 1; j <= b.length; j++) d[0][j] = j;

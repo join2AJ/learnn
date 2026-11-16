@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { useSettings } from "../../core/store";
+import { usePack } from "../../pack";
 import { Header, Say } from "../../ui/kit";
 import { RecBtn } from "../../ui/VoiceCompare";
 
@@ -15,7 +16,8 @@ export default function Sentences() {
   const [lvl, setLvl] = useState(300);
   const [q, setQ] = useState("");
   const [limit, setLimit] = useState(30);
-  useEffect(() => { import("../../packs/ja/data/sentences.json").then((m) => setAll(m.default as Sent[])); }, []);
+  const pk = usePack();
+  useEffect(() => { setAll(null); pk.loadSentences?.().then((d) => setAll(d as Sent[])); }, [pk.id]);
   const list = useMemo(() => {
     if (!all) return [];
     const t = q.trim().toLowerCase();
@@ -25,12 +27,12 @@ export default function Sentences() {
     <div className="screen">
       <Header title="Sentence bank" sub={(all ? all.length.toLocaleString() : "3,200") + " real sentences · simplest & most common first"} backTo="/learn" />
       <div className="card soft-ai" style={{ boxShadow: "none" }}>
-        <div className="sm" style={{ lineHeight: 1.55 }}>Every sentence is real Japanese written by people, ordered by how common its words are. Pick a level: “Top 300” shows sentences built <b>only</b> from the 300 most-spoken words, so you can read them early.</div>
+        <div className="sm" style={{ lineHeight: 1.55 }}>Every sentence is real {pk.name} written by people, ordered by how common its words are. Pick a level: “Top 300” shows sentences built <b>only</b> from the 300 most-spoken words, so you can read them early.</div>
       </div>
       <div className="chips mt12">{LEVELS.map(([l, v]) => <button key={v} className={"chip" + (lvl === v ? " on" : "")} onClick={() => { setLvl(v); setLimit(30); }}>{l}</button>)}</div>
       <div style={{ position: "relative" }} className="mt8">
         <Search size={18} style={{ position: "absolute", left: 14, top: 14 }} className="mu2" />
-        <input type="search" placeholder="Search Japanese, romaji or English" value={q} onChange={(e) => { setQ(e.target.value); setLimit(30); }} style={{ paddingLeft: 40 }} />
+        <input type="search" placeholder={"Search " + pk.name + " or English"} value={q} onChange={(e) => { setQ(e.target.value); setLimit(30); }} style={{ paddingLeft: 40 }} />
       </div>
       <div className="sm mu mt8">{all ? list.length.toLocaleString() + " sentences" : "Loading…"}</div>
       {list.slice(0, limit).map((x, i) => (

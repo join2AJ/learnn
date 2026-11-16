@@ -1,3 +1,4 @@
+import { getSettings } from "./store";
 /**
  * Bridge to the Android shell (MainActivity exposes `window.Native`).
  * Every call has a browser fallback so the app also runs in Chrome for development.
@@ -7,6 +8,7 @@ interface NativeApi {
   speak(text: string, lang: string, rate: number, id: string): void;
   stopSpeaking(): void;
   ttsStatus(): string; // {"ready":bool,"voice":bool}
+  ttsStatusFor?(lang: string): string;
   openTtsSettings(): void;
   startListening(lang: string): void;
   stopListening(): void;
@@ -67,8 +69,10 @@ let warn: (m: string) => void = () => {};
 export const setWarn = (f: (m: string) => void) => { warn = f; };
 
 let seq = 0;
+/** BCP-47 voice language of the active course. */
+export const curLang = () => ({ fr: "fr-FR", ja: "ja-JP" } as Record<string, string>)[getSettings().lang] || "ja-JP";
 export function speak(text: string, opts: { lang?: string; rate?: number; id?: string } = {}) {
-  const lang = opts.lang || "ja-JP";
+  const lang = opts.lang || curLang();
   const rate = opts.rate ?? 0.9;
   const id = opts.id || "s" + ++seq;
   const n = N();
@@ -109,10 +113,10 @@ export function stopSpeaking() {
 export function ttsStatus(): { ready: boolean; voice: boolean; native: boolean } {
   const n = N();
   if (n) {
-    try { return { ...JSON.parse(n.ttsStatus()), native: true }; } catch { return { ready: false, voice: false, native: true }; }
+    try { return { ...JSON.parse(n.ttsStatusFor ? n.ttsStatusFor(curLang()) : n.ttsStatus()), native: true }; } catch { return { ready: false, voice: false, native: true }; }
   }
   const has = typeof window !== "undefined" && !!window.speechSynthesis;
-  const voice = has && window.speechSynthesis.getVoices().some((v) => v.lang?.startsWith("ja"));
+  const voice = has && window.speechSynthesis.getVoices().some((v) => v.lang?.startsWith(curLang().slice(0, 2)));
   return { ready: has, voice, native: false };
 }
 export const openTtsSettings = () => N()?.openTtsSettings();

@@ -128,4 +128,17 @@ export interface LanguagePack {
   scriptsIntro: { title: string; text: string }[];
   compareTable: { head: string[]; rows: string[][] };
   facts: string[];
+  /** Exam levels stored in Word.jlpt (5 = easiest). e.g. JLPT N5-N1, CEFR A1-C1. */
+  exam?: { name: string; short: (n: number) => string; levels: Record<number, { name: string; desc: string; hi: string }>; note: string };
+  topics?: { id: string; name: string; hi: string; icon: string; tone: string }[];
+  loadSentences?: () => Promise<{ jp: string; ro: string; en: string; hi: string; lvl: number; z: number }[]>;
+  /** Normalise text before comparing what the learner said with the target. */
+  normalize?: (s: string) => string;
+  /** Text → pronunciation guide (romaji for Japanese). */
+  romanize?: (s: string) => string;
+  romanLabel?: string;        // "romaji", "pronunciation"
+  writing?: boolean;          // stroke-order writing practice available
+  verbLabels?: Record<string, [string, string]>; // verb group → [label, colour]
+  hasPitch?: boolean;         // pitch-accent drills available
+  country?: string;           // "Japan", "France" - used in titles
 }

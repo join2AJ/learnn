@@ -96,7 +96,7 @@ export default function Recordings() {
 
         <div style={{ position: "relative" }} className="mt12">
           <Search size={18} style={{ position: "absolute", left: 14, top: 14 }} className="mu2" />
-          <input type="search" placeholder="Find a word (Japanese, romaji or English)" value={q} onChange={(e) => setQ(e.target.value)} style={{ paddingLeft: 40 }} />
+          <input type="search" placeholder={"Find a word (" + pk.name + " or English)"} value={q} onChange={(e) => setQ(e.target.value)} style={{ paddingLeft: 40 }} />
         </div>
 
         <div className="mt8">

@@ -6,6 +6,9 @@ import { lessons } from "./lessons";
 import { culture } from "./culture";
 import { conjugate, verbGroup } from "./verbs";
 import * as C from "./content";
+import { JLPT_INFO, TOPICS } from "./topics";
+import { toHira } from "./kana";
+import { romaji } from "./verbs";
 
 const japanese: LanguagePack = {
   id: "ja", name: "Japanese", native: "日本語", flag: "🇯🇵", ttsLang: "ja-JP", status: "ready",
@@ -21,5 +24,10 @@ const japanese: LanguagePack = {
   verbGroup, conjugate,
   sentenceBuilder: C.sentenceBuilder, particleQuiz: C.particleQuiz,
   scriptsIntro: C.scriptsIntro, compareTable: C.compareTable, facts: C.facts,
+  exam: { name: "JLPT", short: (n) => "N" + n, levels: JLPT_INFO, note: "JLPT levels from open community lists (Jonathan Waller / open-anki-jlpt-decks). The official test publishes no word list, so treat levels as a guide." },
+  topics: TOPICS,
+  loadSentences: () => import("./data/sentences.json").then((m) => m.default as never),
+  normalize: (s) => toHira(s).replace(/[\s、。！？!?,.・「」『』〜~]/g, "").toLowerCase(),
+  romanize: romaji, romanLabel: "romaji", writing: true, hasPitch: true, country: "Japan",
 };
 export default japanese;

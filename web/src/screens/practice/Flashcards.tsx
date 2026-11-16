@@ -13,9 +13,8 @@ import { FreqMeter } from "../../core/freq";
 import type { Word } from "../../core/types";
 import { Icon } from "../../ui/icons";
 import { HlJp, HlRo } from "../../ui/Highlight";
-import { TOPICS } from "../../packs/ja/topics";
 
-const DECKS = [
+const JA_DECKS = [
   { id: "words", top: "Words", sub: "शब्द", name: "Words (2,000 core)", en: "the most-spoken Japanese words, most frequent first, with meaning and an example sentence.", hi: "सबसे ज़्यादा बोले जाने वाले 2,000 जापानी शब्द - अर्थ और वाक्य के साथ।" },
   { id: "hira", top: "ひらがな", sub: "Hiragana", name: "Hiragana", en: "the basic Japanese alphabet used for native words and grammar endings.", hi: "मूल जापानी वर्णमाला - जापानी शब्दों और व्याकरण के लिए।" },
   { id: "kata", top: "カタカナ", sub: "Katakana", name: "Katakana", en: "the same sounds in angular shapes, used for foreign words like コーヒー (coffee).", hi: "वही ध्वनियाँ, कोणीय अक्षर - विदेशी शब्दों के लिए (जैसे コーヒー = कॉफ़ी)।" },
@@ -29,8 +28,9 @@ export default function Flashcards({ deck }: { deck: string }) {
   const s = useSettings();
   const p = useProgress();
 
+  const DECKS = pk.id === "ja" ? JA_DECKS : [{ ...JA_DECKS[0], en: "the most-spoken " + pk.name + " words, most frequent first, with meaning and an example sentence." }, ...pk.alphabets.map((a) => ({ id: a.id, top: a.native, sub: a.name, name: a.name, en: a.blurb, hi: "" }))];
   const isWords = deck === "words" || deck.startsWith("topic:") || deck.startsWith("jlpt:");
-  const topic = deck.startsWith("topic:") ? TOPICS.find((t) => t.id === deck.slice(6)) : undefined;
+  const topic = deck.startsWith("topic:") ? (pk.topics || []).find((t) => t.id === deck.slice(6)) : undefined;
   const jl = deck.startsWith("jlpt:") ? +deck.slice(5) : 0;
   const inDeck = (w: Word) => (topic ? (w.tp || []).includes(topic.id) : jl ? w.jlpt === jl : true);
   const reverse = s.cardsReverse && isWords;
@@ -124,7 +124,7 @@ export default function Flashcards({ deck }: { deck: string }) {
             {reverse && card.kind === "word" ? (<>
               <div style={{ fontSize: 28, fontWeight: 800, lineHeight: 1.25 }}>{card.meaning}</div>
               {s.showHindi && card.hindi && <div className="hi lg mt4">{card.hindi}</div>}
-              <div className="sm mu2 mt16">Say it in Japanese, then tap to check</div>
+              <div className="sm mu2 mt16">Say it in {pk.name}, then tap to check</div>
             </>) : (<>
               <div className="huge" style={{ fontSize: card.front.length > 4 ? 44 : card.kind === "kana" ? 96 : 64 }}>{card.front}</div>
               <div className="sm mu2 mt16">Tap to reveal</div>

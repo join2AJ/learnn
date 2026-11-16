@@ -46,3 +46,4 @@ alphabets, speaking, writing, roadmap/timeline, English + Hindi comparison, tens
 - Play App Signing with **our** key via PEPK (critical for the encryption)
 - Real-device test of the encrypted builds; 12-tester / 14-day closed test
 - WhatsApp number, UPI ID / support links (non-Play builds), personal story text for About
+| v4.2 | Build the French course hidden during the closed test, then switch it on after the Japanese launch | Multi-language engine (screens read the active pack); hidden French pack: 2,000 words by spoken frequency with English + Hindi + gender + IPA + Tatoeba sentence, 4,000-sentence bank, alphabet/accents/20 sounds, 7 pronunciation topics, 21 grammar lessons, 30 core words, conjugator (384 verbs × 20 forms), phrases, culture, roadmap, CEFR levels, French vowel map. Unlock: Settings → tap the version 7 times |

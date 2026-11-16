@@ -179,6 +179,12 @@ public class MainActivity extends Activity {
             return "{\"ready\":" + ttsReady + ",\"voice\":" + voice + "}";
         }
         @JavascriptInterface
+        public String ttsStatusFor(String lang) {
+            boolean voice = false;
+            if (ttsReady) voice = tts.isLanguageAvailable(Locale.forLanguageTag(lang)) >= TextToSpeech.LANG_AVAILABLE;
+            return "{\"ready\":" + ttsReady + ",\"voice\":" + voice + "}";
+        }
+        @JavascriptInterface
         public void openTtsSettings() {
             runOnUiThread(() -> {
                 try { startActivity(new Intent("com.android.settings.TTS_SETTINGS")); }

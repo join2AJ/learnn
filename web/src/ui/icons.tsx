@@ -1,3 +1,4 @@
+import { pack } from "../pack";
 import type { LucideIcon } from "lucide-react";
 import {
   Activity, AudioWaveform, Award, Ban, BookOpen, BookOpenCheck, Brain, Briefcase, Building2, CircleCheck, Compass, Earth, Flag, Flame,
@@ -36,6 +37,7 @@ export function IconTile({ name, tone = "shu", size = 40, icon = 20, round }: { 
 
 /** Country flag used to label English / Hindi / Japanese explanations. */
 export function LangPill({ l }: { l: "en" | "hi" | "ja" }) {
-  const flag = { en: "🇬🇧", hi: "🇮🇳", ja: "🇯🇵" }[l];
-  return <span role="img" aria-label={{ en: "English", hi: "Hindi", ja: "Japanese" }[l]} style={{ fontSize: 18, lineHeight: 1, flex: "none" }}>{flag}</span>;
+  const pk = pack();
+  const flag = { en: "🇬🇧", hi: "🇮🇳", ja: pk.flag }[l];
+  return <span role="img" aria-label={{ en: "English", hi: "Hindi", ja: pk.name }[l]} style={{ fontSize: 18, lineHeight: 1, flex: "none" }}>{flag}</span>;
 }

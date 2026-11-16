@@ -53,7 +53,7 @@ const HIRA46 = "あいうえおかきくけこさしすせそたちつてとな�
 const KATA46 = Array.from(HIRA46).map((c) => String.fromCharCode(c.charCodeAt(0) + 0x60)).join("");
 export const sumKana = (p: Progress) => Object.values(p.kana).reduce((a, b) => a + b.c, 0);
 export const isMastered = (s?: { c: number; w: number }) => !!s && s.c >= 3 && s.c >= s.w * 2;
-export const masteredSet = (p: Progress, set: string) => Array.from(set).filter((c) => isMastered(p.kana[c])).length;
+export const masteredSet = (p: Progress, set: string | Iterable<string>) => Array.from(set).filter((c) => isMastered(p.kana[c])).length;
 export const totalMs = (p: Progress) => Object.values(p.days).reduce((a, d) => a + d.ms, 0);
 export const totalReviews = (p: Progress) => Object.values(p.days).reduce((a, d) => a + d.reviews, 0);
 export { HIRA46, KATA46 };
@@ -143,8 +143,8 @@ export function recordAnswer(ok: boolean) {
 const kanaRight = (p: Progress) => Object.values(p.kana).reduce((a, b) => a + b.c, 0);
 export const BADGE_HOW: Record<string, BadgeHow> = {
   first: { prog: (p) => [Math.min(1, p.xp), 1], to: "/learn/scripts", how: "Do anything - read a lesson, answer a quiz or review a card." },
-  kana10: { prog: (p) => [Math.min(10, kanaRight(p)), 10], to: "/practice/quiz/kana?set=hira", how: "Answer kana correctly in the Kana sprint quiz." },
-  kana100: { prog: (p) => [Math.min(100, kanaRight(p)), 100], to: "/practice/quiz/kana?set=hira", how: "Keep doing Kana sprints until 100 correct answers." },
+  kana10: { prog: (p) => [Math.min(10, kanaRight(p)), 10], to: "/practice/quiz/kana", how: "Answer correctly in the alphabet sprint quiz." },
+  kana100: { prog: (p) => [Math.min(100, kanaRight(p)), 100], to: "/practice/quiz/kana", how: "Keep doing alphabet sprints until 100 correct answers." },
   hira: { prog: (p) => [masteredSet(p, HIRA46), 46], to: "/practice/quiz/kana?set=hira", how: "A kana is mastered after 3+ correct answers (and twice as many right as wrong)." },
   kata: { prog: (p) => [masteredSet(p, KATA46), 46], to: "/practice/quiz/kana?set=kata", how: "Master all 46 basic katakana in quizzes." },
   w50: { prog: (p) => [Math.min(50, p.known.length), 50], to: "/practice/cards", how: "Mark words as known or rate them Good twice in flashcards." },

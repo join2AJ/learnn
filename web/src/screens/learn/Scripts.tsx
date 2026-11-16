@@ -15,6 +15,22 @@ export default function Scripts() {
     <div className="screen">
       <Header title="The scripts" sub="What the ‘alphabets’ are and how they compare" backTo="/learn" />
 
+      {pk.id !== "ja" ? (
+      <div className="card hero tint-ink">
+        <div className="kicker">How French is written vs said</div>
+        <div className="row mt8">
+          <div className="grow" style={{ fontSize: 24, lineHeight: 1.5, fontWeight: 700 }}>
+            Le<span style={{ opacity: .35 }}>s</span> <span style={{ color: "#ffb39f" }}>en</span>f<span style={{ color: "#ffb39f" }}>an</span><span style={{ opacity: .35 }}>ts</span> v<span style={{ color: "#ffb39f" }}>on</span><span style={{ opacity: .35 }}>t</span> à l’<span style={{ color: "#a9bdf5" }}>é</span>col<span style={{ opacity: .35 }}>e</span>.
+          </div>
+          <Say text="Les enfants vont à l’école." />
+        </div>
+        <div className="sm mu">le-z-ãfã võ a lekɔl - “The children go to school.” · बच्चे स्कूल जाते हैं।</div>
+        <div className="row wrap mt12 gap6 xs">
+          <span className="tag" style={{ background: "rgba(255,255,255,.12)", color: "#ddd" }}>Faded = silent letters</span>
+          <span className="tag" style={{ background: "rgba(255,179,159,.2)", color: "#ffd3c7" }}>Orange = nasal vowels</span>
+          <span className="tag" style={{ background: "rgba(169,189,245,.2)", color: "#d2ddfb" }}>Blue = accent changes the sound</span>
+        </div>
+      </div>) : (
       <div className="card hero tint-ink">
         <div className="kicker">One sentence, three scripts</div>
         <div className="row mt8">
@@ -29,13 +45,13 @@ export default function Scripts() {
           <span className="tag" style={{ background: "rgba(255,179,159,.2)", color: "#ffd3c7" }}>Hiragana = grammar</span>
           <span className="tag" style={{ background: "rgba(169,189,245,.2)", color: "#d2ddfb" }}>Katakana = foreign words</span>
         </div>
-      </div>
+      </div>)}
 
       {pk.scriptsIntro.map((s) => (
         <div className="card" key={s.title}><div style={{ fontWeight: 800 }}>{s.title}</div><div className="prose sm mt4"><Md text={s.text} /></div></div>
       ))}
 
-      <div className="section-title"><h2>Open each script</h2></div>
+      <div className="section-title"><h2>{pk.id === "ja" ? "Open each script" : "Open each part"}</h2></div>
       {pk.alphabets.map((a) => (
         <button key={a.id} className="card tap" onClick={() => go("/learn/kana/" + a.id)}>
           <div className="row">
@@ -51,7 +67,7 @@ export default function Scripts() {
         </button>
       ))}
 
-      <div className="section-title"><h2>English vs Hindi vs Japanese</h2></div>
+      <div className="section-title"><h2>English vs Hindi vs {pk.name}</h2></div>
       <div className="tbl-wrap" style={{ background: "var(--surface)" }}>
         <table className="tbl">
           <thead><tr>{pk.compareTable.head.map((h) => <th key={h}>{h}</th>)}</tr></thead>
@@ -59,11 +75,11 @@ export default function Scripts() {
         </table>
       </div>
 
-      <div className="card soft-gold mt16" style={{ boxShadow: "none" }}>
+      {pk.id === "ja" && <div className="card soft-gold mt16" style={{ boxShadow: "none" }}>
         <div className="row gap6" style={{ fontWeight: 800 }}><LangPill l="hi" /> Hindi speakers: a big head start</div>
         <div className="sm mt4" style={{ lineHeight: 1.6 }}>The kana chart (a i u e o · ka ki ku ke ko) was organised by Buddhist scholars who studied Sanskrit - it follows the same phonetic logic as <span className="hi">अ इ उ ए ओ · क कि कु के को</span>. Each kana is a syllable just like a Devanagari letter with its मात्रा.</div>
-      </div>
-      <button className="btn primary lg block mt16" onClick={() => go("/learn/kana/hira")}>Start hiragana <ArrowRight size={18} /></button>
+      </div>}
+      <button className="btn primary lg block mt16" onClick={() => go("/learn/kana/" + pk.alphabets[0].id)}>Start {pk.alphabets[0].name.toLowerCase()} <ArrowRight size={18} /></button>
     </div>
   );
 }

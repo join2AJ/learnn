@@ -68,14 +68,14 @@ export default function Words() {
       </div>
       <div style={{ position: "relative" }} className="mt12">
         <Search size={18} style={{ position: "absolute", left: 14, top: 14 }} className="mu2" />
-        <input type="search" placeholder="Search Japanese, romaji, English or हिन्दी" value={q} onChange={(e) => { setQ(e.target.value); setLimit(30); }} style={{ paddingLeft: 40 }} />
+        <input type="search" placeholder={"Search " + pk.name + ", " + (pk.romanLabel || "romaji") + ", English or हिन्दी"} value={q} onChange={(e) => { setQ(e.target.value); setLimit(30); }} style={{ paddingLeft: 40 }} />
       </div>
       <div className="chips mt8">
         {TIERS.map(([l], i) => <button key={l} className={"chip" + (tier === i ? " on" : "")} onClick={() => { setTier(i); setLimit(30); }}>{l}</button>)}
         <button className={"chip" + (hideKnown ? " on" : "")} onClick={() => setHideKnown(!hideKnown)}>Hide known</button>
       </div>
       <div className="chips mt4">
-        {[0, 5, 4, 3, 2, 1].map((n) => <button key={"j" + n} className={"chip" + (jlpt === n ? " on" : "")} onClick={() => { setJlpt(n); setLimit(30); }}>{n ? "JLPT N" + n : "All levels"}</button>)}
+        {(pk.exam ? [0, ...Object.keys(pk.exam.levels).map(Number).sort((a, b) => b - a)] : []).map((n) => <button key={"j" + n} className={"chip" + (jlpt === n ? " on" : "")} onClick={() => { setJlpt(n); setLimit(30); }}>{n ? pk.exam?.name + " " + pk.exam?.short(n) : "All levels"}</button>)}
       </div>
       <div className="chips mt4">
         {types.map((t) => <button key={t} className={"chip" + (type === t ? " shu on" : "")} onClick={() => { setType(t); setLimit(30); }}>{t}</button>)}
@@ -88,7 +88,7 @@ export default function Words() {
           <div key={w.n} className="card" style={k ? { boxShadow: "inset 0 0 0 1.5px color-mix(in srgb, var(--matcha) 50%, transparent), var(--shadow-1)" } : undefined}>
             <div className="row top">
               <div className="grow">
-                <div className="row gap6 wrap"><span className="xs mu2">#{w.rank ?? w.n}</span><FreqMeter w={w} compact /><span className="tag" style={{ background: TYPE_COL[w.t] || "var(--ink-3)", color: "#fff" }}>{w.t}</span>{w.jlpt && <span className="tag" style={{ boxShadow: "inset 0 0 0 1.5px var(--ai)", background: "transparent", color: "var(--ai)" }}>N{w.jlpt}</span>}</div>
+                <div className="row gap6 wrap"><span className="xs mu2">#{w.rank ?? w.n}</span><FreqMeter w={w} compact /><span className="tag" style={{ background: TYPE_COL[w.t] || "var(--ink-3)", color: "#fff" }}>{w.t}</span>{w.jlpt && <span className="tag" style={{ boxShadow: "inset 0 0 0 1.5px var(--ai)", background: "transparent", color: "var(--ai)" }}>{pk.exam?.short(w.jlpt)}</span>}</div>
                 <div className="row" style={{ alignItems: "baseline", gap: 8 }}>
                   <span className="jp" style={{ fontSize: 30, fontWeight: 600 }}>{w.w}</span>
                   {w.r !== w.w && <span className="jp mu">{w.r}</span>}
@@ -97,7 +97,7 @@ export default function Words() {
               </div>
               <div className="row gap6"><Say text={w.r} /><RecBtn text={w.w} ro={w.ro} en={w.m} size="m" /></div>
             </div>
-            <div className="xs mu2">{freqInfo(w).oneIn ? "Heard about 1 in " + freqInfo(w).oneIn.toLocaleString() + " words in everyday Japanese" : ""}</div>
+            <div className="xs mu2">{freqInfo(w).oneIn ? "Heard about 1 in " + freqInfo(w).oneIn.toLocaleString() + " words in everyday " + pk.name : ""}</div>
             <div style={{ fontWeight: 700, marginTop: 2 }}>{w.m}{s.showHindi && <span className="hi" style={{ fontWeight: 500 }}> · {w.h}</span>}</div>
             <div className="ex" style={{ paddingBottom: 4 }}>
               <div className="grow"><div className="j" style={{ fontSize: 17 }}><HlJp text={w.s} word={w} /></div>{s.showRomaji && <div className="r"><HlRo text={w.sr} word={w} /></div>}<div className="e mu">{w.st}</div></div>

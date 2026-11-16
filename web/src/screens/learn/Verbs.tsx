@@ -13,19 +13,20 @@ export default function Verbs({ initial }: { initial: string | null }) {
   const s = useSettings();
   const verbs = useMemo(() => pk.words.filter((w) => pk.conjugate?.(w)), [pk]);
   const [q, setQ] = useState("");
-  const [cur, setCur] = useState(() => verbs.find((v) => v.w === initial) || verbs.find((v) => v.w === "食べる") || verbs[0]);
+  const [cur, setCur] = useState(() => verbs.find((v) => v.w === initial) || verbs.find((v) => v.w === "食べる" || v.w === "parler") || verbs[0]);
   const list = useMemo(() => {
     const t = q.trim().toLowerCase();
     return t ? verbs.filter((v) => [v.w, v.r, v.ro, v.m, v.h].some((x) => x.toLowerCase().includes(t))) : verbs;
   }, [q, verbs]);
   const forms = pk.conjugate!(cur)!;
   const g = pk.verbGroup!(cur)!;
+  const gl = (pk.verbLabels || GROUP_LABEL)[g] || [g, "var(--ai)"];
   return (
     <div className="screen">
       <Header title="Verb conjugator" sub={verbs.length + " verbs from the core list"} backTo="/learn" />
       <div style={{ position: "relative" }}>
         <Search size={18} style={{ position: "absolute", left: 14, top: 14 }} className="mu2" />
-        <input type="search" placeholder="Search: eat, 食べる, taberu, खाना…" value={q} onChange={(e) => setQ(e.target.value)} style={{ paddingLeft: 40 }} />
+        <input type="search" placeholder={pk.id === "ja" ? "Search: eat, 食べる, taberu, खाना…" : "Search: eat, manger, खाना…"} value={q} onChange={(e) => setQ(e.target.value)} style={{ paddingLeft: 40 }} />
       </div>
       <div className="chips mt8">
         {list.slice(0, 60).map((v) => <button key={v.n} className={"chip" + (v.n === cur.n ? " on" : "")} onClick={() => setCur(v)}><span className="jp">{v.w}</span></button>)}
@@ -33,9 +34,9 @@ export default function Verbs({ initial }: { initial: string | null }) {
       <div className="card hero tint-ink mt12">
         <div className="row top">
           <div className="grow">
-            <span className="tag" style={{ background: GROUP_LABEL[g][1], color: "#fff" }}>{GROUP_LABEL[g][0]}</span>
+            <span className="tag" style={{ background: gl[1], color: "#fff" }}>{gl[0]}</span>
             <div className="jp" style={{ fontSize: 40, fontWeight: 700, marginTop: 6 }}>{cur.w}</div>
-            <div className="mu">{cur.r} · {cur.ro}</div>
+            <div className="mu">{pk.id === "ja" ? cur.r + " · " : ""}{cur.ro}</div>
             <div style={{ fontWeight: 700, marginTop: 4 }}>{cur.m}{s.showHindi && <span style={{ color: "#ffb39f" }}> · {cur.h}</span>}</div>
           </div>
           <Say text={cur.r} />

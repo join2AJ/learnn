@@ -1,0 +1,68 @@
+import type { CultureSection } from "../../core/types";
+
+export const culture: CultureSection[] = [
+  { id: "values", title: "Core values", icon: "landmark", tone: "value",
+    intro: "France’s motto is Liberté, Égalité, Fraternité - freedom, equality, brotherhood. You see it on every town hall.",
+    items: [
+      { title: "Laïcité - a secular state", jp: "la laïcité", text: "Religion is private; public schools and offices stay neutral. People rarely talk about their religion with strangers.", india: "India is secular too, but religion is very visible in public life. In France it is kept low-key." },
+      { title: "Debate is a pleasure", jp: "le débat", text: "French people love to discuss and disagree - politics, food, philosophy. A heated debate at dinner is a sign of a good evening, not a fight." },
+      { title: "Quality of life", jp: "la qualité de vie", text: "Long lunches, five weeks of paid holiday, 35-hour work weeks. Work matters, but so does time with family and good food." },
+      { title: "Pride in the language", jp: "la langue française", text: "French is protected by the Académie française. Even a little effort to speak French earns real respect.", india: "Like many Indians are proud of their mother tongue - starting with Bonjour opens doors." },
+      { title: "Politeness rituals", jp: "la politesse", text: "Bonjour, merci, au revoir, s’il vous plaît - always. Skipping Bonjour before asking a question is considered rude." },
+    ] },
+  { id: "likes", intro: "What makes French people happy - good bread, long meals and summer holidays.", title: "What French people love", icon: "heart", tone: "like",
+    items: [
+      { title: "Bread and the boulangerie", jp: "la baguette", text: "Fresh bread every day - France has about 30,000 bakeries. The baguette is on UNESCO’s heritage list." },
+      { title: "Cheese and wine", jp: "le fromage", text: "Over 1,000 cheeses. Wine with dinner is normal, but drunkenness is frowned upon." },
+      { title: "Long meals together", jp: "le repas", text: "Lunch can last 1–2 hours. Dinner is late (8 pm) and many courses: entrée, plat, fromage, dessert.", india: "Like a family meal on a festival day - but every Sunday!" },
+      { title: "Football and cycling", jp: "le foot", text: "Football is the national passion; the Tour de France cycling race crosses the country every July." },
+      { title: "Café terraces", jp: "la terrasse", text: "Sitting outside with a coffee, watching people go by - for as long as you like. Nobody rushes you." },
+      { title: "Holidays and summer", jp: "les vacances", text: "August is holiday month - many shops close and cities empty as people head to the beach or countryside." },
+    ] },
+  { id: "dislikes", intro: "Small things that can feel rude in France, even if they’re normal elsewhere.", title: "What makes people uncomfortable", icon: "ban", tone: "dislike",
+    items: [
+      { title: "Skipping Bonjour", text: "Walking into a shop and asking for something without Bonjour first feels very rude." },
+      { title: "Talking about money", text: "Asking someone’s salary, the price of their house or flat is impolite." },
+      { title: "Being loud in public", text: "On trains and in restaurants people speak quietly. Phone calls on speaker are disliked." },
+      { title: "Rushing a meal", text: "Eating while walking or hurrying the waiter is seen as not appreciating food." },
+      { title: "Assuming everyone speaks English", text: "Start in French, even just Bonjour, excusez-moi, vous parlez anglais ? People then usually switch to help you." },
+    ] },
+  { id: "do", intro: "Simple habits that make people warm to you straight away.", title: "Etiquette: do this", icon: "check", tone: "do",
+    items: [
+      { title: "Say Bonjour Madame / Monsieur", jp: "Bonjour Madame", text: "Greet shopkeepers, bus drivers and waiters when you enter, and say Merci, au revoir when you leave." },
+      { title: "Use vous with strangers", jp: "vous", text: "Use vous with anyone older, in shops or at work. Wait for them to suggest tu.", india: "Exactly like आप vs तुम." },
+      { title: "La bise (cheek kisses)", jp: "la bise", text: "Friends greet with light kisses on the cheeks (2 in Paris, sometimes 3 or 4 elsewhere). At work, a handshake is safer. Follow their lead." },
+      { title: "Keep your hands on the table", text: "At meals, keep both wrists on the table (not on your lap). Wait for ‘Bon appétit’ before starting." },
+      { title: "Bring a small gift", text: "When invited to dinner, bring flowers (not chrysanthemums - they’re for funerals), chocolates or a bottle of wine." },
+    ] },
+  { id: "dont", intro: "Avoid these and you’ll blend in much better.", title: "Etiquette: avoid this", icon: "alert", tone: "dont",
+    items: [
+      { title: "Don’t ask for the bill too early", text: "The waiter will never bring the bill until you ask: L’addition, s’il vous plaît." },
+      { title: "Don’t call a waiter ‘garçon’", text: "Say Monsieur or Madame, or just Excusez-moi." },
+      { title: "Don’t put ketchup on everything", text: "Asking to change a chef’s dish or adding lots of sauce can offend in nice restaurants." },
+      { title: "Don’t be late for dinner… or too early", text: "For dinner at someone’s home, arriving 10–15 minutes late is polite. Arriving early is awkward." },
+    ] },
+  { id: "behaviour", intro: "How French people talk, argue, greet and show feelings.", title: "Behaviour and communication", icon: "chat", tone: "info",
+    items: [
+      { title: "Direct but polite", text: "French people say what they think, sometimes bluntly, but always wrapped in polite words." },
+      { title: "Smiles are for friends", text: "Smiling at strangers is less common than in India or the US - it doesn’t mean people are unfriendly." },
+      { title: "Personal space", text: "People stand a little closer when talking, but keep conversations private." },
+      { title: "Gestures", jp: "bof", text: "A shrug with puffed cheeks (bof) means ‘meh / whatever’. Waving a hand near the face means ‘it’s too much!’." },
+    ] },
+  { id: "india", intro: "Links between France and India - history, studies, and language.", title: "France and India", icon: "earth", tone: "info",
+    items: [
+      { title: "Pondicherry", jp: "Pondichéry", text: "A French territory until 1954. The White Town still has French street names, yellow villas and French schools.", india: "You can practise French in Puducherry - the Alliance Française there is one of India’s oldest." },
+      { title: "Strategic partners", text: "France and India work together on space (ISRO & CNES), defence (Rafale jets) and the International Solar Alliance founded in 2015." },
+      { title: "Studying in France", jp: "Campus France", text: "France welcomes thousands of Indian students every year; many master’s programmes are in English, but daily life needs French." },
+      { title: "Gender in grammar", text: "Both French and Hindi give every noun a gender. But they often disagree: la voiture (car) is feminine in French, गाड़ी is feminine in Hindi too - but le livre (book) is masculine while किताब is feminine!" },
+      { title: "Shared words", text: "Hindi has words from Portuguese and English; English has thousands from French. You already know French words like menu, restaurant, café, ballet, entrepreneur." },
+    ] },
+  { id: "life", intro: "Festivals, routines and everyday life in France.", title: "Daily life and festivals", icon: "party", tone: "info",
+    items: [
+      { title: "14 juillet - Bastille Day", jp: "le 14 juillet", text: "National day: a big military parade on the Champs-Élysées and fireworks everywhere." },
+      { title: "Fête de la Musique - 21 June", jp: "la Fête de la musique", text: "On the longest day, anyone can play music in the street - free concerts all night across France." },
+      { title: "Noël and the galette des rois", jp: "Noël", text: "Christmas Eve dinner is the big family meal. In January, the galette des rois cake hides a small figure - whoever finds it is king for the day." },
+      { title: "The school and work rhythm", text: "School days are long, but Wednesday afternoons are often free. Shops close on Sundays in many towns." },
+      { title: "Markets", jp: "le marché", text: "Weekly open-air markets sell fresh vegetables, cheese and bread - a great place to practise your French numbers." },
+    ] },
+];

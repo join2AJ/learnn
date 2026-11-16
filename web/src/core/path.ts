@@ -17,6 +17,9 @@ export function checkTask(check: string | undefined, p: Progress, pk: LanguagePa
     case "unit1": return unitDone("1");
     case "unit4": return unitDone("2") && unitDone("3") && unitDone("4");
     case "unit5": return unitDone("5");
+    case "abc26": return masteredSet(p, cellsOf(pk, "abc")) >= 26;
+    case "acc": return masteredSet(p, cellsOf(pk, "acc")) >= 10;
+    case "snd": return masteredSet(p, cellsOf(pk, "snd")) >= 14;
     case "w100": return p.known.length >= 100;
     case "w300": return p.known.length >= 300;
     case "w600": return p.known.length >= 600;
@@ -34,8 +37,21 @@ export function phaseProgress(pk: LanguagePack, p: Progress) {
   });
 }
 
+const cellsOf = (pk: LanguagePack, id: string) => (pk.alphabets.find((a) => a.id === id)?.groups || []).flatMap((g) => g.rows.flatMap((r) => r.cells.filter(Boolean).map((c) => c!.ch)));
+
 /** The single most useful next action for the learner. */
 export function nextStep(pk: LanguagePack, p: Progress): { title: string; sub: string; to: string; jp: string } {
+  if (pk.id !== "ja") {
+    if (!p.roadmap.scripts) return { title: "Meet the " + pk.name + " sounds", sub: "2-minute overview: letters, accents, silent letters", to: "/learn/scripts", jp: "Aa" };
+    for (const a of pk.alphabets) {
+      const cells = cellsOf(pk, a.id), m = masteredSet(p, cells);
+      if (m < Math.ceil(cells.length * 0.6)) return { title: a.name + " · " + m + "/" + cells.length + " mastered", sub: m < 5 ? "Tap each one to hear it, then quiz yourself" : "Quiz yourself until most cells turn green", to: m < 5 ? "/learn/kana/" + a.id : "/practice/quiz/kana?set=" + a.id, jp: cells[0] };
+    }
+    const nx = pk.lessons.find((l) => !p.lessons[l.id]);
+    if (nx && (Object.keys(p.lessons).length < 5 || p.known.length >= Object.keys(p.lessons).length * 20)) return { title: nx.title, sub: "Grammar · " + nx.minutes + " min · " + nx.unit, to: "/learn/grammar/" + nx.id, jp: "Gr" };
+    if (p.known.length < 2000) return { title: "Words " + (p.known.length + 1) + "–" + Math.min(2000, p.known.length + 20), sub: "Flashcards with spaced repetition", to: "/practice/cards", jp: "Mo" };
+    return { title: "Keep reviewing", sub: "Spaced repetition keeps everything fresh", to: "/practice/cards", jp: "↻" };
+  }
   const hira = masteredSet(p, HIRA46), kata = masteredSet(p, KATA46);
   if (!p.roadmap.scripts) return { title: "Meet the 3 scripts", sub: "2-minute overview: hiragana, katakana, kanji", to: "/learn/scripts", jp: "字" };
   if (hira < 46) return { title: "Hiragana · " + hira + "/46 mastered", sub: hira < 10 ? "Learn the first rows with sound + stroke order" : "Quiz yourself until every cell turns green", to: hira < 10 ? "/learn/kana/hira" : "/practice/quiz/kana?set=hira", jp: "あ" };

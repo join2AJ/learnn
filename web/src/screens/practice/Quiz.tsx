@@ -20,7 +20,7 @@ interface Q {
   build?: { tokens: string[]; answer: string[] };
 }
 
-const TITLES: Record<string, string> = { kana: "Kana sprint", listen: "Listening", meaning: "Meaning match", reverse: "Say it in Japanese", particle: "Particle fill-in", build: "Sentence builder", verb: "Verb forms" };
+const TITLES: Record<string, string> = { kana: "Sprint", listen: "Listening", meaning: "Meaning match", reverse: "Say it in your target language", particle: "Fill in the gap", build: "Sentence builder", verb: "Verb forms" };
 const N = 10;
 
 function wordPool(pk: LanguagePack) {
@@ -119,7 +119,7 @@ export default function Quiz({ mode, set }: { mode: string; set: string }) {
     if (!done) return;
     updateProgress((x) => { x.quiz.best = Math.max(x.quiz.best, Math.round((score / qs.length) * 10)); });
     award(score === qs.length ? 15 : 5);
-    speak(score >= qs.length * 0.8 ? pick(pk.praise).jp : "頑張って！", { lang: pk.ttsLang });
+    speak(score >= qs.length * 0.8 ? pick(pk.praise).jp : (pk.id === "ja" ? "頑張って！" : "Courage !"), { lang: pk.ttsLang });
   }, [done]); // eslint-disable-line
 
   const answer = (key: string) => {
@@ -145,7 +145,7 @@ export default function Quiz({ mode, set }: { mode: string; set: string }) {
         <Header title={TITLES[mode]} backTo="/practice" />
         <div className={"card hero center " + (pct >= 0.8 ? "tint-matcha" : pct >= 0.5 ? "tint-ai" : "tint-shu")}>
           <div style={{ display: "grid", placeItems: "center" }}><Icon name={pct === 1 ? "trophy" : pct >= 0.8 ? "star" : pct >= 0.5 ? "rocket" : "sprout"} size={54} /></div>
-          <div className="jp" style={{ fontSize: 24, fontWeight: 800 }}>{pct >= 0.8 ? pick(pk.praise).jp : "頑張って！"}</div>
+          <div className="jp" style={{ fontSize: 24, fontWeight: 800 }}>{pct >= 0.8 ? pick(pk.praise).jp : (pk.id === "ja" ? "頑張って！" : "Courage !")}</div>
           <div style={{ fontSize: 40, fontWeight: 800 }}>{score} / {qs.length}</div>
           <div className="sm mu">{pct === 1 ? "Perfect round! +15 XP bonus" : pct >= 0.8 ? "Excellent - you’re ready for more." : "Every mistake is a future right answer. Try again!"}</div>
           <div className="row mt16" style={{ justifyContent: "center" }}>

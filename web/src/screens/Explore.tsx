@@ -41,6 +41,7 @@ function Hub() {
         <div className="xs mu mt4">{cur.done}/{cur.total} auto-checked tasks · tap for the full timeline</div>
       </button>
 
+      {pk.id === "ja" && (<>
       <button className="card tap mt12" style={{ padding: 0, overflow: "hidden" }} onClick={() => go("/explore/map")}>
         <div className="row" style={{ padding: 14 }}>
           <span style={{ width: 52, height: 52, borderRadius: 16, display: "grid", placeItems: "center", background: "var(--shu-soft)", color: "var(--shu)", fontSize: 26, fontFamily: "var(--jp-serif)", fontWeight: 800 }}>日</span>
@@ -48,12 +49,15 @@ function Hub() {
           <ArrowRight size={18} />
         </div>
       </button>
+      </>)}
 
-      <div className="section-title"><h2>Know the people · 日本の文化</h2><span className="mu">{Object.keys(p.culturesRead).length}/{pk.culture.length} read</span></div>
+      <div className="section-title"><h2>Know the people{pk.id === "ja" ? " · 日本の文化" : " · " + pk.country}</h2><span className="mu">{Object.keys(p.culturesRead).length}/{pk.culture.length} read</span></div>
+      {pk.id === "ja" && (<>
       <button className="card tap" style={{ padding: 0, overflow: "hidden", textAlign: "left", marginBottom: 12 }} onClick={() => go("/explore/famous")}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 2 }}>{["fuji", "inari", "kinkaku"].map((id) => <SightPhoto key={id} s={SIGHTS.find((x) => x.id === id)!} h={74} radius={0} />)}</div>
         <div className="row" style={{ padding: 12 }}><div className="grow"><div style={{ fontWeight: 800 }}>Japan is famous for… · 名所</div><div className="sm mu">{FAMOUS_FOR.length} things Japan is known for + {SIGHTS.length} top attractions with photos</div></div><ArrowRight size={18} /></div>
       </button>
+      </>)}
       <div className="grid2">
         {pk.culture.map((c) => (
           <button key={c.id} className={"tile " + TONE[c.tone][0]} style={{ boxShadow: "none" }} onClick={() => go("/explore/culture/" + c.id)}>
@@ -94,7 +98,7 @@ function CultureView({ id }: { id: string }) {
   return (
     <div className="screen">
       <Header title={<span className="row" style={{ gap: 10 }}><IconTile name={c.icon} tone={TONE[c.tone][1].slice(6, -1)} size={34} icon={18} />{c.title}</span>} backTo="/explore" />
-      <div className={"card " + TONE[c.tone][0]} style={{ boxShadow: "none" }}><div className="sm" style={{ fontWeight: 600, lineHeight: 1.55 }}>{c.intro}</div><div className="xs mu mt4">Tip: tap any <span className="jp-tap">日本語</span> to hear it.</div></div>
+      <div className={"card " + TONE[c.tone][0]} style={{ boxShadow: "none" }}><div className="sm" style={{ fontWeight: 600, lineHeight: 1.55 }}>{c.intro}</div>{pk.id === "ja" && <div className="xs mu mt4">Tip: tap any <span className="jp-tap">日本語</span> to hear it.</div>}</div>
       {c.items.map((it, i) => (
         <div className="card" key={i} style={{ borderLeft: "4px solid " + TONE[c.tone][1] }}>
           <div style={{ fontWeight: 800, fontSize: 16 }}>{it.title}</div>
@@ -126,12 +130,12 @@ function Roadmap() {
     const m = +daily;
     // words/day scale with time; kana week fixed. Hours from FSI-style estimates for N5.
     const wpd = m <= 15 ? 8 : m <= 30 ? 15 : m <= 60 ? 25 : 35;
-    const kanaDays = m <= 15 ? 21 : m <= 30 ? 14 : 10;
+    const kanaDays = pk.id === "ja" ? (m <= 15 ? 21 : m <= 30 ? 14 : 10) : (m <= 15 ? 10 : m <= 30 ? 7 : 5);
     const wordDays = Math.ceil(Math.max(0, 1000 - p.known.length) / wpd);
-    const n5Days = Math.ceil((400 * 60) / m);
+    const n5Days = Math.ceil(((pk.id === "ja" ? 400 : 180) * 60) / m);
     const fmt = (d: number) => { const dt = new Date(); dt.setDate(dt.getDate() + d); return dt.toLocaleDateString(undefined, { month: "short", year: "numeric" }); };
     return { wpd, kanaDays, wordDays, n5Days, fmt };
-  }, [daily, p.known.length]);
+  }, [daily, p.known.length, pk.id]);
   return (
     <div className="screen">
       <Header title="Roadmap & timeline" sub="Tasks tick automatically as you progress" backTo="/explore" />
@@ -140,12 +144,12 @@ function Roadmap() {
         <div className="sm mu mt4">How much time can you give each day?</div>
         <div className="mt8"><Seg value={daily} options={[["15", "15 min"], ["30", "30 min"], ["60", "1 hour"], ["120", "2 hours"]]} onChange={setDaily} /></div>
         <div className="grid3 mt12">
-          <div className="stat"><div className="v">{plan.kanaDays}d</div><div className="k">Both kana</div></div>
+          <div className="stat"><div className="v">{plan.kanaDays}d</div><div className="k">{pk.id === "ja" ? "Both kana" : "Alphabet & sounds"}</div></div>
           <div className="stat"><div className="v">{plan.wpd}</div><div className="k">New words/day</div></div>
           <div className="stat"><div className="v">{plan.wordDays}d</div><div className="k">To 1,000 words</div></div>
         </div>
-        <div className="sm mt12" style={{ lineHeight: 1.6 }}>At this pace you’ll finish the 1,000-word core around <b>{plan.fmt(plan.kanaDays + plan.wordDays)}</b> and reach JLPT N5 level around <b>{plan.fmt(plan.n5Days)}</b>.</div>
-        <div className="xs mu mt4">Estimates. The US Foreign Service Institute rates Japanese among the hardest languages for English speakers (~2,200 class hours to professional level). Daily consistency matters more than session length.</div>
+        <div className="sm mt12" style={{ lineHeight: 1.6 }}>At this pace you’ll finish the 1,000-word core around <b>{plan.fmt(plan.kanaDays + plan.wordDays)}</b> and reach {pk.id === "ja" ? "JLPT N5" : "A1"} level around <b>{plan.fmt(plan.n5Days)}</b>.</div>
+        <div className="xs mu mt4">Estimates. {pk.id === "ja" ? "The US Foreign Service Institute rates Japanese among the hardest languages for English speakers (~2,200 class hours to professional level)." : "The US Foreign Service Institute rates French among the easiest languages for English speakers (~600–750 class hours to professional level)."} Daily consistency matters more than session length.</div>
       </div>
 
       <div className="section-title"><h2>Phases</h2></div>

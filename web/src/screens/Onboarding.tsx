@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { dayKey, getProgress, setSettings, useSettings } from "../core/store";
 import { checkBadges } from "../core/rewards";
-import { PACKS } from "../packs/registry";
+import { packList } from "../packs/registry";
 import { speak, vibrate } from "../core/native";
 import { Switch, tap } from "../ui/kit";
 import PolicyReader from "./PolicyReader";
@@ -77,7 +77,7 @@ export default function Onboarding() {
     <div className="onb" style={{ justifyContent: "flex-start", paddingTop: 32 }}>
       <Head kicker="Language" title="What do you want to learn?" sub="Japanese is ready. The same engine will power more languages soon." />
       <div className="list mt8">
-        {PACKS.map((pk) => (
+        {packList().map((pk) => (
           <button key={pk.id} className="li" disabled={pk.status !== "ready"} style={{ opacity: pk.status === "ready" ? 1 : .55 }} onClick={() => { tap(); setSettings({ lang: pk.id }); }}>
             <span className="ico soft-gold" style={{ fontSize: 22 }}>{pk.flag}</span>
             <span className="grow"><div className="t">{pk.name} <span className="mu jp" style={{ fontWeight: 500 }}>{pk.native}</span></div><div className="d">{pk.status === "ready" ? pk.tagline : "Coming soon"}</div></span>

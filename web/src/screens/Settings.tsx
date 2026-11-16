@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Check, ChevronRight, Download, Heart, RotateCcw, Volume2 } from "lucide-react";
 import { dayKey, emitUi, resetProgress, setSettings, toast, useSettings } from "../core/store";
 import { appVersion, openTtsSettings, speak, ttsStatus } from "../core/native";
-import { PACKS } from "../packs/registry";
+import { betaOn, packList } from "../packs/registry";
 import { usePack } from "../pack";
 import { go } from "../core/router";
 import { deleteMedia } from "../core/privacy";
@@ -23,9 +23,9 @@ export default function Settings() {
     <div className="screen">
       <Header title="Settings" backTo="/me" />
 
-      <div className="section-title" style={{ marginTop: 6 }}><h2>Language</h2></div>
+      <div className="section-title" style={{ marginTop: 6 }}><h2>Language</h2>{betaOn() && <span className="tag" style={{ background: "var(--ai)", color: "#fff" }}>beta</span>}</div>
       <div className="list">
-        {PACKS.map((x) => (
+        {packList().map((x) => (
           <button key={x.id} className="li" disabled={x.status !== "ready"} style={{ opacity: x.status === "ready" ? 1 : .5 }} onClick={() => { tap(); setSettings({ lang: x.id }); }}>
             <span className="ico soft-gold" style={{ fontSize: 22 }}>{x.flag}</span>
             <span className="grow"><div className="t">{x.name} <span className="jp mu" style={{ fontWeight: 500 }}>{x.native}</span></div><div className="d">{x.status === "ready" ? x.tagline : "Planned - same engine, new content pack"}</div></span>
@@ -47,7 +47,7 @@ export default function Settings() {
       <div className="section-title"><h2>Display</h2></div>
       <div className="list">
         <Row t="Show Hindi (हिन्दी)" d="Meanings and comparisons"><Switch on={s.showHindi} onChange={(v) => setSettings({ showHindi: v })} /></Row>
-        <Row t="Show romaji" d="Turn off once you can read kana"><Switch on={s.showRomaji} onChange={(v) => setSettings({ showRomaji: v })} /></Row>
+        <Row t={pk.id === "ja" ? "Show romaji" : "Show pronunciation"} d={pk.id === "ja" ? "Turn off once you can read kana" : "IPA under each word"}><Switch on={s.showRomaji} onChange={(v) => setSettings({ showRomaji: v })} /></Row>
         <Row t="Vibration" d="Haptic feedback on taps"><Switch on={s.haptics} onChange={(v) => setSettings({ haptics: v })} /></Row>
         <div className="li" style={{ display: "block" }}><div className="t" style={{ marginBottom: 8 }}>Theme</div><Seg value={s.theme} options={[["auto", "Auto"], ["light", "Light"], ["dark", "Dark"]]} onChange={(v) => setSettings({ theme: v })} /></div>
       </div>
@@ -56,10 +56,10 @@ export default function Settings() {
       <div className="list">
         <Row t="Auto-play audio" d="Speak cards and quiz items automatically"><Switch on={s.autoplay} onChange={(v) => setSettings({ autoplay: v })} /></Row>
         <div className="li" style={{ display: "block" }}>
-          <div className="row"><div className="t grow">Speech speed · {s.rate.toFixed(2)}×</div><button className="btn sm" onClick={() => speak("こんにちは、日本語を勉強しましょう。", { lang: pk.ttsLang, rate: s.rate })}><Volume2 size={15} /> Test</button></div>
+          <div className="row"><div className="t grow">Speech speed · {s.rate.toFixed(2)}×</div><button className="btn sm" onClick={() => speak(pk.id === "fr" ? "Bonjour, apprenons le français ensemble." : "こんにちは、日本語を勉強しましょう。", { lang: pk.ttsLang, rate: s.rate })}><Volume2 size={15} /> Test</button></div>
           <input type="range" min={0.5} max={1.3} step={0.05} value={s.rate} onChange={(e) => setSettings({ rate: +e.target.value })} className="mt8" />
         </div>
-        <Row t="Japanese voice" d={tts.native ? (tts.ready ? (tts.voice ? "Installed ✓" : "Not installed - tap to install") : "Starting…") : "Using browser voices"}>
+        <Row t={pk.name + " voice"} d={tts.native ? (tts.ready ? (tts.voice ? "Installed ✓" : "Not installed - tap to install") : "Starting…") : "Using browser voices"}>
           {tts.native && <button className="btn sm" onClick={openTtsSettings}>Open</button>}
         </Row>
       </div>
@@ -106,7 +106,7 @@ export default function Settings() {
 
       <div className="section-title"><h2>About</h2></div>
       <div className="card sm" style={{ lineHeight: 1.6 }}>
-        <div><b>Nihongo Path</b> · v{APP_VERSION} ({appVersion()})</div>
+        <div role="button" onClick={() => { const n = (window as unknown as { __vt?: number }).__vt = ((window as unknown as { __vt?: number }).__vt || 0) + 1; if (n >= 7) { (window as unknown as { __vt?: number }).__vt = 0; const on = !s.beta; setSettings({ beta: on, ...(on ? {} : { lang: "ja" }) }); toast(on ? "Beta languages unlocked: French" : "Beta languages hidden", "ok"); } }}><b>Nihongo Path</b> · v{APP_VERSION} ({appVersion()})</div>
         <button className="mu mt8 xs" style={{ background: "none", border: 0, padding: 0, textDecoration: "underline", color: "var(--ink-3)" }} onClick={() => go("/me/licenses")}>Licences</button>
       </div>
     </div>

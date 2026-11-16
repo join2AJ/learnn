@@ -1,6 +1,10 @@
 /** Shown once after each update ("What's new"). Newest first. */
-export const APP_VERSION = "4.1";
+export const APP_VERSION = "4.2";
 export const CHANGELOG: { v: string; date: string; items: [string, string][] }[] = [
+  { v: "4.2", date: "18 Nov 2026", items: [
+    ["sparkles", "Behind the scenes: the app is now ready for more languages - screens adapt to each course."],
+    ["volume", "Voice settings follow the course language."],
+  ] },
   { v: "4.1", date: "17 Nov 2026", items: [
     ["shield", "Ready for Google Play: updated for Android 16, new back-gesture support, privacy contact added."],
     ["chat", "Feedback, app requests and donation messages now go straight to our email."],

@@ -111,7 +111,7 @@ export default function Speak() {
         <button className="btn grow" onClick={() => go("/lab")}><AudioLines size={16} /> Sound Lab</button>
       </div>
       <div className="card flat mt16 sm mu" style={{ background: "transparent", lineHeight: 1.55 }}>
-        Uses your phone’s speech recognition in Japanese (Google). If it says “not available”, install Japanese in Settings → System → Languages → On-device speech recognition, or check your internet connection.
+        Uses your phone’s speech recognition in {pk.name} (Google). If it says “not available”, install {pk.name} in Settings → System → Languages → On-device speech recognition, or check your internet connection.
       </div>
     </div>
   );

@@ -17,6 +17,7 @@ export interface Settings {
   toured: boolean;
   newIntro?: boolean;
   introMuted?: boolean;
+  beta?: boolean;
   age: string;
   reasons: string[];
   pledge: { min: number; start: string; days: number } | null;
